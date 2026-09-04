@@ -29,7 +29,7 @@
     
     <section class="lado-direito">
         <form class="card-login">
-            <h1>Acesse sua conta</h1>
+            <h1>Crie sua conta</h1>
             <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
         
             <div class="input-box">
@@ -41,7 +41,7 @@
             </div>
                 
             <div class="input-box">
-                <h5>Senha de Acesso</h5>
+                <h5>Crie uma senha</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
                     <input placeholder="••••••••••••" type="password">
@@ -49,18 +49,20 @@
                 </div>
             </div>
 
-            <div class="relembre-esqueci">
-                <label>
-                    <input type="checkbox" checked>
-                    Lembrar-me
-                </label>
-                <a routerLink="/esquecisenha">Esqueci minha senha</a>
+            <div class="input-box">
+                <h5>Confirme sua senha</h5>
+                <div class="campo">
+                    <i class="bx bxs-lock-alt"></i>
+                    <input placeholder="••••••••••••" type="password">
+                    <i class="bx bx-hide olho"></i>
+                </div>
             </div>
             
-            <button type="submit">Login</button>
+            <button type="submit">Criar conta</button>
 
-            <div class="registro-link">
-                <p>Ainda não tem conta? <a routerLink="/cadastro">Cadastre-se</a> </p>
+            <div class="login-link">
+                <p>Já tem uma conta? </p>
+                <p><a routerLink="/">Conecte-se</a> </p>
             </div>
         </form>
     </section>
