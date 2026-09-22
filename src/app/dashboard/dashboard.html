@@ -1,0 +1,190 @@
+<div class="dashboard-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <i class="bx bxs-shield-alt-2"></i>
+      <div>
+        <h4>Secure<span>Desk</span></h4>
+        <p>Central de Serviços</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active">
+        <i class="bx bxs-dashboard"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="bx bxs-tag-alt"></i>
+        <span>Meus Chamados</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="bx bxs-plus-circle"></i>
+        <span>Novo Chamado</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="bx bxs-cog"></i>
+        <span>Configurações</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="usuario-info" *ngIf="usuario">
+        <div class="avatar">{{ usuario.nome.charAt(0).toUpperCase() }}</div>
+        <div class="usuario-detalhes">
+          <span class="usuario-nome">{{ usuario.nome }}</span>
+          <span class="usuario-perfil">{{ getPerfilLabel() }}</span>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()" title="Sair">
+        <i class="bx bx-log-out"></i>
+      </button>
+    </div>
+  </aside>
+
+  <main class="dashboard-main">
+
+    <header class="dash-header">
+      <div>
+        <h1>Painel de Controle</h1>
+        <p class="dash-subtitle">Bem-vindo, <strong>{{ usuario?.nome }}</strong>. Aqui está o resumo atual.</p>
+      </div>
+      <button class="btn-refresh" (click)="carregarMetricas()" title="Atualizar dados">
+        <i class="bx bx-refresh"></i>
+        Atualizar
+      </button>
+    </header>
+
+    <div *ngIf="carregando" class="estado-loading">
+      <div class="spinner"></div>
+      <p>Carregando métricas...</p>
+    </div>
+
+    <div *ngIf="erro && !carregando" class="estado-erro">
+      <i class="bx bxs-error-circle"></i>
+      <p>{{ erro }}</p>
+      <button (click)="carregarMetricas()">Tentar novamente</button>
+    </div>
+
+    <div *ngIf="metricas && !carregando" class="dash-content">
+
+      <section class="kpi-grid">
+
+        <div class="kpi-card kpi-total">
+          <div class="kpi-icon"><i class="bx bxs-collection"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-valor">{{ metricas.totalChamados }}</span>
+            <span class="kpi-label">Total de Chamados</span>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-aberto">
+          <div class="kpi-icon"><i class="bx bxs-inbox"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-valor">{{ metricas.chamadosAbertos }}</span>
+            <span class="kpi-label">Em Aberto</span>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-andamento">
+          <div class="kpi-icon"><i class="bx bxs-hourglass-top"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-valor">{{ metricas.chamadosEmAndamento }}</span>
+            <span class="kpi-label">Em Andamento</span>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-resolvido">
+          <div class="kpi-icon"><i class="bx bxs-check-circle"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-valor">{{ metricas.chamadosResolvidos }}</span>
+            <span class="kpi-label">Resolvidos</span>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-critica">
+          <div class="kpi-icon"><i class="bx bxs-alarm-exclamation"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-valor">{{ metricas.prioridadeAltaCritica }}</span>
+            <span class="kpi-label">Alta / Crítica Prioridade</span>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="secondary-grid">
+
+        <div class="panel">
+          <h2 class="panel-title"><i class="bx bxs-category"></i> Por Categoria</h2>
+          <ul class="categoria-list">
+            <li *ngFor="let cat of metricas.porCategoria" class="categoria-item">
+              <span class="cat-nome">{{ cat.categoriaNome }}</span>
+              <div class="bar-wrapper">
+                <div
+                  class="bar-fill"
+                  [style.width.%]="(cat.total / metricas.totalChamados) * 100"
+                ></div>
+              </div>
+              <span class="cat-total">{{ cat.total }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title"><i class="bx bxs-flag-alt"></i> Por Prioridade</h2>
+          <ul class="prioridade-list">
+            <li *ngFor="let p of metricas.porPrioridade" class="prioridade-item">
+              <span class="badge-prioridade {{ getPrioridadeClass(p.prioridade) }}">{{ p.prioridade }}</span>
+              <span class="p-total">{{ p.total }} chamado{{ p.total !== 1 ? 's' : '' }}</span>
+            </li>
+          </ul>
+        </div>
+
+      </section>
+
+      <section class="panel panel-wide">
+        <h2 class="panel-title"><i class="bx bx-time"></i> Chamados Recentes</h2>
+
+        <div class="tabela-wrapper">
+          <table class="tabela-chamados">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Título</th>
+                <th>Categoria</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th>Técnico</th>
+                <th>Abertura</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of metricas.recentes">
+                <td class="id-col">#{{ c.id }}</td>
+                <td class="titulo-col">{{ c.titulo }}</td>
+                <td>{{ c.categoriaNome ?? '—' }}</td>
+                <td>
+                  <span class="badge-prioridade {{ getPrioridadeClass(c.prioridade) }}">
+                    {{ c.prioridade }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-status {{ getStatusClass(c.status) }}">
+                    {{ c.status }}
+                  </span>
+                </td>
+                <td>{{ c.tecnicoNome ?? 'Não atribuído' }}</td>
+                <td>{{ c.dataAbertura | date:'dd/MM/yy HH:mm' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="ultima-atualizacao">
+          Última atualização: {{ metricas.geradoEm | date:'dd/MM/yyyy HH:mm:ss' }}
+        </p>
+      </section>
+
+    </div>
+  </main>
+</div>

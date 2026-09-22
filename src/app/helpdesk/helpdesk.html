@@ -28,15 +28,28 @@
     
     
     <section class="lado-direito">
-        <form class="card-login">
+        <form class="card-login" (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
             <h1>Acesse sua conta</h1>
             <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
         
+            <div *ngIf="erroMensagem" class="alerta-erro" role="alert">
+                <i class="bx bxs-error-circle"></i>
+                {{ erroMensagem }}
+            </div>
+
             <div class="input-box">
                 <h5>E-mail institucional</h5>
                 <div class="campo">
-                    <i class="bx bxs-envelope" ></i>
-                    <input placeholder="exemplo@empresa.com" type="email">
+                    <i class="bx bxs-envelope"></i>
+                    <input
+                        id="email"
+                        name="email"
+                        [(ngModel)]="email"
+                        placeholder="exemplo@empresa.com"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
                 </div>
             </div>
                 
@@ -44,20 +57,31 @@
                 <h5>Senha de Acesso</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
-                    <input placeholder="••••••••••••" type="password">
+                    <input
+                        id="senha"
+                        name="senha"
+                        [(ngModel)]="senha"
+                        placeholder="••••••••••••"
+                        type="password"
+                        autocomplete="current-password"
+                        required
+                    >
                     <i class="bx bx-hide olho"></i>
                 </div>
             </div>
 
             <div class="relembre-esqueci">
                 <label>
-                    <input type="checkbox" checked>
+                    <input type="checkbox" name="lembrar" [(ngModel)]="lembrar">
                     Lembrar-me
                 </label>
                 <a routerLink="/esquecisenha">Esqueci minha senha</a>
             </div>
             
-            <button type="submit">Login</button>
+            <button type="submit" [disabled]="carregando">
+                <span *ngIf="!carregando">Login</span>
+                <span *ngIf="carregando">Entrando...</span>
+            </button>
 
             <div class="registro-link">
                 <p>Ainda não tem conta? <a routerLink="/cadastro">Cadastre-se</a> </p>

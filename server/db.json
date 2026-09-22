@@ -1,0 +1,298 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nome": "João Silva",
+      "email": "joao.silvia@empresa.com",
+      "senha": "123456",
+      "perfil": "cliente",
+      "status": "Ativo"
+    },
+    {
+      "id": 2,
+      "nome": "Fernanda Souza",
+      "email": "fernanda.souza@empresa.com",
+      "senha": "123456",
+      "perfil": "tecnico",
+      "status": "Ativo"
+    },
+    {
+      "id": 3,
+      "nome": "Administrador",
+      "email": "carlos.lima@empresa.com",
+      "senha": "123456",
+      "perfil": "admin",
+      "status": "Ativo"
+    }
+  ],
+  "categorias": [
+    {
+      "id": 1,
+      "nome": "Hardware",
+      "descricao": "Problemas relacionados a equipamentos físicos",
+      "status": "Ativa"
+    },
+    {
+      "id": 2,
+      "nome": "Software",
+      "descricao": "Problemas relacionados a programas e sistemas",
+      "status": "Ativa"
+    },
+    {
+      "id": 3,
+      "nome": "Rede",
+      "descricao": "Problemas de conectividade e internet",
+      "status": "Ativa"
+    },
+    {
+      "id": 4,
+      "nome": "E-mail",
+      "descricao": "Problemas com e-mail e contas",
+      "status": "Ativa"
+    },
+    {
+      "id": 5,
+      "nome": "Acesso",
+      "descricao": "Acesso a sistemas e permissões",
+      "status": "Ativa"
+    }
+  ],
+  "equipamentos": [
+    {
+      "id": 1,
+      "tipo": "Notebook",
+      "nome": "Acer Nitro 5",
+      "patrimonio": "PAT-00125",
+      "usuarioId": 1,
+      "status": "Ativo"
+    },
+    {
+      "id": 2,
+      "tipo": "Desktop",
+      "nome": "Dell OptiPlex 3090",
+      "patrimonio": "PAT-00112",
+      "usuarioId": 1,
+      "status": "Ativo"
+    },
+    {
+      "id": 3,
+      "tipo": "Monitor",
+      "nome": "LG 24",
+      "patrimonio": "PAT-00098",
+      "usuarioId": 3,
+      "status": "Ativo"
+    }
+  ],
+  "chamados": [
+    {
+      "id": 1,
+      "titulo": "Notebook não inicia",
+      "descricao": "O notebook não está iniciando corretamente.",
+      "solicitanteId": 1,
+      "tecnicoId": 2,
+      "categoriaId": 1,
+      "equipamentoId": 1,
+      "prioridade": "Alta",
+      "status": "EM ATENDIMENTO",
+      "dataAbertura": "2026-09-01T08:00:00.000Z",
+      "dataEncerramento": null
+    },
+    {
+      "id": 2,
+      "titulo": "Problema de acesso ao sistema",
+      "descricao": "Usuário não consegue acessar o sistema interno da empresa.",
+      "solicitanteId": 1,
+      "tecnicoId": 2,
+      "categoriaId": 5,
+      "equipamentoId": null,
+      "prioridade": "Média",
+      "status": "EM ANÁLISE",
+      "dataAbertura": "2026-09-05T09:30:00.000Z",
+      "dataEncerramento": null
+    },
+    {
+      "id": 3,
+      "titulo": "Computador sem conexão com a internet",
+      "descricao": "O computador está conectado à rede, mas não possui acesso à internet.",
+      "solicitanteId": 3,
+      "tecnicoId": null,
+      "categoriaId": 3,
+      "equipamentoId": null,
+      "prioridade": "Crítica",
+      "status": "ABERTO",
+      "dataAbertura": "2026-09-10T14:00:00.000Z",
+      "dataEncerramento": null
+    },
+    {
+      "id": 4,
+      "titulo": "Impressora travada",
+      "descricao": "A impressora do RH travou papel.",
+      "solicitanteId": 1,
+      "tecnicoId": 2,
+      "categoriaId": 1,
+      "equipamentoId": 1,
+      "prioridade": "Alta",
+      "status": "ENCERRADO",
+      "dataAbertura": "2026-09-21T21:39:49.200Z",
+      "dataEncerramento": "2026-09-21T21:39:49.341Z"
+    }
+  ],
+  "historico": [
+    {
+      "id": 1,
+      "chamadoId": 1,
+      "usuarioId": 1,
+      "statusAnterior": null,
+      "statusNovo": "ABERTO",
+      "observacao": "Chamado aberto pelo usuário.",
+      "dataEvento": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "chamadoId": 1,
+      "usuarioId": 2,
+      "statusAnterior": "ABERTO",
+      "statusNovo": "EM ANÁLISE",
+      "observacao": "Chamado recebido para análise.",
+      "dataEvento": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "chamadoId": 1,
+      "usuarioId": 2,
+      "statusAnterior": "EM ANÁLISE",
+      "statusNovo": "EM ATENDIMENTO",
+      "observacao": "Atendimento iniciado pelo técnico.",
+      "dataEvento": "2026-09-02T08:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "chamadoId": 2,
+      "usuarioId": 1,
+      "statusAnterior": null,
+      "statusNovo": "ABERTO",
+      "observacao": "Chamado aberto pelo usuário.",
+      "dataEvento": "2026-09-05T09:30:00.000Z"
+    },
+    {
+      "id": 5,
+      "chamadoId": 2,
+      "usuarioId": 2,
+      "statusAnterior": "ABERTO",
+      "statusNovo": "EM ANÁLISE",
+      "observacao": "Chamado em análise pelo técnico.",
+      "dataEvento": "2026-09-05T11:00:00.000Z"
+    },
+    {
+      "id": 6,
+      "chamadoId": 3,
+      "usuarioId": 3,
+      "statusAnterior": null,
+      "statusNovo": "ABERTO",
+      "observacao": "Chamado aberto pelo administrador.",
+      "dataEvento": "2026-09-10T14:00:00.000Z"
+    },
+    {
+      "id": 7,
+      "chamadoId": 4,
+      "usuarioId": 1,
+      "statusAnterior": null,
+      "statusNovo": "ABERTO",
+      "observacao": "Chamado aberto.",
+      "dataEvento": "2026-09-21T21:39:49.200Z"
+    },
+    {
+      "id": 8,
+      "chamadoId": 4,
+      "usuarioId": 3,
+      "statusAnterior": "ABERTO",
+      "statusNovo": "EM ANÁLISE",
+      "observacao": null,
+      "dataEvento": "2026-09-21T21:39:49.238Z"
+    },
+    {
+      "id": 9,
+      "chamadoId": 4,
+      "usuarioId": 3,
+      "statusAnterior": "EM ANÁLISE",
+      "statusNovo": "EM ATENDIMENTO",
+      "observacao": null,
+      "dataEvento": "2026-09-21T21:39:49.267Z"
+    },
+    {
+      "id": 10,
+      "chamadoId": 4,
+      "usuarioId": 3,
+      "statusAnterior": "EM ATENDIMENTO",
+      "statusNovo": "RESOLVIDO",
+      "observacao": null,
+      "dataEvento": "2026-09-21T21:39:49.303Z"
+    },
+    {
+      "id": 11,
+      "chamadoId": 4,
+      "usuarioId": 3,
+      "statusAnterior": "RESOLVIDO",
+      "statusNovo": "ENCERRADO",
+      "observacao": null,
+      "dataEvento": "2026-09-21T21:39:49.341Z"
+    }
+  ],
+  "comentarios": [
+    {
+      "id": 1,
+      "chamadoId": 1,
+      "usuarioId": 1,
+      "comentario": "O problema começou após uma atualização do sistema.",
+      "dataCriacao": "2026-09-01T08:10:00.000Z"
+    },
+    {
+      "id": 2,
+      "chamadoId": 1,
+      "usuarioId": 2,
+      "comentario": "Estou verificando o equipamento e o processo de inicialização.",
+      "dataCriacao": "2026-09-01T10:05:00.000Z"
+    },
+    {
+      "id": 3,
+      "chamadoId": 2,
+      "usuarioId": 1,
+      "comentario": "Já tentei redefinir minha senha, mas continuo sem acesso.",
+      "dataCriacao": "2026-09-05T09:40:00.000Z"
+    },
+    {
+      "id": 4,
+      "chamadoId": 2,
+      "usuarioId": 2,
+      "comentario": "Vou verificar as permissões de acesso do usuário.",
+      "dataCriacao": "2026-09-05T11:05:00.000Z"
+    },
+    {
+      "id": 5,
+      "chamadoId": 3,
+      "usuarioId": 3,
+      "comentario": "A conexão parou de funcionar durante o expediente.",
+      "dataCriacao": "2026-09-10T14:10:00.000Z"
+    },
+    {
+      "id": 6,
+      "chamadoId": 4,
+      "usuarioId": 3,
+      "usuarioNome": "Administrador",
+      "comentario": "Problema solucionado com sucesso.",
+      "dataCriacao": "2026-09-21T21:39:49.369Z"
+    }
+  ],
+  "tokens": [
+    {
+      "token": "e57c1700-e41c-43fa-beaa-efb2113f56cb",
+      "usuarioId": 3,
+      "criadoEm": "2026-09-21T21:39:49.123Z"
+    },
+    {
+      "token": "c83ad129-02da-4d73-8170-3037076a65d9",
+      "usuarioId": 1,
+      "criadoEm": "2026-09-21T21:39:49.164Z"
+    }
+  ]
+}
