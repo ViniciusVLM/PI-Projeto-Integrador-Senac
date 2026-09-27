@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont/dist/tabler-icons.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <title>Dashboard</title>
+</head>
+<body>
+    <main class="container-dash">
+        <section class="lado-esquerdo-dash">
+            <div class="logo">
+                <i class="bx bxs-shield-alt-2"></i>
+                <div>
+                    <h3>Secure<span>Desk</span></h3>
+                    <p>Sistemas de Chamado de TI</p>
+                </div>
+            </div>
+
+            <nav class="menuItems">
+                <a href="#" class="menuItem">
+                    <i class="ti ti-layout-dashboard"></i>
+                    <h4>Dashboard</h4>
+                </a>
+                <a href="#" class="menuItem">
+                    <i class="ti ti-ticket"></i>
+                    <h4>Chamados</h4>
+                </a>
+                <a href="#" class="menuItem">
+                    <i class="ti ti-users"></i>
+                    <h4>Usuários</h4>
+                </a>
+                <a href="#" class="menuItem">
+                    <i class="ti ti-cpu"></i>
+                    <h4>Equipamentos</h4>
+                </a>
+                <a href="#" class="menuItem">
+                    <i class="ti ti-tags"></i>
+                    <h4>Categorias</h4>
+                </a>
+                <a href="#" class="menuItem">
+                    <i class="ti ti-chart-dots"></i>
+                    <h4>Relatórios</h4>
+                </a>
+                <a href="#" class="menuItem">
+                    <i class="ti ti-settings"></i>
+                    <h4>Configurações</h4>
+                </a>
+            </nav>
+            <footer>
+                <div class="user-info">
+                    <i class="ti ti-users"></i>
+                    <div class="user-text">
+                        <h4>Nome do Usuário</h4>
+                        <p>Técnico de TI</p>
+                    </div>
+                </div>
+            </footer>
+        </section>
+
+        <section class="lado-direito-dash">
+            <header>
+                <div class="supDireita">
+                    <h1>Olá, Usuário! </h1>
+                    <p>Central de Atendimento Técnica - Visão Geral dos Chamados </p>
+                </div>
+                <div class="cardPeriodo">
+                    <i class="ti ti-calendar"></i>
+                    <h4>Quantidade do período</h4>
+                    <i class="ti ti-chevron-down"></i>
+                </div>
+            </header>
+
+            <div class="cards-row">
+                <div class="card-abertos">
+                    <p>Abertos</p>
+                    <h3>N°</h3>
+                    <span class="dot-indicator dot-verde"></span>
+                </div>
+                <div class="card-andamento">
+                    <p>Em andamento</p>
+                    <h3>N°</h3>
+                    <span class="dot-indicator dot-amarelo"></span>
+                </div>
+                <div class="card-resolvidos">
+                    <p>Resolvidos</p>
+                    <h3>N°</h3>
+                    <span class="dot-indicator dot-azul"></span>
+                </div>
+                <div class="card-aguardando">
+                    <p>Aguardando usuário</p>
+                    <h3>N°</h3>
+                    <span class="dot-indicator dot-vermelho"></span>
+                </div>
+            </div>
+
+            <div class="cards-row-2">
+                <div class="card-status">
+                    <h4>Chamados por Status</h4>
+                    <div class="status-body">
+                        <div class="donut-wrapper">
+                            <svg viewBox="0 0 120 120" class="donut-chart">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#eef1f5" stroke-width="16"/>
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#2563eb" stroke-width="16"
+                                    stroke-dasharray="78.54 314.16" stroke-dashoffset="0"
+                                    transform="rotate(-90 60 60)"/>
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="16"
+                                    stroke-dasharray="78.54 314.16" stroke-dashoffset="-78.54"
+                                    transform="rotate(-90 60 60)"/>
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#eab308" stroke-width="16"
+                                    stroke-dasharray="78.54 314.16" stroke-dashoffset="-157.08"
+                                    transform="rotate(-90 60 60)"/>
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#ef4444" stroke-width="16"
+                                    stroke-dasharray="78.54 314.16" stroke-dashoffset="-235.62"
+                                    transform="rotate(-90 60 60)"/>
+                            </svg>
+                            <div class="donut-center">
+                                <h2>N°</h2>
+                                <p>Total</p>
+                            </div>
+                        </div>
+                        <ul class="status-legend">
+                            <li><span class="dot dot-azul"></span>Resolvidos<b>N°</b></li>
+                            <li><span class="dot dot-verde"></span>Abertos<b>N°</b></li>
+                            <li><span class="dot dot-amarelo"></span>Em andamento<b>N°</b></li>
+                            <li><span class="dot dot-vermelho"></span>Aguardando usuário<b>N°</b></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-prioridade">
+                    <h4>Chamados por Prioridade</h4>
+                    <div class="bars-wrapper">
+                        <div class="bar-item">
+                            <span class="bar-value">N°</span>
+                            <div class="bar" style="height:56px; background:#2563eb;"></div>
+                            <p>Baixa</p>
+                        </div>
+                        <div class="bar-item">
+                            <span class="bar-value">N°</span>
+                            <div class="bar" style="height:90px; background:#eab308;"></div>
+                            <p>Média</p>
+                        </div>
+                        <div class="bar-item">
+                            <span class="bar-value">N°</span>
+                            <div class="bar" style="height:110px; background:#f97316;"></div>
+                            <p>Alta</p>
+                        </div>
+                        <div class="bar-item">
+                            <span class="bar-value">N°</span>
+                            <div class="bar" style="height:38px; background:#ef4444;"></div>
+                            <p>Crítica</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-chamados-recentes">
+                <div class="chamados-header">
+                    <h4>Chamados Recentes</h4>
+                    <a href="#">Ver todos os chamados</a>
+                </div>
+
+                <table class="tabela-chamados">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>TÍTULO DO INCIDENTE</th>
+                            <th>SOLICITANTE</th>
+                            <th>PRIORIDADE</th>
+                            <th>STATUS</th>
+                            <th>ATUALIZAÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="#">N° chamado</a></td>
+                            <td>Descrição do incidente</td>
+                            <td>Nome do colaborador</td>
+                            <td><span class="badge badge-alta">● Alta</span></td>
+                            <td><span class="badge badge-andamento">Em andamento</span></td>
+                            <td>Há ** min</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#">#N° chamado</a></td>
+                            <td>Descrição do incidente</td>
+                            <td>Nome do colaborador</td>
+                            <td><span class="badge badge-critica">● Crítica</span></td>
+                            <td><span class="badge badge-aberto">Aberto</span></td>
+                            <td>Há ** min</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#">#N° chamado</a></td>
+                            <td>Descrição do incidente</td>
+                            <td>Nome do colaborador</td>
+                            <td><span class="badge badge-baixa">● Baixa</span></td>
+                            <td><span class="badge badge-resolvido">Resolvido</span></td>
+                            <td>Há ** hora</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#">#N° chamado</a></td>
+                            <td>Descrição do incidente</td>
+                            <td>Nome do colaborador</td>
+                            <td><span class="badge badge-media">● Média</span></td>
+                            <td><span class="badge badge-aguardando">Aguardando usuário</span></td>
+                            <td>Há ** horas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+</body>
+</html>
