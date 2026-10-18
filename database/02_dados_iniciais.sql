@@ -1,4 +1,4 @@
-INSERT INTO Perfis (Nome, Descrição)
+INSERT INTO Perfis (Nome, Descricao)
 VALUES
 ('Usuário', 'Pode abrir e acompanhar chamados'),
 ('Técnico', 'Pode atender e resolver chamados'),
@@ -20,9 +20,10 @@ INSERT INTO Prioridades (Nome)
 VALUES
 ('Baixa'),
 ('Média'),
-('Alta');
-SELECT * FROM Prioridades; 
+('Alta'),
+('Crítica');
 
+SELECT * FROM Prioridades; 
 
 INSERT INTO Status_Chamados (Nome)
 VALUES
@@ -31,7 +32,9 @@ VALUES
 ('Em atendimento'),
 ('Aguardando usuário'),
 ('Resolvido'),
-('Reaberto');
+('Reaberto'),
+('Encerrado'),
+('Cancelado');
 SELECT * FROM Status_Chamados;
 
 
@@ -95,10 +98,6 @@ VALUES
 );
 
 SELECT * FROM Chamados;
-
-UPDATE Chamados
-SET Equipamento_Id = NULL
-WHERE Id = 3;
 
 INSERT INTO Historico_Chamados (
     Chamado_Id,

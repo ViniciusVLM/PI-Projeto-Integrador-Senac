@@ -1,5 +1,5 @@
--- LISTAR USUARIOS COM SEUS PERFIS
-SELECT 
+-- 1. LISTAR USUARIOS COM SEUS PERFIS
+SELECT
     Usuarios.Id,
     Usuarios.Nome,
     Usuarios.Email,
@@ -10,8 +10,8 @@ INNER JOIN Perfis
     ON Usuarios.Perfil_Id = Perfis.Id;
 
 
--- LISTAR EQUIPAMENTOS COM O USUARIO RESPONSAVEL
-SELECT 
+-- 2. LISTAR EQUIPAMENTOS COM O USUARIO RESPONSAVEL
+SELECT
     Equipamentos.Id,
     Equipamentos.Tipo,
     Equipamentos.Nome,
@@ -23,7 +23,7 @@ LEFT JOIN Usuarios
     ON Equipamentos.Usuario_Id = Usuarios.Id;
 
 
--- LISTAR CHAMADOS COM CATEGORIA, PRIORIDADE E STATUS
+-- 3. LISTAR CHAMADOS COM CATEGORIA, PRIORIDADE E STATUS
 SELECT
     Chamados.Id,
     Chamados.Titulo,
@@ -40,7 +40,7 @@ INNER JOIN Status_Chamados
     ON Chamados.Status_Id = Status_Chamados.Id;
 
 
--- LISTAR CHAMADOS DE ALTA PRIORIDADE
+-- 4. LISTAR CHAMADOS DE ALTA OU CRITICA PRIORIDADE
 SELECT
     Chamados.Id,
     Chamados.Titulo,
@@ -48,10 +48,10 @@ SELECT
 FROM Chamados
 INNER JOIN Prioridades
     ON Chamados.Prioridade_Id = Prioridades.Id
-WHERE Prioridades.Nome = 'Alta';
+WHERE Prioridades.Nome IN ('Alta', 'Crítica');
 
 
--- LISTAR CHAMADOS EM ABERTO
+-- 5. LISTAR CHAMADOS EM ABERTO
 SELECT
     Chamados.Id,
     Chamados.Titulo,
@@ -62,15 +62,19 @@ INNER JOIN Status_Chamados
 WHERE Status_Chamados.Nome = 'Aberto';
 
 
--- CONTAR QUANTOS CHAMADOS EXISTEM
+-- 6. CONTAR QUANTOS CHAMADOS EXISTEM
 SELECT COUNT(*) AS Total_Chamados
 FROM Chamados;
 
--- CONTAR CHAMADOS POR STATUS
+
+-- 7. CONTAR CHAMADOS POR STATUS
 SELECT
     Status_Chamados.Nome AS Status,
     COUNT(Chamados.Id) AS Quantidade
 FROM Status_Chamados
 LEFT JOIN Chamados
     ON Status_Chamados.Id = Chamados.Status_Id
-GROUP BY Status_Chamados.Nome;
+GROUP BY
+    Status_Chamados.Id,
+    Status_Chamados.Nome
+ORDER BY Quantidade DESC;
