@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-dashboard',
-  imports: [],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
-})
-export class Dashboard {}
-=======
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -118,4 +107,3 @@ export class Dashboard implements OnInit {
     return mapa[prioridade] ?? '';
   }
 }
->>>>>>> main
