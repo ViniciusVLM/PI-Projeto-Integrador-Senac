@@ -4,6 +4,9 @@ import { Helpdesk } from './helpdesk/helpdesk';
 import { Esquecisenha } from './helpdesk/esquecisenha/esquecisenha';
 import { Dashboard } from './dashboard/dashboard';
 import { authGuard } from './core/guards/auth.guard';
+import { Chamados } from './chamados/chamados';
+import { Novochamado } from './novochamado/novochamado';
+import { DetalhesChamados } from './detalheschamados/detalheschamados';
 
 export const routes: Routes = [
   { path: '', component: Helpdesk },
@@ -15,4 +18,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   { path: '**', redirectTo: '' },
+  { path: 'chamados', component: Chamados, canActivate: [authGuard] },
+  { path: 'novochamado', component: Novochamado, canActivate: [authGuard] },
+  { path: 'detalhes-chamados/:id', component: DetalhesChamados, canActivate: [authGuard] },
 ];
