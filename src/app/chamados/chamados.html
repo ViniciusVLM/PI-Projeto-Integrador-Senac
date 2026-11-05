@@ -1,0 +1,127 @@
+<main class="container-dash">
+    <!-- SIDEBAR -->
+    <section class="lado-esquerdo-dash">
+        <div class="logo">
+            <i class="bx bxs-shield-alt-2"></i>
+            <div>
+                <h3>Secure<span>Desk</span></h3>
+                <p>Sistemas de Chamado de TI</p>
+            </div>
+        </div>
+
+        <nav class="menuItems">
+            <a routerLink="/dashboard" routerLinkActive="active" class="menuItem">
+                <i class="ti ti-layout-dashboard"></i>
+                <h4>Dashboard</h4>
+            </a>
+            <a routerLink="/chamados" routerLinkActive="active" class="menuItem">
+                <i class="ti ti-ticket"></i>
+                <h4>Chamados</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-users"></i>
+                <h4>Usuários</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-cpu"></i>
+                <h4>Equipamentos</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-tags"></i>
+                <h4>Categorias</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-chart-dots"></i>
+                <h4>Relatórios</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-settings"></i>
+                <h4>Configurações</h4>
+            </a>
+        </nav>
+
+        <footer>
+            <div class="user-info">
+                <i class="ti ti-users"></i>
+                <div class="user-text">
+                    <h4>Fernanda Souza</h4>
+                    <p>Técnico de TI</p>
+                </div>
+            </div>
+        </footer>
+    </section>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <section class="lado-direito-dash">
+        <div class="cabecalho">
+            <div>
+                <h1>Chamados de TI</h1>
+                <p class="subtitulo">Gerencie e acompanhe todos os incidentes e solicitações de suporte.</p>
+            </div>
+
+            <div class="acoes-topo">
+                <label class="busca">
+                    <i class="ti ti-search"></i>
+                    <input type="text" placeholder="Pesquisar chamados..." [(ngModel)]="busca" (ngModelChange)="buscar()">
+                </label>
+                <button type="button" class="btn btn-filtro">
+                    <i class="ti ti-filter"></i>
+                    Filtros
+                </button>
+                <a routerLink="/novochamado" class="btn btn-novo">
+                    <i class="ti ti-plus"></i>
+                    Novo chamado
+                </a>
+            </div>
+        </div>
+
+        <div class="card-tabela">
+            @if (erro) { <p class="erro-msg">{{ erro }}</p> }
+            @if (carregando) { <p class="erro-msg">Carregando...</p> }
+
+            <div class="tabela-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título do incidente</th>
+                            <th>Solicitante</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Técnico</th>
+                            <th>Atualizado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (c of paginados; track c.id) {
+                            <tr>
+                                <td class="id-chamado"><a [routerLink]="['/detalhes-chamados', c.id]">#{{ c.id }}</a></td>
+                                <td class="titulo-chamado"><a [routerLink]="['/detalhes-chamados', c.id]">{{ c.titulo }}</a></td>
+                                <td>{{ c.solicitanteNome || '—' }}</td>
+                                <td><span class="badge prioridade" [class]="'badge prioridade ' + prioridadeClasse(c.prioridade)">{{ c.prioridade }}</span></td>
+                                <td><span [class]="'badge ' + statusClasse(c.status)">{{ c.status }}</span></td>
+                                <td>{{ c.tecnicoNome || 'Aguardando Atrib.' }}</td>
+                                <td>{{ tempoRelativo(c.dataAtualizacao || c.dataAbertura) }}</td>
+                            </tr>
+                        } @empty {
+                            @if (!carregando) {
+                                <tr><td colspan="7">Nenhum chamado encontrado.</td></tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="rodape-tabela">
+                <span>Mostrando <strong>{{ inicio }}-{{ fim }}</strong> de <strong>{{ filtrados.length }}</strong> chamados</span>
+                <div class="paginacao">
+                    <button type="button" (click)="irPara(pagina - 1)"><i class="ti ti-chevron-left"></i></button>
+                    @for (p of paginas; track p) {
+                        <button type="button" [class.atual]="p === pagina" (click)="irPara(p)">{{ p }}</button>
+                    }
+                    <button type="button" (click)="irPara(pagina + 1)"><i class="ti ti-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

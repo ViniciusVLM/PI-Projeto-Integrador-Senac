@@ -1,0 +1,432 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Reset: remove margens/paddings padrão e padroniza a fonte */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+/* Layout geral: sidebar + conteúdo lado a lado */
+.container-dash {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* ---------- SIDEBAR ---------- */
+.lado-esquerdo-dash {
+    flex: 0 0 270px;
+    background-color: #0c1c3a;
+    color: #fff;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.logo i {
+    font-size: 22px;
+    background: #2f6bff;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.logo h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.logo p {
+    font-size: 10px;
+    color: #7fb0ff;
+    white-space: nowrap;
+}
+
+.menuItems {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Item do menu: sem fundo; destaque azul apenas no hover */
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    text-decoration: none;
+    color: #c7d3e3;
+    font-size: 14px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menuItem:hover {
+    background: linear-gradient(90deg, #1650b8, #3b82f6);
+    color: #fff;
+}
+
+.menuItem i {
+    font-size: 17px;
+}
+
+.menuItem h4 {
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* Empurra o bloco do usuário para o fim da sidebar */
+.lado-esquerdo-dash footer {
+    margin-top: auto;
+    padding-top: 30px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 25px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+}
+
+.user-info i {
+    font-size: 22px;
+    color: #fff;
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-text h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.user-text p {
+    margin: 0;
+    font-size: 11px;
+    color: #8fa1bd;
+    white-space: nowrap;
+}
+
+/* ---------- CONTEÚDO ---------- */
+.lado-direito-dash {
+    flex: 1;
+    background: #eaf1f8;
+    padding: 24px 28px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Barra superior: voltar à esquerda, ações à direita */
+.barra-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.link-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f4aa8;
+    text-decoration: none;
+}
+
+.link-voltar:hover {
+    text-decoration: underline;
+}
+
+/* Botões (mesmo padrão da tela de listagem) */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-filtro {
+    color: #0f172a;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-filtro:hover {
+    background: #f1f5f9;
+}
+
+.btn-novo {
+    color: #fff;
+    background: #0f4aa8;
+    border: none;
+}
+
+.btn-novo:hover {
+    background: #0c3d8c;
+}
+
+/* Título do chamado + etiquetas na mesma linha */
+.titulo-detalhe {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.titulo-detalhe h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.categoria {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+/* ---------- BADGES (mesmas cores da listagem) ---------- */
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.prioridade {
+    border-radius: 6px;
+}
+
+.prioridade::before {
+    content: "•";
+    margin-right: 4px;
+}
+
+.alta { background: #ffedd5; color: #ea580c; }
+.status-andamento { background: #fef3c7; color: #a16207; }
+
+/* ---------- GRADE E CARDS ---------- */
+/* Coluna principal (esquerda) + histórico (direita) */
+.grade-detalhe {
+    flex: 1; /* ocupa toda a altura restante da tela */
+    display: grid;
+    grid-template-columns: 1fr 320px; /* principal ocupa o espaço livre, histórico fixo */
+    gap: 20px;
+    align-items: stretch; /* cards vão até o fim da tela */
+}
+
+.coluna-principal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.card h2 {
+    margin-bottom: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+/* Lista de informações: rótulo à esquerda, valor à direita */
+.lista-info {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    row-gap: 10px;
+}
+
+.lista-info dt {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.lista-info dd {
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f172a;
+}
+
+/* ---------- ABAS E DESCRIÇÃO ---------- */
+.abas {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.aba {
+    padding-bottom: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+}
+
+.aba.ativa {
+    color: #0f4aa8;
+    border-bottom-color: #0f4aa8;
+}
+
+.card-descricao {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.texto-descricao {
+    flex: 1; /* empurra o campo de resposta para o rodapé do card */
+}
+
+.texto-descricao p {
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #475569;
+}
+
+/* ---------- CAMPO DE RESPOSTA ---------- */
+.resposta {
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.resposta input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    font-size: 13px;
+    color: #0f172a;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resposta input:focus {
+    border-color: #2f6bff;
+    box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
+}
+
+.resposta input::placeholder {
+    color: #94a3b8;
+}
+
+.resposta-acoes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.anexar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+    text-decoration: none;
+}
+
+.anexar:hover {
+    color: #0f4aa8;
+}
+
+/* ---------- HISTÓRICO (linha do tempo) ---------- */
+.linha-tempo {
+    list-style: none;
+}
+
+.linha-tempo li {
+    position: relative;
+    padding: 0 0 20px 20px;
+}
+
+/* Marcador de cada atividade */
+.linha-tempo li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e1;
+}
+
+.linha-tempo li.atual::before {
+    background: #0f4aa8;
+}
+
+.linha-tempo p {
+    font-size: 13px;
+    color: #475569;
+}
+
+.linha-tempo strong {
+    color: #0f172a;
+}
+
+.linha-tempo span {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* ---------- RESPONSIVO ---------- */
+/* Telas menores: sidebar vai para o topo e o histórico desce */
+@media (max-width: 900px) {
+    .container-dash {
+        flex-direction: column;
+    }
+
+    .lado-esquerdo-dash {
+        flex: none;
+    }
+
+    .grade-detalhe {
+        grid-template-columns: 1fr;
+    }
+}
