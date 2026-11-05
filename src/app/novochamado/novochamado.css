@@ -1,0 +1,360 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Reset: remove margens/paddings padrão e padroniza a fonte */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+/* Layout geral: sidebar + conteúdo lado a lado */
+.container-dash {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* ---------- SIDEBAR ---------- */
+/* ---------- SIDEBAR ---------- */
+.lado-esquerdo-dash {
+    flex: 0 0 270px;
+    background-color: #0c1c3a;
+    color: #fff;
+    padding: 20px 10px; /* espaço no topo (logo) e no rodapé (usuário) */
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.logo i {
+    font-size: 22px;
+    background: #2f6bff;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.logo h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.logo p {
+    font-size: 10px;
+    color: #7fb0ff;
+    white-space: nowrap;
+}
+
+.menuItems {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Item do menu: sem fundo; destaque azul apenas no hover */
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    text-decoration: none;
+    color: #c7d3e3;
+    font-size: 14px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menuItem:hover {
+    background: linear-gradient(90deg, #1650b8, #3b82f6);
+    color: #fff;
+}
+
+.menuItem i {
+    font-size: 17px;
+}
+
+.menuItem h4 {
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* Empurra o bloco do usuário para o fim da sidebar */
+.lado-esquerdo-dash footer {
+    margin-top: auto;
+    padding-top: 30px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 25px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+}
+
+.user-info i {
+    font-size: 22px;
+    color: #fff;
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-text h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.user-text p {
+    margin: 0;
+    font-size: 11px;
+    color: #8fa1bd;
+    white-space: nowrap;
+}
+
+/* ---------- CONTEÚDO ---------- */
+.lado-direito-dash {
+    flex: 1;
+    background: #eaf1f8;
+    padding: 24px 28px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column; /* link no topo, card ocupa o resto da altura */
+}
+
+.voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f4aa8;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 24px;
+    align-self: flex-start;
+}
+
+.voltar:hover {
+    text-decoration: underline;
+}
+
+/* Card grande: centralizado e ocupando toda a altura disponível */
+.card-form {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 40px;
+    width: 100%;
+    max-width: 1450px;
+    margin: 0 auto;
+    flex: 1;
+}
+
+.card-form h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.subtitulo {
+    font-size: 13px;
+    color: #64748b;
+    margin: 4px 0 24px;
+}
+
+/* Bloco de cada campo: label em cima, input embaixo */
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex: 1;
+    min-width: 0;
+}
+
+.campo label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.campo input[type="text"],
+.campo textarea,
+.campo select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #0f172a;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+    color: #94a3b8;
+}
+
+.campo textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+/* Estado de foco: borda azul para indicar o campo ativo */
+.campo input:focus,
+.campo textarea:focus,
+.campo select:focus {
+    border-color: #2f6bff;
+    box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
+}
+
+/* Select com seta personalizada (remove o estilo padrão do navegador) */
+.campo select {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 34px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.campo select:invalid {
+    color: #94a3b8;
+}
+
+/* Linha com os três selects */
+.linha-campos {
+    display: flex;
+    gap: 16px;
+}
+
+/* ---------- UPLOAD ---------- */
+/* Área de upload com borda tracejada */
+.upload {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+}
+
+.btn-arquivo {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-arquivo:hover {
+    background: #f1f5f9;
+}
+
+#nome-arquivo {
+    font-size: 12px;
+    color: #64748b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------- AÇÕES ---------- */
+/* Rodapé do formulário: Cancelar à esquerda, Enviar à direita */
+.acoes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-cancelar {
+    color: #475569;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-cancelar:hover {
+    background: #f1f5f9;
+}
+
+.btn-enviar {
+    color: #fff;
+    background: #0f4aa8;
+    border: none;
+}
+
+.btn-enviar:hover {
+    background: #0c3d8c;
+}
+
+/* ---------- RESPONSIVO ---------- */
+/* Telas menores: sidebar vai para o topo e os selects empilham */
+@media (max-width: 900px) {
+    .container-dash {
+        flex-direction: column;
+    }
+
+    .lado-esquerdo-dash {
+        flex: none;
+    }
+
+    .linha-campos {
+        flex-direction: column;
+        gap: 0;
+    }
+.msg-erro {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+.erro-campo {
+    color: #b91c1c;
+    font-size: 12px;
+}
+
+.btn-enviar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+}
