@@ -17,8 +17,9 @@ export const routes: Routes = [
     component: Dashboard,
     canActivate: [authGuard],
   },
-  { path: '**', redirectTo: '' },
   { path: 'chamados', component: Chamados, canActivate: [authGuard] },
   { path: 'novochamado', component: Novochamado, canActivate: [authGuard] },
   { path: 'detalhes-chamados/:id', component: DetalhesChamados, canActivate: [authGuard] },
+  // precisa ser a última rota: qualquer endereço desconhecido volta para o início
+  { path: '**', redirectTo: '' },
 ];
