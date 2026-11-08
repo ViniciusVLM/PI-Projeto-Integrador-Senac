@@ -63,10 +63,8 @@ PI-Projeto-Integrador-Senac/
 
 ## Pré-requisitos
 
-- [Node.js](https://nodejs.org/) v18 ou superior
-- [Angular CLI](https://angular.dev/tools/cli) v21
-- Banco de dados SQL configurado (ver `/database`)
-- npm v10.9.2+
+- [Node.js](https://nodejs.org/) 20.19 ou superior (exigência do Angular 21)
+- npm v10+
 
 ---
 
@@ -81,37 +79,60 @@ cd PI-Projeto-Integrador-Senac
 
 ### 2. Instale as dependências
 
+Só na pasta raiz (a API usa as mesmas dependências):
+
 ```bash
 npm install
 ```
 
-### 3. Configure o banco de dados
-
-Execute os scripts SQL disponíveis na pasta `/database` no seu gerenciador de banco de dados.
-
-### 4. Inicie o servidor backend (API)
+### 3. Inicie o servidor backend (API)
 
 ```bash
 npm run server
-# Servidor rodando em http://localhost:3000 (ou porta configurada)
+# Servidor rodando em http://localhost:3000
 ```
 
-### 5. Inicie o frontend Angular
+A API grava os dados em `server/db.json`. Para voltar aos dados iniciais da demonstração:
+
+```bash
+npm run db:reset
+```
+
+### 4. Inicie o frontend Angular
+
+Em outro terminal:
 
 ```bash
 npm start
 # Aplicação disponível em http://localhost:4200
 ```
 
+### Usuários de teste
+
+| E-mail | Perfil | Senha |
+|--------|--------|-------|
+| joao.silvia@empresa.com | Cliente | 123456 |
+| fernanda.souza@empresa.com | Técnico | 123456 |
+| paulo.nunes@empresa.com | Técnico | 123456 |
+| carlos.lima@empresa.com | Administrador | 123456 |
+
+### Banco de dados SQL
+
+Os scripts da pasta `/database` descrevem o mesmo modelo de dados em MySQL/MariaDB (criação das tabelas, dados iniciais e consultas). Rode-os na ordem `01`, `02` e `03`.
+
 ---
+
+## API
+
+A documentação de todas as rotas, campos e permissões por perfil está em [`docs/api.md`](docs/api.md).
 
 ## Testes
 
 ```bash
-# Testes unitários
-npm test
+# Testes automatizados da API (não alteram o server/db.json)
+npm run test:api
 
-# Build de produção
+# Build de produção do front-end
 npm run build
 ```
 
