@@ -1,104 +1,153 @@
 const express = require('express');
 const db = require('../db');
 const authMiddleware = require('../middleware/auth');
+const { permitir } = require('../middleware/auth');
+const { paraInteiro, texto } = require('../utils/formatar');
 
 const router = express.Router();
 
+const TIPOS_VALIDOS = ['Desktop', 'Notebook', 'Monitor', 'Impressora', 'Roteador', 'Switch', 'Smartphone', 'Outro'];
+const STATUS_VALIDOS = ['Ativo', 'Em manutenção', 'Inativo'];
+
+function comResponsavel(equipamento) {
+  const usuario = db.data.usuarios.find((u) => u.id === equipamento.usuarioId);
+  return { ...equipamento, usuarioNome: usuario ? usuario.nome : null };
+}
+
+// Monta o nome exibido no sistema a partir da marca e do modelo
+function montarNome(marca, modelo, nome) {
+  if (nome) return nome;
+  return [marca, modelo].filter(Boolean).join(' ');
+}
+
+function validarUsuario(usuarioId) {
+  if (usuarioId === null) return null;
+  if (Number.isNaN(usuarioId)) return 'usuarioId inválido.';
+  const usuario = db.data.usuarios.find((u) => u.id === usuarioId);
+  return usuario ? null : 'Usuário responsável não encontrado.';
+}
+
 router.get('/', authMiddleware, (req, res) => {
-  const { usuarioId, status } = req.query;
+  const { usuarioId, status, tipo, busca } = req.query;
   let resultado = db.data.equipamentos;
 
-  if (usuarioId) {
-    resultado = resultado.filter((e) => e.usuarioId === parseInt(usuarioId));
-  }
-  if (status) {
-    resultado = resultado.filter((e) => e.status.toLowerCase() === status.toLowerCase());
+  // cliente só enxerga os equipamentos que estão com ele
+  if (req.usuario.perfil === 'cliente') {
+    resultado = resultado.filter((e) => e.usuarioId === req.usuario.id);
+  } else if (usuarioId) {
+    resultado = resultado.filter((e) => e.usuarioId === paraInteiro(usuarioId));
   }
 
-  resultado = resultado.map((e) => {
-    const usuario = db.data.usuarios.find((u) => u.id === e.usuarioId);
-    return { ...e, usuarioNome: usuario ? usuario.nome : null };
-  });
+  if (status) resultado = resultado.filter((e) => e.status.toLowerCase() === String(status).toLowerCase());
+  if (tipo) resultado = resultado.filter((e) => e.tipo.toLowerCase() === String(tipo).toLowerCase());
+  if (busca) {
+    const termo = String(busca).trim().toLowerCase();
+    resultado = resultado.filter((e) =>
+      [e.nome, e.marca, e.modelo, e.patrimonio].some((campo) => (campo || '').toLowerCase().includes(termo))
+    );
+  }
 
-  return res.json(resultado);
+  return res.json(resultado.map(comResponsavel));
 });
 
 router.get('/:id', authMiddleware, (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = paraInteiro(req.params.id);
   const eq = db.data.equipamentos.find((e) => e.id === id);
   if (!eq) return res.status(404).json({ erro: 'Equipamento não encontrado.' });
 
-  const usuario = db.data.usuarios.find((u) => u.id === eq.usuarioId);
-  return res.json({ ...eq, usuarioNome: usuario ? usuario.nome : null });
+  if (req.usuario.perfil === 'cliente' && eq.usuarioId !== req.usuario.id) {
+    return res.status(403).json({ erro: 'Acesso negado a este equipamento.' });
+  }
+
+  return res.json(comResponsavel(eq));
 });
 
-router.post('/', authMiddleware, (req, res) => {
-  const { tipo, nome, patrimonio, usuarioId } = req.body;
+router.post('/', authMiddleware, permitir('admin'), (req, res) => {
+  const tipo = texto(req.body.tipo);
+  const marca = texto(req.body.marca) || null;
+  const modelo = texto(req.body.modelo) || null;
+  const patrimonio = texto(req.body.patrimonio);
+  const nome = montarNome(marca, modelo, texto(req.body.nome));
+  const usuarioId = paraInteiro(req.body.usuarioId);
 
-  if (!tipo || !nome || !patrimonio) {
-    return res.status(400).json({ erro: 'Campos obrigatórios: tipo, nome, patrimonio.' });
+  if (!tipo || !patrimonio || !nome) {
+    return res.status(400).json({ erro: 'Campos obrigatórios: tipo, patrimonio e marca/modelo (ou nome).' });
+  }
+  if (!TIPOS_VALIDOS.includes(tipo)) {
+    return res.status(400).json({ erro: `Tipo inválido. Use: ${TIPOS_VALIDOS.join(', ')}` });
   }
 
-  const dup = db.data.equipamentos.find(
-    (e) => e.patrimonio.toUpperCase() === patrimonio.toUpperCase()
-  );
+  const erroUsuario = validarUsuario(usuarioId);
+  if (erroUsuario) return res.status(400).json({ erro: erroUsuario });
+
+  const dup = db.data.equipamentos.find((e) => e.patrimonio.toUpperCase() === patrimonio.toUpperCase());
   if (dup) return res.status(409).json({ erro: 'Já existe um equipamento com este número de patrimônio.' });
-
-  if (usuarioId) {
-    const usuario = db.data.usuarios.find((u) => u.id === usuarioId);
-    if (!usuario) return res.status(404).json({ erro: 'Usuário informado não encontrado.' });
-  }
 
   const novo = {
     id: db.nextId('equipamentos'),
     tipo,
     nome,
-    patrimonio,
-    usuarioId: usuarioId ?? null,
+    marca,
+    modelo,
+    patrimonio: patrimonio.toUpperCase(),
+    usuarioId,
     status: 'Ativo',
   };
 
   db.data.equipamentos.push(novo);
   db.save();
-  return res.status(201).json(novo);
+  return res.status(201).json(comResponsavel(novo));
 });
 
-router.put('/:id', authMiddleware, (req, res) => {
-  const id = parseInt(req.params.id);
-  const idx = db.data.equipamentos.findIndex((e) => e.id === id);
-  if (idx === -1) return res.status(404).json({ erro: 'Equipamento não encontrado.' });
+router.put('/:id', authMiddleware, permitir('admin'), (req, res) => {
+  const id = paraInteiro(req.params.id);
+  const eq = db.data.equipamentos.find((e) => e.id === id);
+  if (!eq) return res.status(404).json({ erro: 'Equipamento não encontrado.' });
 
-  const { tipo, nome, patrimonio, usuarioId, status } = req.body;
+  const tipo = texto(req.body.tipo);
+  const patrimonio = texto(req.body.patrimonio);
+  const { status } = req.body;
+
+  if (tipo !== undefined && !TIPOS_VALIDOS.includes(tipo)) {
+    return res.status(400).json({ erro: `Tipo inválido. Use: ${TIPOS_VALIDOS.join(', ')}` });
+  }
+  if (status !== undefined && !STATUS_VALIDOS.includes(status)) {
+    return res.status(400).json({ erro: `Status inválido. Use: ${STATUS_VALIDOS.join(', ')}` });
+  }
+
+  if (req.body.usuarioId !== undefined) {
+    const usuarioId = paraInteiro(req.body.usuarioId);
+    const erroUsuario = validarUsuario(usuarioId);
+    if (erroUsuario) return res.status(400).json({ erro: erroUsuario });
+    eq.usuarioId = usuarioId;
+  }
 
   if (patrimonio) {
     const dup = db.data.equipamentos.find(
       (e) => e.patrimonio.toUpperCase() === patrimonio.toUpperCase() && e.id !== id
     );
     if (dup) return res.status(409).json({ erro: 'Já existe um equipamento com este número de patrimônio.' });
+    eq.patrimonio = patrimonio.toUpperCase();
   }
 
-  db.data.equipamentos[idx] = {
-    ...db.data.equipamentos[idx],
-    tipo: tipo ?? db.data.equipamentos[idx].tipo,
-    nome: nome ?? db.data.equipamentos[idx].nome,
-    patrimonio: patrimonio ?? db.data.equipamentos[idx].patrimonio,
-    usuarioId: usuarioId !== undefined ? usuarioId : db.data.equipamentos[idx].usuarioId,
-    status: status ?? db.data.equipamentos[idx].status,
-  };
+  if (tipo) eq.tipo = tipo;
+  if (req.body.marca !== undefined) eq.marca = texto(req.body.marca) || null;
+  if (req.body.modelo !== undefined) eq.modelo = texto(req.body.modelo) || null;
+  if (req.body.nome !== undefined || req.body.marca !== undefined || req.body.modelo !== undefined) {
+    eq.nome = montarNome(eq.marca, eq.modelo, texto(req.body.nome)) || eq.nome;
+  }
+  if (status) eq.status = status;
+
   db.save();
-  return res.json(db.data.equipamentos[idx]);
+  return res.json(comResponsavel(eq));
 });
 
-router.delete('/:id', authMiddleware, (req, res) => {
-  if (req.usuario.perfil !== 'admin') {
-    return res.status(403).json({ erro: 'Apenas administradores podem remover equipamentos.' });
-  }
+router.delete('/:id', authMiddleware, permitir('admin'), (req, res) => {
+  const id = paraInteiro(req.params.id);
+  const eq = db.data.equipamentos.find((e) => e.id === id);
+  if (!eq) return res.status(404).json({ erro: 'Equipamento não encontrado.' });
 
-  const id = parseInt(req.params.id);
-  const idx = db.data.equipamentos.findIndex((e) => e.id === id);
-  if (idx === -1) return res.status(404).json({ erro: 'Equipamento não encontrado.' });
-
-  db.data.equipamentos[idx].status = 'Inativo';
+  eq.status = 'Inativo';
   db.save();
   return res.json({ mensagem: 'Equipamento inativado com sucesso.' });
 });
