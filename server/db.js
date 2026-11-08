@@ -1,13 +1,20 @@
 const fs = require('fs');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, 'db.json');
+// DB_FILE permite rodar os testes em uma cópia do banco, sem mexer no db.json
+const DB_PATH = process.env.DB_FILE || path.join(__dirname, 'db.json');
+
+const COLECOES = ['usuarios', 'categorias', 'equipamentos', 'chamados', 'historico', 'comentarios', 'tokens', 'redefinicoes'];
 
 let data = null;
 
 function load() {
   const raw = fs.readFileSync(DB_PATH, 'utf-8');
   data = JSON.parse(raw);
+
+  COLECOES.forEach((colecao) => {
+    if (!Array.isArray(data[colecao])) data[colecao] = [];
+  });
 }
 
 function save() {
@@ -21,4 +28,12 @@ function nextId(colecao) {
 
 load();
 
-module.exports = { data, save, nextId, load };
+module.exports = {
+  get data() {
+    return data;
+  },
+  save,
+  nextId,
+  load,
+  DB_PATH,
+};
