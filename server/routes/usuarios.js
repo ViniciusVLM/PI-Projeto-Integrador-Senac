@@ -1,118 +1,156 @@
 const express = require('express');
 const db = require('../db');
 const authMiddleware = require('../middleware/auth');
+const { permitir } = require('../middleware/auth');
+const { hashSenha, emailValido, validarNovaSenha } = require('../utils/seguranca');
+const { semSenha, paraInteiro, texto, agora } = require('../utils/formatar');
 
 const router = express.Router();
 
+const PERFIS_VALIDOS = ['cliente', 'tecnico', 'admin'];
+const STATUS_VALIDOS = ['Ativo', 'Inativo'];
+
 router.get('/', authMiddleware, (req, res) => {
-  if (req.usuario.perfil === 'admin') {
-    return res.json(db.data.usuarios.map(sem_senha));
+  if (req.usuario.perfil !== 'admin') {
+    return res.json([semSenha(req.usuario)]);
   }
-  return res.json([sem_senha(req.usuario)]);
+
+  const { perfil, status, busca } = req.query;
+  let resultado = db.data.usuarios;
+
+  if (perfil) resultado = resultado.filter((u) => u.perfil === perfil);
+  if (status) resultado = resultado.filter((u) => u.status.toLowerCase() === String(status).toLowerCase());
+  if (busca) {
+    const termo = String(busca).trim().toLowerCase();
+    resultado = resultado.filter(
+      (u) => u.nome.toLowerCase().includes(termo) || u.email.toLowerCase().includes(termo)
+    );
+  }
+
+  return res.json(resultado.map(semSenha));
 });
 
 router.get('/tecnicos', authMiddleware, (req, res) => {
   const tecnicos = db.data.usuarios
     .filter((u) => u.perfil === 'tecnico' && u.status === 'Ativo')
-    .map(sem_senha);
+    .map(semSenha);
   return res.json(tecnicos);
 });
 
 router.get('/:id', authMiddleware, (req, res) => {
-  const id = parseInt(req.params.id);
-  const usuario = db.data.usuarios.find((u) => u.id === id);
-  if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado.' });
-  return res.json(sem_senha(usuario));
-});
+  const id = paraInteiro(req.params.id);
 
-router.post('/', authMiddleware, (req, res) => {
-  if (req.usuario.perfil !== 'admin') {
-    return res.status(403).json({ erro: 'Apenas administradores podem criar usuários.' });
+  if (req.usuario.perfil !== 'admin' && req.usuario.id !== id) {
+    return res.status(403).json({ erro: 'Você só pode visualizar o seu próprio usuário.' });
   }
 
-  const { nome, email, senha, perfil } = req.body;
+  const usuario = db.data.usuarios.find((u) => u.id === id);
+  if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+  return res.json(semSenha(usuario));
+});
+
+router.post('/', authMiddleware, permitir('admin'), (req, res) => {
+  const nome = texto(req.body.nome);
+  const email = texto(req.body.email);
+  const telefone = texto(req.body.telefone) || null;
+  const { senha, perfil } = req.body;
 
   if (!nome || !email || !senha || !perfil) {
     return res.status(400).json({ erro: 'Campos obrigatórios: nome, email, senha, perfil.' });
   }
+  if (!emailValido(email)) {
+    return res.status(400).json({ erro: 'E-mail inválido.' });
+  }
+  if (!PERFIS_VALIDOS.includes(perfil)) {
+    return res.status(400).json({ erro: `Perfil inválido. Use: ${PERFIS_VALIDOS.join(', ')}` });
+  }
 
-  const emailExistente = db.data.usuarios.find(
-    (u) => u.email.toLowerCase() === email.toLowerCase()
-  );
+  const erroSenha = validarNovaSenha(senha);
+  if (erroSenha) return res.status(400).json({ erro: erroSenha });
+
+  const emailExistente = db.data.usuarios.find((u) => u.email.toLowerCase() === email.toLowerCase());
   if (emailExistente) {
     return res.status(409).json({ erro: 'Já existe um usuário com este e-mail.' });
   }
 
-  const perfisValidos = ['cliente', 'tecnico', 'admin'];
-  if (!perfisValidos.includes(perfil)) {
-    return res.status(400).json({ erro: `Perfil inválido. Use: ${perfisValidos.join(', ')}` });
-  }
-
-  const novoId = db.nextId('usuarios');
   const novoUsuario = {
-    id: novoId,
+    id: db.nextId('usuarios'),
     nome,
-    email,
-    senha,
+    email: email.toLowerCase(),
+    telefone,
+    senha: hashSenha(senha),
     perfil,
     status: 'Ativo',
+    criadoEm: agora(),
   };
 
   db.data.usuarios.push(novoUsuario);
   db.save();
 
-  return res.status(201).json(sem_senha(novoUsuario));
+  return res.status(201).json(semSenha(novoUsuario));
 });
 
-router.put('/:id', authMiddleware, (req, res) => {
-  if (req.usuario.perfil !== 'admin') {
-    return res.status(403).json({ erro: 'Apenas administradores podem editar usuários.' });
+router.put('/:id', authMiddleware, permitir('admin'), (req, res) => {
+  const id = paraInteiro(req.params.id);
+  const usuario = db.data.usuarios.find((u) => u.id === id);
+  if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+
+  const nome = texto(req.body.nome);
+  const email = texto(req.body.email);
+  const { senha, perfil, status } = req.body;
+
+  if (nome !== undefined && !nome) return res.status(400).json({ erro: 'O nome não pode ficar vazio.' });
+  if (email !== undefined && !emailValido(email)) return res.status(400).json({ erro: 'E-mail inválido.' });
+  if (perfil !== undefined && !PERFIS_VALIDOS.includes(perfil)) {
+    return res.status(400).json({ erro: `Perfil inválido. Use: ${PERFIS_VALIDOS.join(', ')}` });
+  }
+  if (status !== undefined && !STATUS_VALIDOS.includes(status)) {
+    return res.status(400).json({ erro: `Status inválido. Use: ${STATUS_VALIDOS.join(', ')}` });
+  }
+  if (senha !== undefined) {
+    const erroSenha = validarNovaSenha(senha);
+    if (erroSenha) return res.status(400).json({ erro: erroSenha });
   }
 
-  const id = parseInt(req.params.id);
-  const idx = db.data.usuarios.findIndex((u) => u.id === id);
-  if (idx === -1) return res.status(404).json({ erro: 'Usuário não encontrado.' });
-
-  const { nome, email, senha, perfil, status } = req.body;
+  if (usuario.id === req.usuario.id && ((perfil && perfil !== 'admin') || status === 'Inativo')) {
+    return res.status(400).json({ erro: 'Você não pode remover o seu próprio acesso de administrador.' });
+  }
 
   if (email) {
-    const dup = db.data.usuarios.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.id !== id
-    );
+    const dup = db.data.usuarios.find((u) => u.email.toLowerCase() === email.toLowerCase() && u.id !== id);
     if (dup) return res.status(409).json({ erro: 'Já existe um usuário com este e-mail.' });
+    usuario.email = email.toLowerCase();
   }
 
-  db.data.usuarios[idx] = {
-    ...db.data.usuarios[idx],
-    nome: nome ?? db.data.usuarios[idx].nome,
-    email: email ?? db.data.usuarios[idx].email,
-    senha: senha ?? db.data.usuarios[idx].senha,
-    perfil: perfil ?? db.data.usuarios[idx].perfil,
-    status: status ?? db.data.usuarios[idx].status,
-  };
-  db.save();
+  if (nome) usuario.nome = nome;
+  if (req.body.telefone !== undefined) usuario.telefone = texto(req.body.telefone) || null;
+  if (perfil) usuario.perfil = perfil;
+  if (status) usuario.status = status;
+  if (senha) usuario.senha = hashSenha(senha);
 
-  return res.json(sem_senha(db.data.usuarios[idx]));
+  if (status === 'Inativo' || senha) {
+    db.data.tokens = db.data.tokens.filter((t) => t.usuarioId !== usuario.id);
+  }
+
+  db.save();
+  return res.json(semSenha(usuario));
 });
 
-router.delete('/:id', authMiddleware, (req, res) => {
-  if (req.usuario.perfil !== 'admin') {
-    return res.status(403).json({ erro: 'Apenas administradores podem remover usuários.' });
+// Não apaga o registro: o usuário fica inativo para manter o histórico dos chamados
+router.delete('/:id', authMiddleware, permitir('admin'), (req, res) => {
+  const id = paraInteiro(req.params.id);
+  const usuario = db.data.usuarios.find((u) => u.id === id);
+  if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+
+  if (usuario.id === req.usuario.id) {
+    return res.status(400).json({ erro: 'Você não pode inativar a sua própria conta.' });
   }
 
-  const id = parseInt(req.params.id);
-  const idx = db.data.usuarios.findIndex((u) => u.id === id);
-  if (idx === -1) return res.status(404).json({ erro: 'Usuário não encontrado.' });
-
-  db.data.usuarios[idx].status = 'Inativo';
+  usuario.status = 'Inativo';
+  db.data.tokens = db.data.tokens.filter((t) => t.usuarioId !== usuario.id);
   db.save();
 
   return res.json({ mensagem: 'Usuário inativado com sucesso.' });
 });
-
-function sem_senha(u) {
-  const { senha, ...resto } = u;
-  return resto;
-}
 
 module.exports = router;
