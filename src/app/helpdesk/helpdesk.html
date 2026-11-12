@@ -1,6 +1,5 @@
 <main class="container">
-    
-    
+
     <section class="lado-esquerdo">
         <div class="logo">
             <i class="bx bxs-shield-alt-2"></i>
@@ -25,13 +24,12 @@
             Protegido por criptografia TLS.
         </footer>
     </section>
-    
-    
+
     <section class="lado-direito">
         <form class="card-login" (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
             <h1>Acesse sua conta</h1>
             <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
-        
+
             <div *ngIf="erroMensagem" class="alerta-erro" role="alert">
                 <i class="bx bxs-error-circle"></i>
                 {{ erroMensagem }}
@@ -52,7 +50,7 @@
                     >
                 </div>
             </div>
-                
+
             <div class="input-box">
                 <h5>Senha de Acesso</h5>
                 <div class="campo">
@@ -62,11 +60,20 @@
                         name="senha"
                         [(ngModel)]="senha"
                         placeholder="••••••••••••"
-                        type="password"
+                        [type]="mostrarSenha ? 'text' : 'password'"
                         autocomplete="current-password"
                         required
                     >
-                    <i class="bx bx-hide olho"></i>
+                    <i
+                        class="bx olho"
+                        [class.bx-show]="mostrarSenha"
+                        [class.bx-hide]="!mostrarSenha"
+                        (click)="alternarSenha()"
+                        (keydown.enter)="alternarSenha()"
+                        role="button"
+                        tabindex="0"
+                        [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+                    ></i>
                 </div>
             </div>
 
@@ -77,14 +84,14 @@
                 </label>
                 <a routerLink="/esquecisenha">Esqueci minha senha</a>
             </div>
-            
+
             <button type="submit" [disabled]="carregando">
                 <span *ngIf="!carregando">Login</span>
                 <span *ngIf="carregando">Entrando...</span>
             </button>
 
             <div class="registro-link">
-                <p>Ainda não tem conta? <a routerLink="/cadastro">Cadastre-se</a> </p>
+                <p>Ainda não tem conta? <a routerLink="/cadastro">Cadastre-se</a></p>
             </div>
         </form>
     </section>

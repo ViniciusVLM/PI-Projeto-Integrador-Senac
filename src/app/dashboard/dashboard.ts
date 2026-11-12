@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { AuthService, UsuarioPerfil } from '../core/services/auth.service';
 
@@ -30,7 +30,7 @@ const API_URL = 'http://localhost:3000/api';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgIf, NgFor, DatePipe],
+  imports: [NgIf, NgFor, DatePipe, RouterLink, RouterLinkActive],
   styleUrl: './dashboard.css',
   templateUrl: './dashboard.html',
 })

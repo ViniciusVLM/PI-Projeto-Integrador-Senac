@@ -12,13 +12,9 @@ export const routes: Routes = [
   { path: '', component: Helpdesk },
   { path: 'esquecisenha', component: Esquecisenha },
   { path: 'cadastro', component: Cadastro },
-  {
-    path: 'dashboard',
-    component: Dashboard,
-    canActivate: [authGuard],
-  },
-  { path: '**', redirectTo: '' },
+  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
   { path: 'chamados', component: Chamados, canActivate: [authGuard] },
   { path: 'novochamado', component: Novochamado, canActivate: [authGuard] },
   { path: 'detalhes-chamados/:id', component: DetalhesChamados, canActivate: [authGuard] },
+  { path: '**', redirectTo: '' },
 ];

@@ -21,12 +21,11 @@ html, body {
 }
 
 /* ---------- SIDEBAR ---------- */
-/* ---------- SIDEBAR ---------- */
 .lado-esquerdo-dash {
     flex: 0 0 270px;
     background-color: #0c1c3a;
     color: #fff;
-    padding: 20px 10px; /* espaço no topo (logo) e no rodapé (usuário) */
+    padding: 20px 10px;
     display: flex;
     flex-direction: column;
 }
@@ -62,7 +61,7 @@ html, body {
     gap: 4px;
 }
 
-/* Item do menu: sem fundo; destaque azul apenas no hover */
+/* Item do menu: sem fundo; destaque azul no hover e no item ativo */
 .menuItem {
     display: flex;
     align-items: center;
@@ -75,7 +74,8 @@ html, body {
     transition: background 0.2s ease, color 0.2s ease;
 }
 
-.menuItem:hover {
+.menuItem:hover,
+.menuItem.active {
     background: linear-gradient(90deg, #1650b8, #3b82f6);
     color: #fff;
 }
@@ -138,7 +138,7 @@ html, body {
     padding: 24px 28px;
     min-width: 0;
     display: flex;
-    flex-direction: column; /* link no topo, card ocupa o resto da altura */
+    flex-direction: column;
 }
 
 .voltar {
@@ -249,8 +249,22 @@ html, body {
     gap: 16px;
 }
 
+/* ---------- MENSAGENS DE ERRO ---------- */
+.msg-erro {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+.erro-campo {
+    color: #b91c1c;
+    font-size: 12px;
+}
+
 /* ---------- UPLOAD ---------- */
-/* Área de upload com borda tracejada */
 .upload {
     display: flex;
     align-items: center;
@@ -286,7 +300,6 @@ html, body {
 }
 
 /* ---------- AÇÕES ---------- */
-/* Rodapé do formulário: Cancelar à esquerda, Enviar à direita */
 .acoes {
     display: flex;
     justify-content: space-between;
@@ -324,8 +337,12 @@ html, body {
     background: #0c3d8c;
 }
 
+.btn-enviar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* ---------- RESPONSIVO ---------- */
-/* Telas menores: sidebar vai para o topo e os selects empilham */
 @media (max-width: 900px) {
     .container-dash {
         flex-direction: column;
@@ -339,22 +356,4 @@ html, body {
         flex-direction: column;
         gap: 0;
     }
-.msg-erro {
-    background: #fee2e2;
-    color: #991b1b;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 13px;
-}
-
-.erro-campo {
-    color: #b91c1c;
-    font-size: 12px;
-}
-
-.btn-enviar:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
 }

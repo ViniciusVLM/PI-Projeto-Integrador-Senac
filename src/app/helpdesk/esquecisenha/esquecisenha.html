@@ -1,6 +1,5 @@
 <main class="container">
-    
-    
+
     <section class="lado-esquerdo">
         <div class="logo">
             <i class="bx bxs-shield-alt-2"></i>
@@ -25,27 +24,37 @@
             Protegido por criptografia TLS.
         </footer>
     </section>
-    
-    
+
     <section class="lado-direito">
         <form class="card-login">
             <h1>Redefina sua senha</h1>
-            
 
             <div class="input-box">
-                <h5> Insira seu e-mail institucional</h5>
+                <h5>Insira seu e-mail institucional</h5>
                 <div class="campo">
-                    <i class="bx bxs-envelope" ></i>
+                    <i class="bx bxs-envelope"></i>
                     <input placeholder="exemplo@empresa.com" type="email">
                 </div>
             </div>
-                
+
             <div class="input-box">
                 <h5>Crie sua senha nova</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
-                    <input placeholder="••••••••••••" type="password">
-                    <i class="bx bx-hide olho"></i>
+                    <input
+                        placeholder="••••••••••••"
+                        [type]="mostrarSenha ? 'text' : 'password'"
+                    >
+                    <i
+                        class="bx olho"
+                        [class.bx-show]="mostrarSenha"
+                        [class.bx-hide]="!mostrarSenha"
+                        (click)="alternarSenha()"
+                        (keydown.enter)="alternarSenha()"
+                        role="button"
+                        tabindex="0"
+                        [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+                    ></i>
                 </div>
             </div>
 
@@ -53,12 +62,25 @@
                 <h5>Confirme sua senha nova</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
-                    <input placeholder="••••••••••••" type="password">
-                    <i class="bx bx-hide olho"></i>
+                    <input
+                        placeholder="••••••••••••"
+                        [type]="mostrarConfirmarSenha ? 'text' : 'password'"
+                    >
+                    <i
+                        class="bx olho"
+                        [class.bx-show]="mostrarConfirmarSenha"
+                        [class.bx-hide]="!mostrarConfirmarSenha"
+                        (click)="alternarConfirmarSenha()"
+                        (keydown.enter)="alternarConfirmarSenha()"
+                        role="button"
+                        tabindex="0"
+                        [attr.aria-label]="mostrarConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+                    ></i>
                 </div>
             </div>
 
             <button type="submit">Redefinir Senha</button>
+
             <div class="voltar-login">
                 <p><a routerLink="/">Voltar ao login</a></p>
             </div>

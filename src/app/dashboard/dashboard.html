@@ -10,15 +10,15 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a href="#" class="nav-item active">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
         <i class="bx bxs-dashboard"></i>
         <span>Dashboard</span>
       </a>
-      <a href="#" class="nav-item">
+      <a routerLink="/chamados" routerLinkActive="active" class="nav-item">
         <i class="bx bxs-tag-alt"></i>
         <span>Meus Chamados</span>
       </a>
-      <a href="#" class="nav-item">
+      <a routerLink="/novochamado" routerLinkActive="active" class="nav-item">
         <i class="bx bxs-plus-circle"></i>
         <span>Novo Chamado</span>
       </a>
@@ -160,8 +160,8 @@
             </thead>
             <tbody>
               <tr *ngFor="let c of metricas.recentes">
-                <td class="id-col">#{{ c.id }}</td>
-                <td class="titulo-col">{{ c.titulo }}</td>
+                <td class="id-col"><a [routerLink]="['/detalhes-chamados', c.id]">#{{ c.id }}</a></td>
+                <td class="titulo-col"><a [routerLink]="['/detalhes-chamados', c.id]">{{ c.titulo }}</a></td>
                 <td>{{ c.categoriaNome ?? '—' }}</td>
                 <td>
                   <span class="badge-prioridade {{ getPrioridadeClass(c.prioridade) }}">

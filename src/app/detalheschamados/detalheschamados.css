@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Reset: remove margens/paddings padrão e padroniza a fonte */
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +12,6 @@ html, body {
     height: 100%;
 }
 
-/* Layout geral: sidebar + conteúdo lado a lado */
 .container-dash {
     display: flex;
     width: 100%;
@@ -61,7 +59,6 @@ html, body {
     gap: 4px;
 }
 
-/* Item do menu: sem fundo; destaque azul apenas no hover */
 .menuItem {
     display: flex;
     align-items: center;
@@ -74,7 +71,8 @@ html, body {
     transition: background 0.2s ease, color 0.2s ease;
 }
 
-.menuItem:hover {
+.menuItem:hover,
+.menuItem.active {
     background: linear-gradient(90deg, #1650b8, #3b82f6);
     color: #fff;
 }
@@ -89,7 +87,6 @@ html, body {
     font-size: 14px;
 }
 
-/* Empurra o bloco do usuário para o fim da sidebar */
 .lado-esquerdo-dash footer {
     margin-top: auto;
     padding-top: 30px;
@@ -140,7 +137,6 @@ html, body {
     flex-direction: column;
 }
 
-/* Barra superior: voltar à esquerda, ações à direita */
 .barra-topo {
     display: flex;
     justify-content: space-between;
@@ -162,7 +158,6 @@ html, body {
     text-decoration: underline;
 }
 
-/* Botões (mesmo padrão da tela de listagem) */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -196,7 +191,20 @@ html, body {
     background: #0c3d8c;
 }
 
-/* Título do chamado + etiquetas na mesma linha */
+/* Mensagens de carregamento e erro */
+.msg-estado {
+    font-size: 13px;
+    color: #64748b;
+    padding: 12px 0;
+}
+
+.msg-erro {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
 .titulo-detalhe {
     display: flex;
     align-items: center;
@@ -217,7 +225,7 @@ html, body {
     color: #64748b;
 }
 
-/* ---------- BADGES (mesmas cores da listagem) ---------- */
+/* ---------- BADGES ---------- */
 .badge {
     display: inline-block;
     padding: 3px 10px;
@@ -236,17 +244,28 @@ html, body {
     margin-right: 4px;
 }
 
-.alta { background: #ffedd5; color: #ea580c; }
-.status-andamento { background: #fef3c7; color: #a16207; }
+/* Prioridade */
+.critica { background: #fee2e2; color: #dc2626; }
+.alta    { background: #ffedd5; color: #ea580c; }
+.media   { background: #fef9c3; color: #a16207; }
+.baixa   { background: #dbeafe; color: #2563eb; }
+
+/* Status */
+.status-aberto     { background: #dcfce7; color: #16a34a; }
+.status-andamento  { background: #fef3c7; color: #a16207; }
+.status-analise    { background: #e0f2fe; color: #0369a1; }
+.status-aguardando { background: #fee2e2; color: #dc2626; }
+.status-resolvido  { background: #dbeafe; color: #2563eb; }
+.status-encerrado  { background: #e2e8f0; color: #475569; }
+.status-cancelado  { background: #f1f5f9; color: #64748b; }
 
 /* ---------- GRADE E CARDS ---------- */
-/* Coluna principal (esquerda) + histórico (direita) */
 .grade-detalhe {
-    flex: 1; /* ocupa toda a altura restante da tela */
+    flex: 1;
     display: grid;
-    grid-template-columns: 1fr 320px; /* principal ocupa o espaço livre, histórico fixo */
+    grid-template-columns: 1fr 320px;
     gap: 20px;
-    align-items: stretch; /* cards vão até o fim da tela */
+    align-items: stretch;
 }
 
 .coluna-principal {
@@ -270,7 +289,6 @@ html, body {
     text-transform: uppercase;
 }
 
-/* Lista de informações: rótulo à esquerda, valor à direita */
 .lista-info {
     display: grid;
     grid-template-columns: 160px 1fr;
@@ -317,7 +335,7 @@ html, body {
 }
 
 .texto-descricao {
-    flex: 1; /* empurra o campo de resposta para o rodapé do card */
+    flex: 1;
 }
 
 .texto-descricao p {
@@ -325,6 +343,7 @@ html, body {
     font-size: 13px;
     line-height: 1.7;
     color: #475569;
+    white-space: pre-line;
 }
 
 /* ---------- CAMPO DE RESPOSTA ---------- */
@@ -375,7 +394,7 @@ html, body {
     color: #0f4aa8;
 }
 
-/* ---------- HISTÓRICO (linha do tempo) ---------- */
+/* ---------- HISTÓRICO ---------- */
 .linha-tempo {
     list-style: none;
 }
@@ -385,7 +404,6 @@ html, body {
     padding: 0 0 20px 20px;
 }
 
-/* Marcador de cada atividade */
 .linha-tempo li::before {
     content: "";
     position: absolute;
@@ -416,7 +434,6 @@ html, body {
 }
 
 /* ---------- RESPONSIVO ---------- */
-/* Telas menores: sidebar vai para o topo e o histórico desce */
 @media (max-width: 900px) {
     .container-dash {
         flex-direction: column;

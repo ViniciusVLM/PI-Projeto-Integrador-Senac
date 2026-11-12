@@ -1,128 +1,108 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont/dist/tabler-icons.min.css">
-    <link rel="stylesheet" href="detalheschamados.css">
-    <title>Detalhes Chamados</title>
-</head>
-<body>
-    <!-- Container principal: sidebar à esquerda + conteúdo à direita (flex) -->
-    <main class="container-dash">
-        <!-- SIDEBAR -->
-        <section class="lado-esquerdo-dash">
-            <!-- Logo e nome do sistema -->
-            <div class="logo">
-                <i class="bx bxs-shield-alt-2"></i>
-                <div>
-                    <h3>Secure<span>Desk</span></h3>
-                    <p>Sistemas de Chamado de TI</p>
+<main class="container-dash">
+    <!-- SIDEBAR -->
+    <section class="lado-esquerdo-dash">
+        <div class="logo">
+            <i class="bx bxs-shield-alt-2"></i>
+            <div>
+                <h3>Secure<span>Desk</span></h3>
+                <p>Sistemas de Chamado de TI</p>
+            </div>
+        </div>
+
+        <nav class="menuItems">
+            <a routerLink="/dashboard" routerLinkActive="active" class="menuItem">
+                <i class="ti ti-layout-dashboard"></i>
+                <h4>Dashboard</h4>
+            </a>
+            <a routerLink="/chamados" routerLinkActive="active" class="menuItem">
+                <i class="ti ti-ticket"></i>
+                <h4>Chamados</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-users"></i>
+                <h4>Usuários</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-cpu"></i>
+                <h4>Equipamentos</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-tags"></i>
+                <h4>Categorias</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-chart-dots"></i>
+                <h4>Relatórios</h4>
+            </a>
+            <a href="#" class="menuItem">
+                <i class="ti ti-settings"></i>
+                <h4>Configurações</h4>
+            </a>
+        </nav>
+
+        <footer>
+            <div class="user-info">
+                <i class="ti ti-users"></i>
+                <div class="user-text">
+                    <h4>Fernanda Souza</h4>
+                    <p>Técnico de TI</p>
                 </div>
             </div>
+        </footer>
+    </section>
 
-            <!-- Menu de navegação (ícones Tabler Icons) -->
-            <nav class="menuItems">
-                <a href="#" class="menuItem">
-                    <i class="ti ti-layout-dashboard"></i>
-                    <h4>Dashboard</h4>
-                </a>
-                <a href="#" class="menuItem">
-                    <i class="ti ti-ticket"></i>
-                    <h4>Chamados</h4>
-                </a>
-                <a href="#" class="menuItem">
-                    <i class="ti ti-users"></i>
-                    <h4>Usuários</h4>
-                </a>
-                <a href="#" class="menuItem">
-                    <i class="ti ti-cpu"></i>
-                    <h4>Equipamentos</h4>
-                </a>
-                <a href="#" class="menuItem">
-                    <i class="ti ti-tags"></i>
-                    <h4>Categorias</h4>
-                </a>
-                <a href="#" class="menuItem">
-                    <i class="ti ti-chart-dots"></i>
-                    <h4>Relatórios</h4>
-                </a>
-                <a href="#" class="menuItem">
-                    <i class="ti ti-settings"></i>
-                    <h4>Configurações</h4>
-                </a>
-            </nav>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <section class="lado-direito-dash">
+        <div class="barra-topo">
+            <a routerLink="/chamados" class="link-voltar">
+                <i class="ti ti-arrow-left"></i>
+                Voltar para a lista
+            </a>
+            <button type="button" class="btn btn-filtro">
+                Ações
+                <i class="ti ti-chevron-down"></i>
+            </button>
+        </div>
 
-            <!-- Rodapé: usuário logado -->
-            <footer>
-                <div class="user-info">
-                    <i class="ti ti-users"></i>
-                    <div class="user-text">
-                        <h4>Fernanda Souza</h4>
-                        <p>Técnico de TI</p>
-                    </div>
-                </div>
-            </footer>
-        </section>
+        @if (carregando) { <p class="msg-estado">Carregando...</p> }
+        @if (erro) { <p class="msg-estado msg-erro">{{ erro }}</p> }
 
-        <!-- CONTEÚDO PRINCIPAL -->
-        <section class="lado-direito-dash">
-            <!-- Barra superior: voltar + menu de ações -->
-            <div class="barra-topo">
-                <a href="#" class="link-voltar">
-                    <i class="ti ti-arrow-left"></i>
-                    Voltar para a lista
-                </a>
-                <button type="button" class="btn btn-filtro">
-                    Ações
-                    <i class="ti ti-chevron-down"></i>
-                </button>
-            </div>
-
-            <!-- Título do chamado + etiquetas -->
+        @if (chamado) {
             <div class="titulo-detalhe">
-                <h1>#1025 – Notebook não inicia após atualização</h1>
-                <span class="badge prioridade alta">Alta</span>
-                <span class="badge status-andamento">Em andamento</span>
-                <span class="categoria">Hardware</span>
+                <h1>#{{ chamado.id }} – {{ chamado.titulo }}</h1>
+                <span [class]="'badge prioridade ' + prioridadeClasse(chamado.prioridade)">{{ chamado.prioridade }}</span>
+                <span [class]="'badge ' + statusClasse(chamado.status)">{{ chamado.status }}</span>
+                <span class="categoria">{{ chamado.categoriaNome }}</span>
             </div>
 
-            <!-- Grade: coluna principal + histórico -->
             <div class="grade-detalhe">
                 <div class="coluna-principal">
 
-                    <!-- Card: informações do chamado -->
                     <div class="card">
                         <h2>Informações do chamado</h2>
                         <dl class="lista-info">
                             <dt>Solicitante:</dt>
-                            <dd>João Silva (Financeiro)</dd>
+                            <dd>{{ chamado.solicitanteNome || '—' }}</dd>
                             <dt>Data de abertura:</dt>
-                            <dd>07/05/2026 às 14:32</dd>
+                            <dd>{{ chamado.dataAbertura | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
                             <dt>Equipamento:</dt>
-                            <dd>Notebook Acer Nitro 5 PAT-00125</dd>
+                            <dd>{{ chamado.equipamentoNome || '—' }}</dd>
                             <dt>Última atualização:</dt>
-                            <dd>08/05/2026 às 10:15</dd>
+                            <dd>{{ (chamado.dataAtualizacao || chamado.dataAbertura) | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
                             <dt>Técnico responsável:</dt>
-                            <dd>Fernanda Souza</dd>
+                            <dd>{{ chamado.tecnicoNome || 'Aguardando atribuição' }}</dd>
                         </dl>
                     </div>
 
-                    <!-- Card: descrição, abas e resposta -->
                     <div class="card card-descricao">
                         <div class="abas">
-                            <a href="#" class="aba ativa">Descrição</a>
-                            <a href="#" class="aba">Histórico</a>
-                            <a href="#" class="aba">Anexos (2)</a>
+                            <a class="aba ativa">Descrição</a>
                         </div>
 
                         <div class="texto-descricao">
-                            <p>O notebook do usuário desliga sozinho logo na tela de login do Windows após a última atualização corporativa forçada instalada ontem à noite. Já foram realizadas tentativas de inicialização em modo de segurança, porém o comportamento de loop de desligamento persiste.</p>
-                            <p>Possível corrupção de sistema ou conflito de driver de vídeo. Técnico necessita analisar os logs de dump em laboratório físico.</p>
+                            <p>{{ chamado.descricao }}</p>
                         </div>
 
-                        <!-- Campo de resposta -->
                         <div class="resposta">
                             <input type="text" placeholder="Digite uma resposta ou atualização pública sobre o caso...">
                             <div class="resposta-acoes">
@@ -136,26 +116,27 @@
                     </div>
                 </div>
 
-                <!-- Card: histórico de atividades -->
                 <div class="card">
                     <h2>Histórico de atividades</h2>
                     <ul class="linha-tempo">
-                        <li class="atual">
-                            <p><strong>Fernanda Souza</strong> alterou o status para Em andamento</p>
-                            <span>08/05 às 10:15</span>
-                        </li>
+                        @if (chamado.dataAtualizacao && chamado.dataAtualizacao !== chamado.dataAbertura) {
+                            <li class="atual">
+                                <p>Status atual: <strong>{{ chamado.status }}</strong></p>
+                                <span>{{ chamado.dataAtualizacao | date:"dd/MM 'às' HH:mm" }}</span>
+                            </li>
+                        }
+                        @if (chamado.tecnicoNome) {
+                            <li [class.atual]="!chamado.dataAtualizacao || chamado.dataAtualizacao === chamado.dataAbertura">
+                                <p>Chamado atribuído a <strong>{{ chamado.tecnicoNome }}</strong></p>
+                            </li>
+                        }
                         <li>
-                            <p><strong>Sistema</strong> atribuiu este chamado para Fernanda Souza</p>
-                            <span>08/05 às 09:00</span>
-                        </li>
-                        <li>
-                            <p><strong>João Silva</strong> abriu este chamado</p>
-                            <span>07/05 às 14:32</span>
+                            <p><strong>{{ chamado.solicitanteNome || 'Usuário' }}</strong> abriu este chamado</p>
+                            <span>{{ chamado.dataAbertura | date:"dd/MM 'às' HH:mm" }}</span>
                         </li>
                     </ul>
                 </div>
             </div>
-        </section>
-    </main>
-</body>
-</html>
+        }
+    </section>
+</main>

@@ -429,6 +429,16 @@
 .id-col { font-weight: 600; color: #2f6bff; }
 .titulo-col { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+.id-col a,
+.titulo-col a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.titulo-col a:hover {
+  color: #2f6bff;
+}
+
 .badge-status, .badge-prioridade {
   display: inline-block;
   padding: 3px 10px;
