@@ -1,58 +1,7 @@
-<main class="container-dash">
-    <!-- SIDEBAR -->
-    <section class="lado-esquerdo-dash">
-        <div class="logo">
-            <i class="bx bxs-shield-alt-2"></i>
-            <div>
-                <h3>Secure<span>Desk</span></h3>
-                <p>Sistemas de Chamado de TI</p>
-            </div>
-        </div>
+<div class="container-dash">
+    <app-sidebar />
 
-        <nav class="menuItems">
-            <a routerLink="/dashboard" routerLinkActive="active" class="menuItem">
-                <i class="ti ti-layout-dashboard"></i>
-                <h4>Dashboard</h4>
-            </a>
-            <a routerLink="/chamados" routerLinkActive="active" class="menuItem">
-                <i class="ti ti-ticket"></i>
-                <h4>Chamados</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-users"></i>
-                <h4>Usuários</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-cpu"></i>
-                <h4>Equipamentos</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-tags"></i>
-                <h4>Categorias</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-chart-dots"></i>
-                <h4>Relatórios</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-settings"></i>
-                <h4>Configurações</h4>
-            </a>
-        </nav>
-
-        <footer>
-            <div class="user-info">
-                <i class="ti ti-users"></i>
-                <div class="user-text">
-                    <h4>Fernanda Souza</h4>
-                    <p>Técnico de TI</p>
-                </div>
-            </div>
-        </footer>
-    </section>
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <section class="lado-direito-dash">
+    <main class="lado-direito-dash">
         <div class="barra-topo">
             <a routerLink="/chamados" class="link-voltar">
                 <i class="ti ti-arrow-left"></i>
@@ -68,10 +17,24 @@
         @if (erro) { <p class="msg-estado msg-erro">{{ erro }}</p> }
 
         @if (chamado) {
+            <!-- Lista de atividades, usada na aba "Histórico" e no card da direita -->
+            <ng-template #historico>
+                <ul class="linha-tempo">
+                    @for (e of eventos; track $index) {
+                        <li [class.atual]="e.atual">
+                            <p><strong>{{ e.autor }}</strong> {{ e.acao }}</p>
+                            @if (e.data) {
+                                <span>{{ e.data | date:"dd/MM 'às' HH:mm" }}</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            </ng-template>
+
             <div class="titulo-detalhe">
                 <h1>#{{ chamado.id }} – {{ chamado.titulo }}</h1>
-                <span [class]="'badge prioridade ' + prioridadeClasse(chamado.prioridade)">{{ chamado.prioridade }}</span>
-                <span [class]="'badge ' + statusClasse(chamado.status)">{{ chamado.status }}</span>
+                <span class="badge prioridade {{ prioridadeClasse(chamado.prioridade) }}">{{ chamado.prioridade }}</span>
+                <span class="badge {{ statusClasse(chamado.status) }}">{{ formatarStatus(chamado.status) }}</span>
                 <span class="categoria">{{ chamado.categoriaNome }}</span>
             </div>
 
@@ -82,11 +45,11 @@
                         <h2>Informações do chamado</h2>
                         <dl class="lista-info">
                             <dt>Solicitante:</dt>
-                            <dd>{{ chamado.solicitanteNome || '—' }}</dd>
+                            <dd>{{ (chamado.solicitanteNome || '—') + (chamado.solicitanteSetor ? ' (' + chamado.solicitanteSetor + ')' : '') }}</dd>
                             <dt>Data de abertura:</dt>
                             <dd>{{ chamado.dataAbertura | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
                             <dt>Equipamento:</dt>
-                            <dd>{{ chamado.equipamentoNome || '—' }}</dd>
+                            <dd>{{ (chamado.equipamentoNome || '—') + (chamado.equipamentoPatrimonio ? ' ' + chamado.equipamentoPatrimonio : '') }}</dd>
                             <dt>Última atualização:</dt>
                             <dd>{{ (chamado.dataAtualizacao || chamado.dataAbertura) | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
                             <dt>Técnico responsável:</dt>
@@ -96,11 +59,31 @@
 
                     <div class="card card-descricao">
                         <div class="abas">
-                            <a class="aba ativa">Descrição</a>
+                            <button type="button" class="aba" [class.ativa]="aba === 'descricao'" (click)="aba = 'descricao'">Descrição</button>
+                            <button type="button" class="aba" [class.ativa]="aba === 'historico'" (click)="aba = 'historico'">Histórico</button>
+                            <button type="button" class="aba" [class.ativa]="aba === 'anexos'" (click)="aba = 'anexos'">Anexos ({{ chamado.anexos?.length ?? 0 }})</button>
                         </div>
 
-                        <div class="texto-descricao">
-                            <p>{{ chamado.descricao }}</p>
+                        <div class="conteudo-aba">
+                            @switch (aba) {
+                                @case ('descricao') {
+                                    <div class="texto-descricao">
+                                        <p>{{ chamado.descricao }}</p>
+                                    </div>
+                                }
+                                @case ('historico') {
+                                    <ng-container [ngTemplateOutlet]="historico" />
+                                }
+                                @case ('anexos') {
+                                    <ul class="lista-anexos">
+                                        @for (a of chamado.anexos ?? []; track $index) {
+                                            <li><i class="ti ti-paperclip"></i> {{ a.nome }}</li>
+                                        } @empty {
+                                            <li class="vazio">Nenhum anexo.</li>
+                                        }
+                                    </ul>
+                                }
+                            }
                         </div>
 
                         <div class="resposta">
@@ -118,25 +101,9 @@
 
                 <div class="card">
                     <h2>Histórico de atividades</h2>
-                    <ul class="linha-tempo">
-                        @if (chamado.dataAtualizacao && chamado.dataAtualizacao !== chamado.dataAbertura) {
-                            <li class="atual">
-                                <p>Status atual: <strong>{{ chamado.status }}</strong></p>
-                                <span>{{ chamado.dataAtualizacao | date:"dd/MM 'às' HH:mm" }}</span>
-                            </li>
-                        }
-                        @if (chamado.tecnicoNome) {
-                            <li [class.atual]="!chamado.dataAtualizacao || chamado.dataAtualizacao === chamado.dataAbertura">
-                                <p>Chamado atribuído a <strong>{{ chamado.tecnicoNome }}</strong></p>
-                            </li>
-                        }
-                        <li>
-                            <p><strong>{{ chamado.solicitanteNome || 'Usuário' }}</strong> abriu este chamado</p>
-                            <span>{{ chamado.dataAbertura | date:"dd/MM 'às' HH:mm" }}</span>
-                        </li>
-                    </ul>
+                    <ng-container [ngTemplateOutlet]="historico" />
                 </div>
             </div>
         }
-    </section>
-</main>
+    </main>
+</div>

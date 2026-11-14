@@ -1,58 +1,7 @@
-<main class="container-dash">
-    <!-- SIDEBAR -->
-    <section class="lado-esquerdo-dash">
-        <div class="logo">
-            <i class="bx bxs-shield-alt-2"></i>
-            <div>
-                <h3>Secure<span>Desk</span></h3>
-                <p>Sistemas de Chamado de TI</p>
-            </div>
-        </div>
+<div class="container-dash">
+    <app-sidebar />
 
-        <nav class="menuItems">
-            <a routerLink="/dashboard" class="menuItem">
-                <i class="ti ti-layout-dashboard"></i>
-                <h4>Dashboard</h4>
-            </a>
-            <a routerLink="/chamados" class="menuItem">
-                <i class="ti ti-ticket"></i>
-                <h4>Chamados</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-users"></i>
-                <h4>Usuários</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-cpu"></i>
-                <h4>Equipamentos</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-tags"></i>
-                <h4>Categorias</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-chart-dots"></i>
-                <h4>Relatórios</h4>
-            </a>
-            <a href="#" class="menuItem">
-                <i class="ti ti-settings"></i>
-                <h4>Configurações</h4>
-            </a>
-        </nav>
-
-        <footer>
-            <div class="user-info">
-                <i class="ti ti-users"></i>
-                <div class="user-text">
-                    <h4>Nome do Usuário</h4>
-                    <p>Técnico de TI</p>
-                </div>
-            </div>
-        </footer>
-    </section>
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <section class="lado-direito-dash">
+    <main class="lado-direito-dash">
         <a routerLink="/chamados" class="voltar">
             <i class="ti ti-arrow-left"></i>
             Voltar para a lista
@@ -132,5 +81,5 @@
                 </div>
             </form>
         </div>
-    </section>
-</main>
+    </main>
+</div>

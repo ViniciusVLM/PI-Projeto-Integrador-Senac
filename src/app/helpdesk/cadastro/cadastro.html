@@ -26,9 +26,8 @@
     </section>
 
     <section class="lado-direito">
-        <form class="card-login">
-            <h1>Crie sua conta</h1>
-            <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
+        <form class="card-login" (submit)="$event.preventDefault()">
+            <h1>Crie sua Conta</h1>
 
             <div class="input-box">
                 <h5>E-mail institucional</h5>
@@ -39,7 +38,7 @@
             </div>
 
             <div class="input-box">
-                <h5>Crie uma senha</h5>
+                <h5>Crie sua senha</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
                     <input
@@ -80,11 +79,11 @@
                 </div>
             </div>
 
-            <button type="submit">Criar conta</button>
+            <button type="submit">Criar minha conta</button>
 
             <div class="login-link">
-                <p>Já tem uma conta? </p>
-                <p><a routerLink="/">Conecte-se</a> </p>
+                <p>Já tem uma conta?</p>
+                <p><a routerLink="/">Conecte-se</a></p>
             </div>
         </form>
     </section>

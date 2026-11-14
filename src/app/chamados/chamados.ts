@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Sidebar } from '../sidebar/sidebar';
 
 interface Chamado {
   id: number;
@@ -18,7 +19,7 @@ const API_URL = 'http://localhost:3000/api';
 
 @Component({
   selector: 'app-chamados',
-  imports: [RouterLink, RouterLinkActive, FormsModule],
+  imports: [RouterLink, FormsModule, Sidebar],
   templateUrl: './chamados.html',
   styleUrl: './chamados.css',
 })
@@ -45,6 +46,7 @@ export class Chamados implements OnInit {
     });
   }
 
+  // Lista filtrada pela busca (título, solicitante ou ID)
   get filtrados(): Chamado[] {
     const termo = this.busca.trim().toLowerCase();
     if (!termo) return this.chamados;
@@ -60,8 +62,14 @@ export class Chamados implements OnInit {
     return Math.max(1, Math.ceil(this.filtrados.length / this.porPagina));
   }
 
-  get paginas(): number[] {
-    return Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
+  // Botões da paginação com reticências: 1 2 3 ... 15
+  get paginas(): (number | string)[] {
+    const total = this.totalPaginas;
+    const p = this.pagina;
+    if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+    if (p <= 3) return [1, 2, 3, '...', total];
+    if (p >= total - 2) return [1, '...', total - 2, total - 1, total];
+    return [1, '...', p - 1, p, p + 1, '...', total];
   }
 
   get paginados(): Chamado[] {
@@ -77,16 +85,23 @@ export class Chamados implements OnInit {
     return Math.min(this.pagina * this.porPagina, this.filtrados.length);
   }
 
-  irPara(p: number): void {
-    if (p >= 1 && p <= this.totalPaginas) this.pagina = p;
+  irPara(p: number | string): void {
+    if (typeof p === 'number' && p >= 1 && p <= this.totalPaginas) this.pagina = p;
   }
 
+  // Ao buscar, volta para a primeira página
   buscar(): void {
     this.pagina = 1;
   }
 
   private normalizar(v: string): string {
     return (v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  // "EM ANÁLISE" -> "Em análise"
+  formatarStatus(v: string): string {
+    const t = (v || '').toLowerCase();
+    return t.charAt(0).toUpperCase() + t.slice(1);
   }
 
   prioridadeClasse(v: string): string {
@@ -100,12 +115,12 @@ export class Chamados implements OnInit {
 
   statusClasse(v: string): string {
     const n = this.normalizar(v);
-    if (n.includes('andamento')) return 'status-andamento';
+    if (n.includes('andamento') || n.includes('atendimento')) return 'status-andamento';
     if (n.includes('aguardando')) return 'status-aguardando';
     if (n.includes('analise')) return 'status-analise';
     if (n.includes('resolvid')) return 'status-resolvido';
     if (n.includes('abert')) return 'status-aberto';
-    return '';
+    return 'status-encerrado';
   }
 
   tempoRelativo(data?: string): string {

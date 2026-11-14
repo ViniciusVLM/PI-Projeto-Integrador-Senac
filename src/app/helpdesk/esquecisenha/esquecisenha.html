@@ -26,7 +26,7 @@
     </section>
 
     <section class="lado-direito">
-        <form class="card-login">
+        <form class="card-login" (submit)="$event.preventDefault()">
             <h1>Redefina sua senha</h1>
 
             <div class="input-box">
@@ -80,10 +80,6 @@
             </div>
 
             <button type="submit">Redefinir Senha</button>
-
-            <div class="voltar-login">
-                <p><a routerLink="/">Voltar ao login</a></p>
-            </div>
         </form>
     </section>
 

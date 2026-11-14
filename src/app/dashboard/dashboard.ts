@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AuthService, UsuarioPerfil } from '../core/services/auth.service';
+import { Sidebar } from '../sidebar/sidebar';
 
 interface Metricas {
   totalChamados: number;
@@ -21,6 +21,7 @@ interface Metricas {
     prioridade: string;
     categoriaNome: string;
     tecnicoNome: string;
+    solicitanteNome?: string;
     dataAbertura: string;
   }[];
   geradoEm: string;
@@ -30,7 +31,7 @@ const API_URL = 'http://localhost:3000/api';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgIf, NgFor, DatePipe, RouterLink, RouterLinkActive],
+  imports: [RouterLink, Sidebar],
   styleUrl: './dashboard.css',
   templateUrl: './dashboard.html',
 })
@@ -39,11 +40,11 @@ export class Dashboard implements OnInit {
   metricas: Metricas | null = null;
   carregando = true;
   erro = '';
+  periodo = '';
 
   constructor(
     private authService: AuthService,
     private http: HttpClient,
-    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -54,47 +55,105 @@ export class Dashboard implements OnInit {
   carregarMetricas(): void {
     this.carregando = true;
     this.erro = '';
-    this.http.get<Metricas>(`${API_URL}/dashboard/metricas`).subscribe({
+    const params: Record<string, string> = this.periodo ? { periodo: this.periodo } : {};
+
+    this.http.get<Metricas>(`${API_URL}/dashboard/metricas`, { params }).subscribe({
       next: (dados) => {
         this.metricas = dados;
         this.carregando = false;
       },
       error: (err) => {
         this.carregando = false;
-        if (err.status === 0) {
-          this.erro = 'Não foi possível conectar ao servidor. Execute: npm run server';
-        } else {
-          this.erro = 'Erro ao carregar métricas.';
-        }
+        this.erro =
+          err.status === 0
+            ? 'Não foi possível conectar ao servidor. Execute: npm run server'
+            : 'Erro ao carregar métricas.';
       },
     });
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
+  onPeriodo(event: Event): void {
+    this.periodo = (event.target as HTMLSelectElement).value;
+    this.carregarMetricas();
   }
 
-  getPerfilLabel(): string {
-    const mapa: Record<string, string> = {
-      admin: 'Administrador',
-      tecnico: 'Técnico',
-      cliente: 'Usuário',
-    };
-    return mapa[this.usuario?.perfil ?? ''] ?? this.usuario?.perfil ?? '';
+  get primeiroNome(): string {
+    return this.usuario?.nome?.split(' ')[0] ?? 'Usuário';
+  }
+
+  // Total de chamados aguardando usuário (vem de porStatus)
+  get aguardando(): number {
+    return (
+      this.metricas?.porStatus.find((s) => s.status.toUpperCase() === 'AGUARDANDO USUÁRIO')
+        ?.total ?? 0
+    );
+  }
+
+  // Legenda do gráfico de rosca
+  get statusLegenda() {
+    const m = this.metricas;
+    return [
+      { nome: 'Resolvidos', total: m?.chamadosResolvidos ?? 0, cor: '#2563eb' },
+      { nome: 'Abertos', total: m?.chamadosAbertos ?? 0, cor: '#22c55e' },
+      { nome: 'Em andamento', total: m?.chamadosEmAndamento ?? 0, cor: '#eab308' },
+      { nome: 'Aguardando usuário', total: this.aguardando, cor: '#ef4444' },
+    ];
+  }
+
+  // Monta o conic-gradient da rosca com a proporção de cada status
+  get donutGradiente(): string {
+    const total = this.metricas?.totalChamados ?? 0;
+    if (!total) return '#e2e8f0';
+
+    let acumulado = 0;
+    const partes = this.statusLegenda.map((s) => {
+      const inicio = acumulado;
+      acumulado += (s.total / total) * 100;
+      return `${s.cor} ${inicio}% ${acumulado}%`;
+    });
+    if (acumulado < 100) partes.push(`#e2e8f0 ${acumulado}% 100%`);
+    return `conic-gradient(${partes.join(', ')})`;
+  }
+
+  // Barras do gráfico de prioridade, sempre na mesma ordem
+  get prioridades() {
+    const ordem = [
+      { nome: 'Baixa', cor: '#2563eb' },
+      { nome: 'Média', cor: '#eab308' },
+      { nome: 'Alta', cor: '#f97316' },
+      { nome: 'Crítica', cor: '#ef4444' },
+    ];
+    const lista = this.metricas?.porPrioridade ?? [];
+    return ordem.map((o) => ({
+      ...o,
+      total: lista.find((p) => p.prioridade === o.nome)?.total ?? 0,
+    }));
+  }
+
+  // Altura da barra (em %) proporcional ao maior valor
+  alturaBarra(total: number): number {
+    const maior = Math.max(1, ...this.prioridades.map((p) => p.total));
+    return (total / maior) * 75;
+  }
+
+  // Tabela mostra só os 4 mais recentes
+  get recentes() {
+    return (this.metricas?.recentes ?? []).slice(0, 4);
+  }
+
+  formatarStatus(status: string): string {
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   }
 
   getStatusClass(status: string): string {
     const mapa: Record<string, string> = {
       'ABERTO': 'badge-aberto',
-      'EM ANÁLISE': 'badge-analise',
-      'EM ATENDIMENTO': 'badge-atendimento',
+      'EM ANÁLISE': 'badge-andamento',
+      'EM ATENDIMENTO': 'badge-andamento',
       'AGUARDANDO USUÁRIO': 'badge-aguardando',
       'RESOLVIDO': 'badge-resolvido',
-      'ENCERRADO': 'badge-encerrado',
-      'CANCELADO': 'badge-cancelado',
     };
-    return mapa[status] ?? 'badge-default';
+    return mapa[status.toUpperCase()] ?? 'badge-default';
   }
 
   getPrioridadeClass(prioridade: string): string {
@@ -105,5 +164,15 @@ export class Dashboard implements OnInit {
       'Crítica': 'prioridade-critica',
     };
     return mapa[prioridade] ?? '';
+  }
+
+  // Ex.: "Há 5 min", "Há 2 horas", "Há 1 dia"
+  tempoRelativo(data: string): string {
+    const min = Math.max(0, Math.floor((Date.now() - new Date(data).getTime()) / 60000));
+    if (min < 60) return `Há ${min} min`;
+    const horas = Math.floor(min / 60);
+    if (horas < 24) return `Há ${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+    const dias = Math.floor(horas / 24);
+    return `Há ${dias} ${dias === 1 ? 'dia' : 'dias'}`;
   }
 }

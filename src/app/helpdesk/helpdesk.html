@@ -5,7 +5,7 @@
             <i class="bx bxs-shield-alt-2"></i>
             <div>
                 <h4>Secure<span>Desk</span></h4>
-                <p>Sistemas de Chamado de TI</p>
+                <p>Sistemas de Chamados de TI</p>
             </div>
         </div>
 
@@ -43,7 +43,7 @@
                         id="email"
                         name="email"
                         [(ngModel)]="email"
-                        placeholder="exemplo@empresa.com"
+                        placeholder="exemplo@empresa.com.br"
                         type="email"
                         autocomplete="email"
                         required
@@ -52,7 +52,7 @@
             </div>
 
             <div class="input-box">
-                <h5>Senha de Acesso</h5>
+                <h5>Senha de acesso</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
                     <input
@@ -86,7 +86,7 @@
             </div>
 
             <button type="submit" [disabled]="carregando">
-                <span *ngIf="!carregando">Login</span>
+                <span *ngIf="!carregando">Entrar no Painel</span>
                 <span *ngIf="carregando">Entrando...</span>
             </button>
 
