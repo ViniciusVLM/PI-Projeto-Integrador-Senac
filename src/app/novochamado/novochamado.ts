@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Sidebar } from '../sidebar/sidebar';
 
 interface Opcao { id: number; nome: string; }
 
@@ -10,7 +11,7 @@ const LIMITE = 10 * 1024 * 1024;
 
 @Component({
   selector: 'app-novochamado',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, Sidebar],
   templateUrl: './novochamado.html',
   styleUrl: './novochamado.css',
 })

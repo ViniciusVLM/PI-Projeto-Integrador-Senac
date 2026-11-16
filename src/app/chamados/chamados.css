@@ -1,133 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-/* Reset: remove margens/paddings padrão e padroniza a fonte */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-}
-
-html, body {
-    width: 100%;
-    height: 100%;
-}
-
 /* Layout geral: sidebar + conteúdo lado a lado */
 .container-dash {
     display: flex;
     width: 100%;
     min-height: 100vh;
-}
-
-/* ---------- SIDEBAR ---------- */
-.lado-esquerdo-dash {
-    flex: 0 0 270px;
-    background-color: #0c1c3a;
-    color: #fff;
-    padding: 20px 10px; /* espaço no topo (logo) e no rodapé (usuário) */
-    display: flex;
-    flex-direction: column;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 30px;
-}
-
-.logo i {
-    font-size: 22px;
-    background: #2f6bff;
-    padding: 8px;
-    border-radius: 8px;
-}
-
-.logo h3 {
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.logo p {
-    font-size: 10px;
-    color: #7fb0ff;
-    white-space: nowrap;
-}
-
-.menuItems {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-/* Item do menu: sem fundo; destaque azul apenas no hover */
-.menuItem {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 9px;
-    text-decoration: none;
-    color: #c7d3e3;
-    font-size: 14px;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.menuItem:hover {
-    background: linear-gradient(90deg, #1650b8, #3b82f6);
-    color: #fff;
-}
-
-.menuItem i {
-    font-size: 17px;
-}
-
-.menuItem h4 {
-    margin: 0;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-/* Empurra o bloco do usuário para o fim da sidebar */
-.lado-esquerdo-dash footer {
-    margin-top: auto;
-    padding-top: 30px;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 20px 25px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-}
-
-.user-info i {
-    font-size: 22px;
-    color: #fff;
-}
-
-.user-text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.user-text h4 {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    white-space: nowrap;
-}
-
-.user-text p {
-    margin: 0;
-    font-size: 11px;
-    color: #8fa1bd;
-    white-space: nowrap;
 }
 
 /* ---------- CONTEÚDO ---------- */
@@ -247,6 +122,12 @@ html, body {
     overflow: hidden;
 }
 
+.erro-msg {
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #64748b;
+}
+
 .tabela-scroll {
     flex: 1;
     overflow-x: auto;
@@ -276,9 +157,15 @@ td {
     border-bottom: 1px solid #e2e8f0;
 }
 
+/* Última coluna (Atualizado) alinhada à direita */
 th:last-child,
 td:last-child {
     text-align: right;
+}
+
+td.sem-resultado {
+    text-align: center;
+    color: #94a3b8;
 }
 
 tbody tr:hover {
@@ -291,12 +178,23 @@ tbody tr:hover {
 }
 
 .titulo-chamado {
-    max-width: 260px;
+    max-width: 400px;
     font-weight: 600;
     color: #0f172a;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Links da tabela sem azul/sublinhado padrão do navegador */
+.id-chamado a,
+.titulo-chamado a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.titulo-chamado a:hover {
+    color: #0f4aa8;
 }
 
 /* ---------- BADGES ---------- */
@@ -329,6 +227,7 @@ tbody tr:hover {
 .status-analise    { background: #fef3c7; color: #a16207; }
 .status-resolvido  { background: #dbeafe; color: #1d4ed8; }
 .status-aguardando { background: #fee2e2; color: #dc2626; }
+.status-encerrado  { background: #e2e8f0; color: #475569; }
 
 /* ---------- RODAPÉ DA TABELA / PAGINAÇÃO ---------- */
 .rodape-tabela {
@@ -363,8 +262,13 @@ tbody tr:hover {
     cursor: pointer;
 }
 
-.paginacao button:hover {
+.paginacao button:hover:not(:disabled) {
     background: #f1f5f9;
+}
+
+.paginacao button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .paginacao button.atual {
@@ -373,15 +277,16 @@ tbody tr:hover {
     border-color: #0f4aa8;
 }
 
+.reticencias {
+    padding: 0 2px;
+    color: #94a3b8;
+}
+
 /* ---------- RESPONSIVO ---------- */
 /* Telas menores: sidebar vai para o topo e a busca ocupa a largura toda */
 @media (max-width: 900px) {
     .container-dash {
         flex-direction: column;
-    }
-
-    .lado-esquerdo-dash {
-        flex: none;
     }
 
     .busca {

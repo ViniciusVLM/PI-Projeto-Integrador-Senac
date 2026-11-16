@@ -16,11 +16,16 @@ export class Helpdesk {
   lembrar = true;
   carregando = false;
   erroMensagem = '';
+  mostrarSenha = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
   ) {}
+
+  alternarSenha(): void {
+    this.mostrarSenha = !this.mostrarSenha;
+  }
 
   onLogin(): void {
     this.erroMensagem = '';

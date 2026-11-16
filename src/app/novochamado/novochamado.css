@@ -1,134 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-/* Reset: remove margens/paddings padrão e padroniza a fonte */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-}
-
-html, body {
-    width: 100%;
-    height: 100%;
-}
-
 /* Layout geral: sidebar + conteúdo lado a lado */
 .container-dash {
     display: flex;
     width: 100%;
     min-height: 100vh;
-}
-
-/* ---------- SIDEBAR ---------- */
-/* ---------- SIDEBAR ---------- */
-.lado-esquerdo-dash {
-    flex: 0 0 270px;
-    background-color: #0c1c3a;
-    color: #fff;
-    padding: 20px 10px; /* espaço no topo (logo) e no rodapé (usuário) */
-    display: flex;
-    flex-direction: column;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 30px;
-}
-
-.logo i {
-    font-size: 22px;
-    background: #2f6bff;
-    padding: 8px;
-    border-radius: 8px;
-}
-
-.logo h3 {
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.logo p {
-    font-size: 10px;
-    color: #7fb0ff;
-    white-space: nowrap;
-}
-
-.menuItems {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-/* Item do menu: sem fundo; destaque azul apenas no hover */
-.menuItem {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 9px;
-    text-decoration: none;
-    color: #c7d3e3;
-    font-size: 14px;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.menuItem:hover {
-    background: linear-gradient(90deg, #1650b8, #3b82f6);
-    color: #fff;
-}
-
-.menuItem i {
-    font-size: 17px;
-}
-
-.menuItem h4 {
-    margin: 0;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-/* Empurra o bloco do usuário para o fim da sidebar */
-.lado-esquerdo-dash footer {
-    margin-top: auto;
-    padding-top: 30px;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 20px 25px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-}
-
-.user-info i {
-    font-size: 22px;
-    color: #fff;
-}
-
-.user-text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.user-text h4 {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    white-space: nowrap;
-}
-
-.user-text p {
-    margin: 0;
-    font-size: 11px;
-    color: #8fa1bd;
-    white-space: nowrap;
 }
 
 /* ---------- CONTEÚDO ---------- */
@@ -138,7 +12,7 @@ html, body {
     padding: 24px 28px;
     min-width: 0;
     display: flex;
-    flex-direction: column; /* link no topo, card ocupa o resto da altura */
+    flex-direction: column;
 }
 
 .voltar {
@@ -239,6 +113,7 @@ html, body {
     background-position: right 12px center;
 }
 
+/* Placeholder cinza enquanto nenhuma opção obrigatória foi escolhida */
 .campo select:invalid {
     color: #94a3b8;
 }
@@ -249,8 +124,22 @@ html, body {
     gap: 16px;
 }
 
+/* ---------- MENSAGENS DE ERRO ---------- */
+.msg-erro {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+.erro-campo {
+    color: #b91c1c;
+    font-size: 12px;
+}
+
 /* ---------- UPLOAD ---------- */
-/* Área de upload com borda tracejada */
 .upload {
     display: flex;
     align-items: center;
@@ -286,7 +175,6 @@ html, body {
 }
 
 /* ---------- AÇÕES ---------- */
-/* Rodapé do formulário: Cancelar à esquerda, Enviar à direita */
 .acoes {
     display: flex;
     justify-content: space-between;
@@ -324,37 +212,19 @@ html, body {
     background: #0c3d8c;
 }
 
+.btn-enviar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* ---------- RESPONSIVO ---------- */
-/* Telas menores: sidebar vai para o topo e os selects empilham */
 @media (max-width: 900px) {
     .container-dash {
         flex-direction: column;
-    }
-
-    .lado-esquerdo-dash {
-        flex: none;
     }
 
     .linha-campos {
         flex-direction: column;
         gap: 0;
     }
-.msg-erro {
-    background: #fee2e2;
-    color: #991b1b;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 13px;
-}
-
-.erro-campo {
-    color: #b91c1c;
-    font-size: 12px;
-}
-
-.btn-enviar:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
 }

@@ -1,17 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-}
-
-body {
-    min-height: 100vh;
-    background-color: #f2f4f7;
-}
-
 .container {
     display: flex;
     width: 100%;
@@ -52,7 +38,9 @@ body {
 }
 
 .logo p {
-    font-size: 10px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     color: #9fb0d0;
 }
 
@@ -113,13 +101,14 @@ body {
     padding: 40px;
 }
 
+/* Card: sombra suave no lugar da borda tracejada */
 .card-login {
     width: 100%;
-    max-width: 500px;
+    max-width: 440px;
     background: #fff;
-    padding: 90px;
+    padding: 40px;
     border-radius: 14px;
-    border: 1px dashed #cfd8e8;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
 .card-login h1 {
@@ -193,8 +182,15 @@ body {
     gap: 6px;
 }
 
+/* Checkbox azul */
+.relembre-esqueci input[type="checkbox"] {
+    accent-color: #1a3ea8;
+}
+
+/* "Esqueci minha senha" em negrito */
 .relembre-esqueci a {
-    color: #2f6bff;
+    color: #1a3ea8;
+    font-weight: 600;
     text-decoration: none;
 }
 
@@ -215,6 +211,12 @@ button[type="submit"]:hover {
     background-color: #16337f;
 }
 
+button[type="submit"]:disabled {
+    background-color: #9fb0d0;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
 .registro-link {
     text-align: center;
     font-size: 12px;
@@ -222,18 +224,9 @@ button[type="submit"]:hover {
 }
 
 .registro-link a {
-    color: #2f6bff;
+    color: #1a3ea8;
     text-decoration: none;
-    font-weight: 500;
-}
-
-@media (max-width: 800px) {
-    .container {
-        flex-direction: column;
-    }
-    .lado-esquerdo {
-        display: none;
-    }
+    font-weight: 600;
 }
 
 .alerta-erro {
@@ -256,13 +249,17 @@ button[type="submit"]:hover {
     flex-shrink: 0;
 }
 
-button[type="submit"]:disabled {
-    background-color: #9fb0d0;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
-}
+}
+
+@media (max-width: 800px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .lado-esquerdo {
+        display: none;
+    }
+}

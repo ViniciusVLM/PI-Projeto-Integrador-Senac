@@ -1,0 +1,55 @@
+<div class="container-dash">
+  <app-sidebar />
+
+  <main class="lado-direito-dash">
+    <header class="topo">
+      <div class="titulo-pagina">
+        <h1>Equipamentos</h1>
+        <p>Controle os equipamentos cadastrados</p>
+      </div>
+
+      <div class="topo-acoes">
+        <label class="busca">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Buscar equipamento..." (input)="onBusca($event)" />
+        </label>
+        <button type="button" class="btn btn-enviar btn-novo">
+          <i class="bi bi-plus-lg"></i> Novo equipamento
+        </button>
+      </div>
+    </header>
+
+    <section class="card-tabela">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Equipamento</th>
+            <th>Tipo</th>
+            <th>Patrimônio</th>
+            <th>Usuário</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of filtrados(); track e.id) {
+            <tr>
+              <td class="col-nome">{{ e.nome }}</td>
+              <td class="col-destaque">{{ e.tipo }}</td>
+              <td class="col-secundaria">{{ e.patrimonio }}</td>
+              <td class="col-secundaria">{{ e.usuario }}</td>
+              <td>
+                <span class="badge" [class.badge-inativo]="!e.ativo">
+                  {{ e.ativo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="sem-resultado">Nenhum equipamento encontrado.</td></tr>
+          }
+        </tbody>
+      </table>
+
+      <p class="rodape-tabela">Total: <strong>{{ filtrados().length }}</strong> equipamentos</p>
+    </section>
+  </main>
+</div>

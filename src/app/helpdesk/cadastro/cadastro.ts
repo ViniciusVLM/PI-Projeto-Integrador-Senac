@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-cadastro',
@@ -7,4 +7,15 @@ import { RouterLink } from "@angular/router";
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css',
 })
-export class Cadastro {}
+export class Cadastro {
+  mostrarSenha = false;
+  mostrarConfirmarSenha = false;
+
+  alternarSenha(): void {
+    this.mostrarSenha = !this.mostrarSenha;
+  }
+
+  alternarConfirmarSenha(): void {
+    this.mostrarConfirmarSenha = !this.mostrarConfirmarSenha;
+  }
+}
