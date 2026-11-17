@@ -62,11 +62,18 @@
                         name="senha"
                         [(ngModel)]="senha"
                         placeholder="••••••••••••"
-                        type="password"
+                        [type]="mostrarSenha ? 'text' : 'password'"
                         autocomplete="current-password"
                         required
                     >
-                    <i class="bx bx-hide olho"></i>
+                    <button
+                        type="button"
+                        class="olho"
+                        (click)="alternarSenha()"
+                        [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+                    >
+                        <i [class]="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
+                    </button>
                 </div>
             </div>
 

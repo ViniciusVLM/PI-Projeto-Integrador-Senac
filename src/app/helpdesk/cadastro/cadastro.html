@@ -28,15 +28,33 @@
     
     
     <section class="lado-direito">
-        <form class="card-login">
+        <form class="card-login" (ngSubmit)="onCadastrar()" #cadastroForm="ngForm" novalidate>
             <h1>Crie sua conta</h1>
             <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
         
+            <div *ngIf="erroMensagem" class="alerta-erro" role="alert">
+                <i class="bx bxs-error-circle"></i>
+                {{ erroMensagem }}
+            </div>
+
+            <div *ngIf="sucessoMensagem" class="alerta-sucesso" role="alert">
+                <i class="bx bxs-check-circle"></i>
+                {{ sucessoMensagem }}
+            </div>
+
             <div class="input-box">
                 <h5>E-mail institucional</h5>
                 <div class="campo">
                     <i class="bx bxs-envelope" ></i>
-                    <input placeholder="exemplo@empresa.com" type="email">
+                    <input
+                        id="email"
+                        name="email"
+                        [(ngModel)]="email"
+                        placeholder="exemplo@empresa.com"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
                 </div>
             </div>
                 
@@ -44,8 +62,23 @@
                 <h5>Crie uma senha</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
-                    <input placeholder="••••••••••••" type="password">
-                    <i class="bx bx-hide olho"></i>
+                    <input
+                        id="senha"
+                        name="senha"
+                        [(ngModel)]="senha"
+                        placeholder="••••••••••••"
+                        [type]="mostrarSenha ? 'text' : 'password'"
+                        autocomplete="new-password"
+                        required
+                    >
+                    <button
+                        type="button"
+                        class="olho"
+                        (click)="alternarSenha()"
+                        [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+                    >
+                        <i [class]="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
+                    </button>
                 </div>
             </div>
 
@@ -53,12 +86,30 @@
                 <h5>Confirme sua senha</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
-                    <input placeholder="••••••••••••" type="password">
-                    <i class="bx bx-hide olho"></i>
+                    <input
+                        id="confirmarSenha"
+                        name="confirmarSenha"
+                        [(ngModel)]="confirmarSenha"
+                        placeholder="••••••••••••"
+                        [type]="mostrarConfirmarSenha ? 'text' : 'password'"
+                        autocomplete="new-password"
+                        required
+                    >
+                    <button
+                        type="button"
+                        class="olho"
+                        (click)="alternarConfirmarSenha()"
+                        [attr.aria-label]="mostrarConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+                    >
+                        <i [class]="mostrarConfirmarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
+                    </button>
                 </div>
             </div>
             
-            <button type="submit">Criar conta</button>
+            <button type="submit" [disabled]="carregando">
+                <span *ngIf="!carregando">Criar conta</span>
+                <span *ngIf="carregando">Cadastrando...</span>
+            </button>
 
             <div class="login-link">
                 <p>Já tem uma conta? </p>

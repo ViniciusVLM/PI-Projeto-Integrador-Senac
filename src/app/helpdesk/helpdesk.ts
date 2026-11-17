@@ -13,6 +13,7 @@ import { AuthService } from '../core/services/auth.service';
 export class Helpdesk {
   email = '';
   senha = '';
+  mostrarSenha = false;
   lembrar = true;
   carregando = false;
   erroMensagem = '';
@@ -21,6 +22,10 @@ export class Helpdesk {
     private authService: AuthService,
     private router: Router,
   ) {}
+
+  alternarSenha(): void {
+    this.mostrarSenha = !this.mostrarSenha;
+  }
 
   onLogin(): void {
     this.erroMensagem = '';
