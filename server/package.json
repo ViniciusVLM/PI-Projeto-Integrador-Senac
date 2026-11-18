@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "pi-projeto-integrador-senac": "file:.."
-  }
+    "multer": "^2.5.0"
+  },
+  "description": "API REST do SecureDesk. As dependências são instaladas pelo package.json da raiz (npm install)."
 }

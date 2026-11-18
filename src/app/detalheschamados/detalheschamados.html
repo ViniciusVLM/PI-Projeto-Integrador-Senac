@@ -1,0 +1,109 @@
+<div class="container-dash">
+    <app-sidebar />
+
+    <main class="lado-direito-dash">
+        <div class="barra-topo">
+            <a routerLink="/chamados" class="link-voltar">
+                <i class="ti ti-arrow-left"></i>
+                Voltar para a lista
+            </a>
+            <button type="button" class="btn btn-filtro">
+                Ações
+                <i class="ti ti-chevron-down"></i>
+            </button>
+        </div>
+
+        @if (carregando) { <p class="msg-estado">Carregando...</p> }
+        @if (erro) { <p class="msg-estado msg-erro">{{ erro }}</p> }
+
+        @if (chamado) {
+            <!-- Lista de atividades, usada na aba "Histórico" e no card da direita -->
+            <ng-template #historico>
+                <ul class="linha-tempo">
+                    @for (e of eventos; track $index) {
+                        <li [class.atual]="e.atual">
+                            <p><strong>{{ e.autor }}</strong> {{ e.acao }}</p>
+                            @if (e.data) {
+                                <span>{{ e.data | date:"dd/MM 'às' HH:mm" }}</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            </ng-template>
+
+            <div class="titulo-detalhe">
+                <h1>#{{ chamado.id }} – {{ chamado.titulo }}</h1>
+                <span class="badge prioridade {{ prioridadeClasse(chamado.prioridade) }}">{{ chamado.prioridade }}</span>
+                <span class="badge {{ statusClasse(chamado.status) }}">{{ formatarStatus(chamado.status) }}</span>
+                <span class="categoria">{{ chamado.categoriaNome }}</span>
+            </div>
+
+            <div class="grade-detalhe">
+                <div class="coluna-principal">
+
+                    <div class="card">
+                        <h2>Informações do chamado</h2>
+                        <dl class="lista-info">
+                            <dt>Solicitante:</dt>
+                            <dd>{{ (chamado.solicitanteNome || '—') + (chamado.solicitanteSetor ? ' (' + chamado.solicitanteSetor + ')' : '') }}</dd>
+                            <dt>Data de abertura:</dt>
+                            <dd>{{ chamado.dataAbertura | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
+                            <dt>Equipamento:</dt>
+                            <dd>{{ (chamado.equipamentoNome || '—') + (chamado.equipamentoPatrimonio ? ' ' + chamado.equipamentoPatrimonio : '') }}</dd>
+                            <dt>Última atualização:</dt>
+                            <dd>{{ (chamado.dataAtualizacao || chamado.dataAbertura) | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
+                            <dt>Técnico responsável:</dt>
+                            <dd>{{ chamado.tecnicoNome || 'Aguardando atribuição' }}</dd>
+                        </dl>
+                    </div>
+
+                    <div class="card card-descricao">
+                        <div class="abas">
+                            <button type="button" class="aba" [class.ativa]="aba === 'descricao'" (click)="aba = 'descricao'">Descrição</button>
+                            <button type="button" class="aba" [class.ativa]="aba === 'historico'" (click)="aba = 'historico'">Histórico</button>
+                            <button type="button" class="aba" [class.ativa]="aba === 'anexos'" (click)="aba = 'anexos'">Anexos ({{ chamado.anexos?.length ?? 0 }})</button>
+                        </div>
+
+                        <div class="conteudo-aba">
+                            @switch (aba) {
+                                @case ('descricao') {
+                                    <div class="texto-descricao">
+                                        <p>{{ chamado.descricao }}</p>
+                                    </div>
+                                }
+                                @case ('historico') {
+                                    <ng-container [ngTemplateOutlet]="historico" />
+                                }
+                                @case ('anexos') {
+                                    <ul class="lista-anexos">
+                                        @for (a of chamado.anexos ?? []; track $index) {
+                                            <li><i class="ti ti-paperclip"></i> {{ a.nome }}</li>
+                                        } @empty {
+                                            <li class="vazio">Nenhum anexo.</li>
+                                        }
+                                    </ul>
+                                }
+                            }
+                        </div>
+
+                        <div class="resposta">
+                            <input type="text" placeholder="Digite uma resposta ou atualização pública sobre o caso...">
+                            <div class="resposta-acoes">
+                                <a href="#" class="anexar">
+                                    <i class="ti ti-paperclip"></i>
+                                    Anexar arquivo
+                                </a>
+                                <button type="button" class="btn btn-novo">Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Histórico de atividades</h2>
+                    <ng-container [ngTemplateOutlet]="historico" />
+                </div>
+            </div>
+        }
+    </main>
+</div>

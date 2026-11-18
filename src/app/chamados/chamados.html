@@ -1,0 +1,80 @@
+<div class="container-dash">
+    <app-sidebar />
+
+    <main class="lado-direito-dash">
+        <div class="cabecalho">
+            <div>
+                <h1>Chamados de TI</h1>
+                <p class="subtitulo">Gerencie e acompanhe todos os incidentes e solicitações de suporte.</p>
+            </div>
+
+            <div class="acoes-topo">
+                <label class="busca">
+                    <i class="ti ti-search"></i>
+                    <input type="text" placeholder="Pesquisar chamados..." [(ngModel)]="busca" (ngModelChange)="buscar()">
+                </label>
+                <button type="button" class="btn btn-filtro">
+                    <i class="ti ti-filter"></i>
+                    Filtros
+                </button>
+                <a routerLink="/novochamado" class="btn btn-novo">
+                    <i class="ti ti-plus"></i>
+                    Novo chamado
+                </a>
+            </div>
+        </div>
+
+        <div class="card-tabela">
+            @if (erro) { <p class="erro-msg">{{ erro }}</p> }
+            @if (carregando) { <p class="erro-msg">Carregando...</p> }
+
+            <div class="tabela-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título do incidente</th>
+                            <th>Solicitante</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Técnico</th>
+                            <th>Atualizado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (c of paginados; track c.id) {
+                            <tr>
+                                <td class="id-chamado"><a [routerLink]="['/detalhes-chamados', c.id]">#{{ c.id }}</a></td>
+                                <td class="titulo-chamado"><a [routerLink]="['/detalhes-chamados', c.id]">{{ c.titulo }}</a></td>
+                                <td>{{ c.solicitanteNome || '—' }}</td>
+                                <td><span class="badge prioridade {{ prioridadeClasse(c.prioridade) }}">{{ c.prioridade }}</span></td>
+                                <td><span class="badge {{ statusClasse(c.status) }}">{{ formatarStatus(c.status) }}</span></td>
+                                <td>{{ c.tecnicoNome || 'Aguardando Atrib.' }}</td>
+                                <td>{{ tempoRelativo(c.dataAtualizacao || c.dataAbertura) }}</td>
+                            </tr>
+                        } @empty {
+                            @if (!carregando) {
+                                <tr><td colspan="7" class="sem-resultado">Nenhum chamado encontrado.</td></tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="rodape-tabela">
+                <span>Mostrando <strong>{{ inicio }}-{{ fim }}</strong> de <strong>{{ filtrados.length }}</strong> chamados</span>
+                <div class="paginacao">
+                    <button type="button" [disabled]="pagina === 1" (click)="irPara(pagina - 1)"><i class="ti ti-chevron-left"></i></button>
+                    @for (p of paginas; track $index) {
+                        @if (p === '...') {
+                            <span class="reticencias">...</span>
+                        } @else {
+                            <button type="button" [class.atual]="p === pagina" (click)="irPara(p)">{{ p }}</button>
+                        }
+                    }
+                    <button type="button" [disabled]="pagina === totalPaginas" (click)="irPara(pagina + 1)"><i class="ti ti-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

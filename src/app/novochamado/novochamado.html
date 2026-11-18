@@ -1,0 +1,85 @@
+<div class="container-dash">
+    <app-sidebar />
+
+    <main class="lado-direito-dash">
+        <a routerLink="/chamados" class="voltar">
+            <i class="ti ti-arrow-left"></i>
+            Voltar para a lista
+        </a>
+
+        <div class="card-form">
+            <h1>Abrir novo chamado</h1>
+            <p class="subtitulo">Preencha as informações detalhadas para registrar o ticket na central de TI.</p>
+
+            @if (erro) { <div class="msg-erro">{{ erro }}</div> }
+
+            <form [formGroup]="form" (ngSubmit)="enviar()">
+                <div class="campo">
+                    <label for="titulo">Título do chamado *</label>
+                    <input type="text" id="titulo" formControlName="titulo" placeholder="Ex: Problemas de conexão com o banco de dados">
+                    @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
+                        <small class="erro-campo">Informe um título (mín. 5 caracteres).</small>
+                    }
+                </div>
+
+                <div class="campo">
+                    <label for="descricao">Descrição detalhada *</label>
+                    <textarea id="descricao" rows="6" formControlName="descricao" placeholder="Por favor, descreva o erro com o máximo de detalhes possível, incluindo passos para reproduzir..."></textarea>
+                    @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
+                        <small class="erro-campo">Informe uma descrição (mín. 10 caracteres).</small>
+                    }
+                </div>
+
+                <div class="linha-campos">
+                    <div class="campo">
+                        <label for="categoria">Categoria *</label>
+                        <select id="categoria" formControlName="categoriaId" required>
+                            <option value="">Selecione...</option>
+                            @for (c of categorias; track c.id) {
+                                <option [value]="c.id">{{ c.nome }}</option>
+                            }
+                        </select>
+                        @if (form.controls.categoriaId.touched && form.controls.categoriaId.invalid) {
+                            <small class="erro-campo">Selecione uma categoria.</small>
+                        }
+                    </div>
+
+                    <div class="campo">
+                        <label for="prioridade">Prioridade *</label>
+                        <select id="prioridade" formControlName="prioridade">
+                            @for (p of prioridades; track p) {
+                                <option [value]="p">{{ p }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="equipamento">Equipamento</label>
+                        <select id="equipamento" formControlName="equipamentoId">
+                            <option value="">Selecionar equipamento...</option>
+                            @for (e of equipamentos; track e.id) {
+                                <option [value]="e.id">{{ e.nome }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="anexo">Anexos</label>
+                    <div class="upload">
+                        <input type="file" id="anexo" hidden multiple (change)="selecionarArquivos($event)">
+                        <label for="anexo" class="btn-arquivo">Escolher arquivo</label>
+                        <span id="nome-arquivo">{{ textoAnexos }}</span>
+                    </div>
+                </div>
+
+                <div class="acoes">
+                    <button type="button" class="btn btn-cancelar" routerLink="/chamados">Cancelar</button>
+                    <button type="submit" class="btn btn-enviar" [disabled]="enviando">
+                        {{ enviando ? 'Enviando...' : 'Enviar chamado' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>

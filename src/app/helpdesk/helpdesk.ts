@@ -17,6 +17,7 @@ export class Helpdesk {
   lembrar = true;
   carregando = false;
   erroMensagem = '';
+  mostrarSenha = false;
 
   constructor(
     private authService: AuthService,

@@ -1,0 +1,128 @@
+:host {
+    display: flex;
+    flex: 0 0 270px;
+}
+
+.lado-esquerdo-dash {
+    flex: 1;
+    background-color: #0c1c3a;
+    color: #fff;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.logo i {
+    font-size: 22px;
+    background: #2f6bff;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.logo h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.logo p {
+    font-size: 10px;
+    color: #7fb0ff;
+    white-space: nowrap;
+}
+
+.menuItems {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    text-decoration: none;
+    color: #c7d3e3;
+    font-size: 14px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menuItem:hover,
+.menuItem.active {
+    background: linear-gradient(90deg, #1650b8, #3b82f6);
+    color: #fff;
+}
+
+.menuItem i {
+    font-size: 17px;
+}
+
+.menuItem h4 {
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+footer {
+    margin-top: auto;
+    padding-top: 30px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+}
+
+.avatar {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #2f6bff;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-text h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.user-text p {
+    margin: 0;
+    font-size: 11px;
+    color: #8fa1bd;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    :host {
+        flex: none;
+    }
+}
