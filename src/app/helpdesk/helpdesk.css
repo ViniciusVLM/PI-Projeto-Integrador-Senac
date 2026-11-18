@@ -1,3 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #f2f4f7;
+}
+
 .container {
     display: flex;
     width: 100%;
@@ -38,9 +52,7 @@
 }
 
 .logo p {
-    font-size: 9px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    font-size: 10px;
     color: #9fb0d0;
 }
 
@@ -101,14 +113,13 @@
     padding: 40px;
 }
 
-/* Card: sombra suave no lugar da borda tracejada */
 .card-login {
     width: 100%;
-    max-width: 440px;
+    max-width: 500px;
     background: #fff;
-    padding: 40px;
+    padding: 90px;
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    border: 1px dashed #cfd8e8;
 }
 
 .card-login h1 {
@@ -141,17 +152,55 @@
     align-items: center;
 }
 
-.campo i {
+.campo > i {
     position: absolute;
     left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     color: #9aa5b8;
     font-size: 16px;
+    line-height: 1;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .campo .olho {
-    left: auto;
+    position: absolute;
     right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: #9aa5b8;
     cursor: pointer;
+    z-index: 2;
+    transition: color 0.2s ease;
+}
+
+.campo .olho:hover {
+    color: #2f6bff;
+}
+
+.campo .olho:focus-visible {
+    outline: 2px solid #2f6bff;
+    outline-offset: 1px;
+}
+
+.campo .olho i {
+    position: static;
+    transform: none;
+    font-size: 18px;
+    color: inherit;
+    line-height: 1;
+    pointer-events: none;
 }
 
 .campo input {
@@ -161,6 +210,12 @@
     border-radius: 8px;
     font-size: 13px;
     outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.campo:has(.olho) input,
+.campo input[type="password"] {
+    padding-right: 44px;
 }
 
 .campo input:focus {
@@ -182,15 +237,8 @@
     gap: 6px;
 }
 
-/* Checkbox azul */
-.relembre-esqueci input[type="checkbox"] {
-    accent-color: #1a3ea8;
-}
-
-/* "Esqueci minha senha" em negrito */
 .relembre-esqueci a {
-    color: #1a3ea8;
-    font-weight: 600;
+    color: #2f6bff;
     text-decoration: none;
 }
 
@@ -211,12 +259,6 @@ button[type="submit"]:hover {
     background-color: #16337f;
 }
 
-button[type="submit"]:disabled {
-    background-color: #9fb0d0;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
 .registro-link {
     text-align: center;
     font-size: 12px;
@@ -224,9 +266,18 @@ button[type="submit"]:disabled {
 }
 
 .registro-link a {
-    color: #1a3ea8;
+    color: #2f6bff;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 500;
+}
+
+@media (max-width: 800px) {
+    .container {
+        flex-direction: column;
+    }
+    .lado-esquerdo {
+        display: none;
+    }
 }
 
 .alerta-erro {
@@ -249,17 +300,14 @@ button[type="submit"]:disabled {
     flex-shrink: 0;
 }
 
+button[type="submit"]:disabled {
+    background-color: #9fb0d0;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 800px) {
-    .container {
-        flex-direction: column;
-    }
-
-    .lado-esquerdo {
-        display: none;
-    }
-}

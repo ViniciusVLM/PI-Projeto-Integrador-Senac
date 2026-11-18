@@ -152,17 +152,55 @@ body {
     align-items: center;
 }
 
-.campo i {
+.campo > i {
     position: absolute;
     left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     color: #9aa5b8;
     font-size: 16px;
+    line-height: 1;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .campo .olho {
-    left: auto;
+    position: absolute;
     right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: #9aa5b8;
     cursor: pointer;
+    z-index: 2;
+    transition: color 0.2s ease;
+}
+
+.campo .olho:hover {
+    color: #2f6bff;
+}
+
+.campo .olho:focus-visible {
+    outline: 2px solid #2f6bff;
+    outline-offset: 1px;
+}
+
+.campo .olho i {
+    position: static;
+    transform: none;
+    font-size: 18px;
+    color: inherit;
+    line-height: 1;
+    pointer-events: none;
 }
 
 .campo input {
@@ -172,6 +210,12 @@ body {
     border-radius: 8px;
     font-size: 13px;
     outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.campo:has(.olho) input,
+.campo input[type="password"] {
+    padding-right: 44px;
 }
 
 .campo input:focus {
@@ -234,4 +278,55 @@ button[type="submit"]:hover {
     .lado-esquerdo {
         display: none;
     }
+}
+
+.alerta-erro {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff0f0;
+    border: 1px solid #ffcdd2;
+    border-left: 4px solid #e53935;
+    color: #c62828;
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.2s ease;
+}
+
+.alerta-erro i {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.alerta-sucesso {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-left: 4px solid #43a047;
+    color: #2e7d32;
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.2s ease;
+}
+
+.alerta-sucesso i {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+button[type="submit"]:disabled {
+    background-color: #9fb0d0;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
 }

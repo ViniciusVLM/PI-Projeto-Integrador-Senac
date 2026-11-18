@@ -13,6 +13,7 @@ import { AuthService } from '../core/services/auth.service';
 export class Helpdesk {
   email = '';
   senha = '';
+  mostrarSenha = false;
   lembrar = true;
   carregando = false;
   erroMensagem = '';

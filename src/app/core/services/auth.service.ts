@@ -14,6 +14,25 @@ export interface LoginResponse {
   usuario: UsuarioPerfil;
 }
 
+export interface CadastroPayload {
+  email: string;
+  senha: string;
+  confirmarSenha?: string;
+  nome?: string;
+}
+
+export interface EsqueciSenhaPayload {
+  email: string;
+  novaSenha?: string;
+  confirmarSenha?: string;
+  senha?: string;
+}
+
+export interface MensagemResponse {
+  mensagem: string;
+  usuario?: UsuarioPerfil;
+}
+
 const API_URL = 'http://localhost:3000/api';
 const TOKEN_KEY = 'securedesk_token';
 const USUARIO_KEY = 'securedesk_usuario';
@@ -67,5 +86,17 @@ export class AuthService {
   temPerfil(...perfis: string[]): boolean {
     const perfil = this.getPerfil();
     return perfil ? perfis.includes(perfil) : false;
+  }
+
+  cadastrar(dados: CadastroPayload): Observable<MensagemResponse> {
+    return this.http.post<MensagemResponse>(`${API_URL}/auth/cadastro`, dados);
+  }
+
+  esqueciSenha(dados: EsqueciSenhaPayload): Observable<MensagemResponse> {
+    return this.http.post<MensagemResponse>(`${API_URL}/auth/esqueci-senha`, dados);
+  }
+
+  redefinirSenha(email: string, novaSenha: string, confirmarSenha?: string): Observable<MensagemResponse> {
+    return this.esqueciSenha({ email, novaSenha, confirmarSenha });
   }
 }

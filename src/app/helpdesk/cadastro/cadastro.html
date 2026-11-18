@@ -1,5 +1,6 @@
 <main class="container">
-
+    
+    
     <section class="lado-esquerdo">
         <div class="logo">
             <i class="bx bxs-shield-alt-2"></i>
@@ -24,37 +25,60 @@
             Protegido por criptografia TLS.
         </footer>
     </section>
-
+    
+    
     <section class="lado-direito">
-        <form class="card-login" (submit)="$event.preventDefault()">
-            <h1>Crie sua Conta</h1>
+        <form class="card-login" (ngSubmit)="onCadastrar()" #cadastroForm="ngForm" novalidate>
+            <h1>Crie sua conta</h1>
+            <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
+        
+            <div *ngIf="erroMensagem" class="alerta-erro" role="alert">
+                <i class="bx bxs-error-circle"></i>
+                {{ erroMensagem }}
+            </div>
+
+            <div *ngIf="sucessoMensagem" class="alerta-sucesso" role="alert">
+                <i class="bx bxs-check-circle"></i>
+                {{ sucessoMensagem }}
+            </div>
 
             <div class="input-box">
                 <h5>E-mail institucional</h5>
                 <div class="campo">
-                    <i class="bx bxs-envelope"></i>
-                    <input placeholder="exemplo@empresa.com" type="email">
+                    <i class="bx bxs-envelope" ></i>
+                    <input
+                        id="email"
+                        name="email"
+                        [(ngModel)]="email"
+                        placeholder="exemplo@empresa.com"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
                 </div>
             </div>
-
+                
             <div class="input-box">
-                <h5>Crie sua senha</h5>
+                <h5>Crie uma senha</h5>
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
                     <input
+                        id="senha"
+                        name="senha"
+                        [(ngModel)]="senha"
                         placeholder="••••••••••••"
                         [type]="mostrarSenha ? 'text' : 'password'"
+                        autocomplete="new-password"
+                        required
                     >
-                    <i
-                        class="bx olho"
-                        [class.bx-show]="mostrarSenha"
-                        [class.bx-hide]="!mostrarSenha"
+                    <button
+                        type="button"
+                        class="olho"
                         (click)="alternarSenha()"
-                        (keydown.enter)="alternarSenha()"
-                        role="button"
-                        tabindex="0"
                         [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
-                    ></i>
+                    >
+                        <i [class]="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
+                    </button>
                 </div>
             </div>
 
@@ -63,27 +87,33 @@
                 <div class="campo">
                     <i class="bx bxs-lock-alt"></i>
                     <input
+                        id="confirmarSenha"
+                        name="confirmarSenha"
+                        [(ngModel)]="confirmarSenha"
                         placeholder="••••••••••••"
                         [type]="mostrarConfirmarSenha ? 'text' : 'password'"
+                        autocomplete="new-password"
+                        required
                     >
-                    <i
-                        class="bx olho"
-                        [class.bx-show]="mostrarConfirmarSenha"
-                        [class.bx-hide]="!mostrarConfirmarSenha"
+                    <button
+                        type="button"
+                        class="olho"
                         (click)="alternarConfirmarSenha()"
-                        (keydown.enter)="alternarConfirmarSenha()"
-                        role="button"
-                        tabindex="0"
                         [attr.aria-label]="mostrarConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'"
-                    ></i>
+                    >
+                        <i [class]="mostrarConfirmarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
+                    </button>
                 </div>
             </div>
-
-            <button type="submit">Criar minha conta</button>
+            
+            <button type="submit" [disabled]="carregando">
+                <span *ngIf="!carregando">Criar conta</span>
+                <span *ngIf="carregando">Cadastrando...</span>
+            </button>
 
             <div class="login-link">
-                <p>Já tem uma conta?</p>
-                <p><a routerLink="/">Conecte-se</a></p>
+                <p>Já tem uma conta? </p>
+                <p><a routerLink="/">Conecte-se</a> </p>
             </div>
         </form>
     </section>
