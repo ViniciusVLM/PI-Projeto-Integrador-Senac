@@ -1,4 +1,5 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Sidebar } from '../sidebar/sidebar';
 
 interface Usuario {
@@ -9,6 +10,16 @@ interface Usuario {
   ativo: boolean;
 }
 
+interface UsuarioApi {
+  id: number;
+  nome: string;
+  email: string;
+  perfil: string;
+  status: string;
+}
+
+const API_URL = 'http://localhost:3000/api';
+
 @Component({
   selector: 'app-usuarioslista',
   standalone: true,
@@ -16,16 +27,35 @@ interface Usuario {
   templateUrl: './usuarioslista.html',
   styleUrl: './usuarioslista.css',
 })
-export class Usuarioslista {
-  usuarios = signal<Usuario[]>([
-    { id: 1, nome: 'Ana Souza', email: 'ana.souza@empresa.com', perfil: 'Administrador', ativo: true },
-    { id: 2, nome: 'Carlos Lima', email: 'carlos.lima@empresa.com', perfil: 'Técnico', ativo: true },
-    { id: 3, nome: 'Marina Alves', email: 'marina.alves@empresa.com', perfil: 'Solicitante', ativo: true },
-    { id: 4, nome: 'João Pereira', email: 'joao.pereira@empresa.com', perfil: 'Técnico', ativo: false },
-    { id: 5, nome: 'Fernanda Rocha', email: 'fernanda.rocha@empresa.com', perfil: 'Solicitante', ativo: true },
-  ]);
+export class Usuarioslista implements OnInit {
+  private http = inject(HttpClient);
+
+  usuarios = signal<Usuario[]>([]);
 
   busca = signal('');
+
+  ngOnInit(): void {
+    const mapaPerfil: Record<string, string> = {
+      admin: 'Administrador',
+      tecnico: 'Técnico',
+      cliente: 'Solicitante',
+    };
+
+    this.http.get<UsuarioApi[]>(`${API_URL}/usuarios`).subscribe({
+      next: (lista) => {
+        this.usuarios.set(
+          lista.map((u) => ({
+            id: u.id,
+            nome: u.nome,
+            email: u.email,
+            perfil: mapaPerfil[u.perfil] ?? u.perfil,
+            ativo: u.status === 'Ativo',
+          }))
+        );
+      },
+      error: () => {},
+    });
+  }
 
   filtrados = computed(() => {
     const termo = this.busca().toLowerCase().trim();

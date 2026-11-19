@@ -1,6 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const db = require('../db');
+const { hashSenha, conferirSenha } = require('../utils/seguranca');
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post('/login', (req, res) => {
   }
 
   const usuario = db.data.usuarios.find(
-    (u) => u.email.toLowerCase() === email.toLowerCase() && u.senha === senha && u.status === 'Ativo'
+    (u) => u.email.toLowerCase() === email.toLowerCase() && conferirSenha(senha, u.senha) && u.status === 'Ativo'
   );
 
   if (!usuario) {
@@ -79,7 +80,7 @@ const handleCadastro = (req, res) => {
     id: novoId,
     nome: nomeFormatado,
     email: email.trim().toLowerCase(),
-    senha,
+    senha: hashSenha(senha),
     perfil: 'cliente',
     status: 'Ativo',
   };
@@ -100,6 +101,7 @@ const handleCadastro = (req, res) => {
 
 router.post('/cadastro', handleCadastro);
 router.post('/register', handleCadastro);
+router.post('/registro', handleCadastro);
 
 const handleEsqueciSenha = (req, res) => {
   const { email, senha, novaSenha, confirmarSenha } = req.body;
@@ -126,7 +128,7 @@ const handleEsqueciSenha = (req, res) => {
       return res.status(400).json({ erro: 'As senhas não coincidem.' });
     }
 
-    usuario.senha = proximaSenha;
+    usuario.senha = hashSenha(proximaSenha);
     db.save();
 
     return res.status(200).json({

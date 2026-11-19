@@ -80,6 +80,14 @@
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "cliente",
       "status": "Ativo"
+    },
+    {
+      "id": 10,
+      "nome": "Vini172006v",
+      "email": "vini172006v@gmail.com",
+      "senha": "$2b$10$9WwnYFAsy95BTxklJSJktuLvCmelBlITbk5pP0NTBQcbIeRwnbiiS",
+      "perfil": "cliente",
+      "status": "Ativo"
     }
   ],
   "categorias": [
@@ -2391,6 +2399,12 @@
       "dataCriacao": "2026-11-07T14:05:00.000Z"
     }
   ],
-  "tokens": [],
+  "tokens": [
+    {
+      "token": "4455fdc5-47d8-4090-a32a-17ac9f4e7a13",
+      "usuarioId": 10,
+      "criadoEm": "2026-11-19T00:47:53.948Z"
+    }
+  ],
   "redefinicoes": []
 }
