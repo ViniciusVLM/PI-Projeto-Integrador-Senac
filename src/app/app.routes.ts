@@ -10,6 +10,8 @@ import { DetalhesChamados } from './detalheschamados/detalheschamados';
 import { Usuarioslista } from './usuarioslista/usuarioslista';
 import { Equipamentoslista } from './equipamentoslista/equipamentoslista';
 import { Categorialista } from './categorialista/categorialista';
+import { Relatorios } from './relatorios/relatorios';
+import { Configuracoes } from './configuracoes/configuracoes';
 
 export const routes: Routes = [
   { path: '', component: Helpdesk, title: 'Login | SecureDesk' },
@@ -27,5 +29,7 @@ export const routes: Routes = [
   { path: 'usuarios', component: Usuarioslista, title: 'Usuários | SecureDesk', canActivate: [authGuard] },
   { path: 'equipamentos', component: Equipamentoslista, title: 'Equipamentos | SecureDesk', canActivate: [authGuard] },
   { path: 'categorias', component: Categorialista, title: 'Categorias | SecureDesk', canActivate: [authGuard] },
+  { path: 'relatorios', component: Relatorios, title: 'Relatórios | SecureDesk', canActivate: [authGuard] },
+  { path: 'configuracoes', component: Configuracoes, title: 'Configurações | SecureDesk', canActivate: [authGuard] },
   { path: '**', redirectTo: '' },
 ];

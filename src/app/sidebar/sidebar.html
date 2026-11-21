@@ -23,20 +23,20 @@
     <a class="menuItem" routerLink="/categorias" routerLinkActive="active">
       <i class="bi bi-tags"></i><h4>Categorias</h4>
     </a>
-    <a class="menuItem" href="#">
+    <a class="menuItem" routerLink="/relatorios" routerLinkActive="active">
       <i class="bi bi-bar-chart"></i><h4>Relatórios</h4>
     </a>
-    <a class="menuItem" href="#">
+    <a class="menuItem" routerLink="/configuracoes" routerLinkActive="active">
       <i class="bi bi-gear"></i><h4>Configurações</h4>
     </a>
   </nav>
 
   <footer>
     <div class="user-info">
-      <div class="avatar">AD</div>
+      <div class="avatar">{{ iniciais }}</div>
       <div class="user-text">
-        <h4>Administrador</h4>
-        <p>Perfil de acesso</p>
+        <h4>{{ nomeUsuario }}</h4>
+        <p>{{ cargoUsuario }}</p>
       </div>
     </div>
   </footer>

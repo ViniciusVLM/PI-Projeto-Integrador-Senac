@@ -1,0 +1,344 @@
+<div class="container-dash">
+  <app-sidebar />
+
+  <main class="lado-direito-dash">
+    <header class="topo">
+      <div class="titulo-pagina">
+        <h1>Configurações</h1>
+        <p>Gerencie seus dados pessoais e as preferências do sistema</p>
+      </div>
+    </header>
+
+    @if (erroMensagem) {
+      <div class="alerta alerta-erro" role="alert">
+        <i class="ti ti-alert-circle"></i>
+        <span>{{ erroMensagem }}</span>
+      </div>
+    }
+
+    @if (sucessoMensagem) {
+      <div class="alerta alerta-sucesso" role="status">
+        <i class="ti ti-circle-check"></i>
+        <span>{{ sucessoMensagem }}</span>
+      </div>
+    }
+
+    <div class="config-layout">
+      <!-- Submenu lateral -->
+      <aside class="config-menu">
+        <button
+          type="button"
+          class="menu-btn"
+          [class.ativo]="secaoAtiva === 'perfil'"
+          (click)="selecionarSecao('perfil', 'secao-perfil')"
+        >
+          <i class="ti ti-user"></i>
+          <span>Meu perfil</span>
+        </button>
+
+        <button
+          type="button"
+          class="menu-btn"
+          [class.ativo]="secaoAtiva === 'senha'"
+          (click)="selecionarSecao('senha', 'secao-senha')"
+        >
+          <i class="ti ti-lock"></i>
+          <span>Alterar senha</span>
+        </button>
+
+        <button
+          type="button"
+          class="menu-btn"
+          [class.ativo]="secaoAtiva === 'notificacoes'"
+          (click)="selecionarSecao('notificacoes', 'secao-notificacoes')"
+        >
+          <i class="ti ti-bell"></i>
+          <span>Notificações</span>
+        </button>
+
+        <button
+          type="button"
+          class="menu-btn"
+          [class.ativo]="secaoAtiva === 'preferencias'"
+          (click)="selecionarSecao('preferencias', 'secao-preferencias')"
+        >
+          <i class="ti ti-adjustments-horizontal"></i>
+          <span>Preferências</span>
+        </button>
+
+        <button
+          type="button"
+          class="menu-btn menu-btn-admin"
+          [class.ativo]="secaoAtiva === 'parametros'"
+          (click)="selecionarSecao('parametros', 'secao-parametros')"
+        >
+          <i class="ti ti-server"></i>
+          <span class="texto-quebra">Parâmetros<br />do sistema</span>
+          <span class="badge-admin">Admin</span>
+        </button>
+      </aside>
+
+      <!-- Conteúdo principal -->
+      <section class="config-conteudo">
+        <!-- Card 1: Meu perfil -->
+        <div class="painel" id="secao-perfil">
+          <h2>Meu perfil</h2>
+
+          <div class="perfil-topo">
+            <div class="perfil-identidade">
+              @if (config.fotoBase64) {
+                <img [src]="config.fotoBase64" alt="Foto do perfil" class="avatar-grande avatar-img" />
+              } @else {
+                <div class="avatar-grande">{{ inicial }}</div>
+              }
+              <div class="perfil-nomes">
+                <strong>{{ nome || 'Usuário' }}</strong>
+                <span>{{ cargoSubtitulo }}</span>
+              </div>
+            </div>
+
+            <div>
+              <input
+                #fotoInput
+                type="file"
+                accept="image/*"
+                hidden
+                (change)="aoSelecionarFoto($event)"
+              />
+              <button type="button" class="btn-foto" (click)="fotoInput.click()">
+                <i class="ti ti-camera"></i>
+                <span>Alterar foto</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid-2col">
+            <div class="campo">
+              <label for="cfg-nome">Nome completo</label>
+              <input
+                id="cfg-nome"
+                type="text"
+                [(ngModel)]="nome"
+                name="nome"
+                placeholder="Informe seu nome completo"
+              />
+            </div>
+
+            <div class="campo">
+              <label for="cfg-email">E-mail institucional</label>
+              <div class="input-bloqueado">
+                <input
+                  id="cfg-email"
+                  type="email"
+                  [value]="email"
+                  disabled
+                  readonly
+                />
+                <i class="ti ti-lock"></i>
+              </div>
+            </div>
+
+            <div class="campo">
+              <label for="cfg-telefone">Telefone</label>
+              <input
+                id="cfg-telefone"
+                type="text"
+                [(ngModel)]="telefone"
+                name="telefone"
+                placeholder="(11) 90000-0000"
+              />
+            </div>
+
+            <div class="campo">
+              <label for="cfg-perfil">Perfil de acesso</label>
+              <div class="input-bloqueado">
+                <input
+                  id="cfg-perfil"
+                  type="text"
+                  [value]="perfilExibicao"
+                  disabled
+                  readonly
+                />
+                <i class="ti ti-lock"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Alterar senha -->
+        <div class="painel" id="secao-senha">
+          <h2>Alterar senha</h2>
+
+          <div class="grid-3col">
+            <div class="campo">
+              <label for="cfg-senha-atual">Senha atual</label>
+              <input
+                id="cfg-senha-atual"
+                type="password"
+                [(ngModel)]="senhaAtual"
+                name="senhaAtual"
+                placeholder="••••••••••"
+                autocomplete="current-password"
+              />
+            </div>
+
+            <div class="campo">
+              <label for="cfg-nova-senha">Nova senha</label>
+              <input
+                id="cfg-nova-senha"
+                type="password"
+                [(ngModel)]="novaSenha"
+                name="novaSenha"
+                placeholder="••••••••••"
+                autocomplete="new-password"
+              />
+            </div>
+
+            <div class="campo">
+              <label for="cfg-confirmar-senha">Confirmar nova senha</label>
+              <input
+                id="cfg-confirmar-senha"
+                type="password"
+                [(ngModel)]="confirmarSenha"
+                name="confirmarSenha"
+                placeholder="••••••••••"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+
+          <small class="dica-senha">Use ao menos 6 caracteres.</small>
+        </div>
+
+        <!-- Card 3: Notificações -->
+        <div class="painel" id="secao-notificacoes">
+          <h2>Notificações</h2>
+
+          <div class="lista-switches">
+            <label class="linha-switch">
+              <span>Receber e-mail quando um chamado for atribuído a mim</span>
+              <input type="checkbox" [(ngModel)]="config.notifAtribuido" name="notifAtribuido" />
+              <span class="slider"></span>
+            </label>
+
+            <label class="linha-switch">
+              <span>Avisar quando o status de um chamado for alterado</span>
+              <input type="checkbox" [(ngModel)]="config.notifStatus" name="notifStatus" />
+              <span class="slider"></span>
+            </label>
+
+            <label class="linha-switch">
+              <span>Receber resumo semanal de indicadores</span>
+              <input type="checkbox" [(ngModel)]="config.notifResumo" name="notifResumo" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Card 4: Preferências (exibido ao clicar na aba Preferências) -->
+        @if (secaoAtiva === 'preferencias') {
+          <div class="painel" id="secao-preferencias">
+            <h2>Preferências</h2>
+
+            <div class="grid-2col">
+              <div class="campo">
+                <label for="cfg-idioma">Idioma da interface</label>
+                <select id="cfg-idioma" [(ngModel)]="config.idioma" name="idioma">
+                  <option value="pt-BR">Português (Brasil)</option>
+                  <option value="en-US">English (US)</option>
+                  <option value="es-ES">Español</option>
+                </select>
+              </div>
+
+              <div class="campo">
+                <label for="cfg-itens">Itens por página nas listagens</label>
+                <select id="cfg-itens" [(ngModel)]="config.itensPorPagina" name="itensPorPagina">
+                  <option value="5">5 itens por página</option>
+                  <option value="10">10 itens por página</option>
+                  <option value="20">20 itens por página</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="lista-switches">
+              <label class="linha-switch">
+                <span>Exibir visualização compacta nas tabelas do sistema</span>
+                <input type="checkbox" [(ngModel)]="config.dashboardCompacto" name="dashboardCompacto" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        }
+
+        <!-- Card 5: Parâmetros do sistema (exibido ao clicar na aba Parâmetros do sistema) -->
+        @if (secaoAtiva === 'parametros') {
+          <div class="painel" id="secao-parametros">
+            <div class="painel-cabecalho">
+              <h2>Parâmetros do sistema</h2>
+              <span class="badge-admin">Admin</span>
+            </div>
+
+            @if (!isAdmin) {
+              <p class="aviso-restrito">
+                Os parâmetros globais do sistema são exibidos apenas para consulta e só podem ser alterados por um <strong>Administrador</strong>.
+              </p>
+            }
+
+            <div class="grid-2col">
+              <div class="campo">
+                <label for="cfg-sla">Prazo padrão de atendimento SLA (horas)</label>
+                <input
+                  id="cfg-sla"
+                  type="number"
+                  min="1"
+                  max="168"
+                  [(ngModel)]="config.slaPadraoHoras"
+                  name="slaPadraoHoras"
+                  [disabled]="!isAdmin"
+                />
+              </div>
+
+              <div class="campo">
+                <label for="cfg-prio">Prioridade padrão na abertura de chamados</label>
+                <select
+                  id="cfg-prio"
+                  [(ngModel)]="config.prioridadePadrao"
+                  name="prioridadePadrao"
+                  [disabled]="!isAdmin"
+                >
+                  <option value="Baixa">Baixa</option>
+                  <option value="Média">Média</option>
+                  <option value="Alta">Alta</option>
+                  <option value="Crítica">Crítica</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="lista-switches">
+              <label class="linha-switch">
+                <span>Permitir auto-cadastro público de novos clientes na tela de login</span>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="config.cadastroPublicoAtivo"
+                  name="cadastroPublicoAtivo"
+                  [disabled]="!isAdmin"
+                />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        }
+
+        <!-- Ações no rodapé -->
+        <div class="acoes-rodape">
+          <button type="button" class="btn-cancelar" [disabled]="salvando" (click)="restaurar()">
+            Cancelar
+          </button>
+          <button type="button" class="btn-salvar" [disabled]="salvando" (click)="salvarAlteracoes()">
+            {{ salvando ? 'Salvando...' : 'Salvar alterações' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,184 @@
+<div class="container-dash">
+  <app-sidebar />
+
+  <main class="lado-direito-dash">
+    <header class="topo">
+      <div class="titulo-pagina">
+        <h1>Relatórios</h1>
+        <p>Analise o desempenho do atendimento e exporte os dados</p>
+      </div>
+
+      <button
+        type="button"
+        class="btn-exportar"
+        [disabled]="exportando || semPermissao || carregando"
+        (click)="exportarCsv()"
+      >
+        <i class="ti ti-download"></i>
+        <span>{{ exportando ? 'Exportando...' : 'Exportar' }}</span>
+      </button>
+    </header>
+
+    <section class="filtros-barra">
+      <div class="filtro-select">
+        <select [(ngModel)]="meses" (change)="carregarRelatorio()" aria-label="Período">
+          <option value="1">Período: Último mês</option>
+          <option value="3">Período: Últimos 3 meses</option>
+          <option value="6">Período: Últimos 6 meses</option>
+          <option value="12">Período: Últimos 12 meses</option>
+        </select>
+      </div>
+
+      <div class="filtro-select">
+        <select [(ngModel)]="categoriaId" (change)="carregarRelatorio()" aria-label="Categoria">
+          <option value="">Categoria: Todas</option>
+          @for (c of categorias; track c.id) {
+            <option [value]="c.id">Categoria: {{ c.nome }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filtro-select">
+        <select [(ngModel)]="tecnicoId" (change)="carregarRelatorio()" aria-label="Técnico">
+          <option value="">Técnico: Todos</option>
+          @for (t of tecnicos; track t.id) {
+            <option [value]="t.id">Técnico: {{ t.nome }}</option>
+          }
+          <option value="nenhum">Técnico: Não atribuído</option>
+        </select>
+      </div>
+
+      <div class="filtro-select">
+        <select [(ngModel)]="status" (change)="carregarRelatorio()" aria-label="Status">
+          <option value="">Status: Todos</option>
+          @for (s of statusOpcoes; track s.valor) {
+            <option [value]="s.valor">Status: {{ s.nome }}</option>
+          }
+        </select>
+      </div>
+    </section>
+
+    @if (carregando) {
+      <div class="estado">
+        <p>Carregando indicadores do relatório...</p>
+      </div>
+    } @else if (erro) {
+      <div class="estado erro">
+        <p>{{ erro }}</p>
+        @if (!semPermissao) {
+          <button type="button" (click)="carregarRelatorio()">Tentar novamente</button>
+        }
+      </div>
+    } @else if (dados) {
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span class="kpi-label">Total de chamados</span>
+            <strong class="kpi-valor">{{ dados.totalChamados }}</strong>
+          </div>
+          <div class="kpi-icone icone-azul">
+            <i class="ti ti-file-text"></i>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span class="kpi-label">Chamados resolvidos</span>
+            <strong class="kpi-valor">{{ dados.chamadosResolvidos }}</strong>
+          </div>
+          <div class="kpi-icone icone-verde">
+            <i class="ti ti-circle-check"></i>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span class="kpi-label">Taxa de resolução</span>
+            <strong class="kpi-valor">{{ dados.taxaResolucao }}%</strong>
+          </div>
+          <div class="kpi-icone icone-roxo">
+            <i class="ti ti-trending-up"></i>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span class="kpi-label">Tempo médio de resolução</span>
+            <strong class="kpi-valor">{{ formatarTempo(dados.tempoMedioResolucaoHoras) }}</strong>
+          </div>
+          <div class="kpi-icone icone-laranja">
+            <i class="ti ti-clock"></i>
+          </div>
+        </div>
+      </section>
+
+      <section class="graficos">
+        <div class="painel">
+          <h2>Chamados por mês</h2>
+          <div class="barras-mes">
+            @for (m of dados.porMes; track m.mes) {
+              <div class="barra-col">
+                <div class="barra-area">
+                  <span class="barra-valor">{{ m.total }}</span>
+                  <div class="barra" [style.height.%]="alturaBarraMes(m.total)"></div>
+                </div>
+                <span class="barra-label">{{ rotuloMesCurto(m.rotulo) }}</span>
+              </div>
+            } @empty {
+              <p class="sem-dados">Sem registros no período selecionado.</p>
+            }
+          </div>
+        </div>
+
+        <div class="painel">
+          <h2>Chamados por categoria</h2>
+          <div class="lista-categorias">
+            @for (cat of dados.porCategoria; track cat.categoriaId) {
+              <div class="cat-linha">
+                <span class="cat-nome">{{ cat.categoriaNome }}</span>
+                <div class="cat-trilha">
+                  <div class="cat-preenchimento" [style.width.%]="larguraCategoria(cat.total)"></div>
+                </div>
+                <strong class="cat-total">{{ cat.total }}</strong>
+              </div>
+            } @empty {
+              <p class="sem-dados">Nenhum chamado encontrado para as categorias.</p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="painel painel-tabela">
+        <h2>Desempenho por técnico</h2>
+        <div class="tabela-wrapper">
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th>TÉCNICO</th>
+                <th>ATENDIDOS</th>
+                <th>RESOLVIDOS</th>
+                <th>TAXA DE RESOLUÇÃO</th>
+                <th>TEMPO MÉDIO</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of dados.porTecnico; track t.tecnicoNome) {
+                <tr>
+                  <td class="col-tecnico">{{ t.tecnicoNome }}</td>
+                  <td>{{ t.atendidos }}</td>
+                  <td>{{ t.resolvidos }}</td>
+                  <td>{{ t.taxaResolucao }}%</td>
+                  <td>{{ formatarTempo(t.tempoMedioResolucaoHoras) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="sem-resultado">Nenhum atendimento registrado para os filtros selecionados.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  </main>
+</div>

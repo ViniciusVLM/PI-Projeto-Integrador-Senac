@@ -1,7 +1,9 @@
 const express = require('express');
 const crypto = require('crypto');
 const db = require('../db');
-const { hashSenha, conferirSenha } = require('../utils/seguranca');
+const authMiddleware = require('../middleware/auth');
+const { hashSenha, conferirSenha, validarNovaSenha } = require('../utils/seguranca');
+const { semSenha, texto } = require('../utils/formatar');
 
 const router = express.Router();
 
@@ -37,6 +39,7 @@ router.post('/login', (req, res) => {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
+      telefone: usuario.telefone ?? null,
       perfil: usuario.perfil,
     },
   });
@@ -143,5 +146,48 @@ const handleEsqueciSenha = (req, res) => {
 
 router.post('/esqueci-senha', handleEsqueciSenha);
 router.post('/redefinir-senha', handleEsqueciSenha);
+
+router.get('/me', authMiddleware, (req, res) => {
+  return res.json(semSenha(req.usuario));
+});
+
+router.put('/me', authMiddleware, (req, res) => {
+  const nome = req.body.nome !== undefined ? texto(req.body.nome) : undefined;
+  const telefone = req.body.telefone !== undefined ? texto(req.body.telefone) || null : undefined;
+
+  if (nome !== undefined && (!nome || nome.length < 3)) {
+    return res.status(400).json({ erro: 'Informe o nome completo (mínimo de 3 caracteres).' });
+  }
+
+  if (nome !== undefined) req.usuario.nome = nome;
+  if (telefone !== undefined) req.usuario.telefone = telefone;
+  db.save();
+
+  return res.json(semSenha(req.usuario));
+});
+
+router.put('/me/senha', authMiddleware, (req, res) => {
+  const { senhaAtual, novaSenha, confirmarSenha } = req.body;
+
+  if (!senhaAtual || !novaSenha) {
+    return res.status(400).json({ erro: 'Campos obrigatórios: senhaAtual, novaSenha.' });
+  }
+  if (!conferirSenha(senhaAtual, req.usuario.senha)) {
+    return res.status(400).json({ erro: 'Senha atual incorreta.' });
+  }
+
+  const erroSenha = validarNovaSenha(novaSenha);
+  if (erroSenha) return res.status(400).json({ erro: erroSenha });
+
+  if (confirmarSenha !== undefined && confirmarSenha !== novaSenha) {
+    return res.status(400).json({ erro: 'As senhas não conferem.' });
+  }
+
+  req.usuario.senha = hashSenha(novaSenha);
+  db.data.tokens = db.data.tokens.filter((t) => t.usuarioId !== req.usuario.id || t.token === req.token);
+  db.save();
+
+  return res.json({ mensagem: 'Senha alterada com sucesso.' });
+});
 
 module.exports = router;

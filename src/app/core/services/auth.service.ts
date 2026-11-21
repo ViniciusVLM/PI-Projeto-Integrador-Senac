@@ -6,6 +6,7 @@ export interface UsuarioPerfil {
   id: number;
   nome: string;
   email: string;
+  telefone?: string | null;
   perfil: 'cliente' | 'tecnico' | 'admin';
 }
 
@@ -73,6 +74,13 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  atualizarUsuarioLocal(parcial: Partial<UsuarioPerfil>): void {
+    const atual = this.getUsuario();
+    if (!atual) return;
+    const atualizado = { ...atual, ...parcial };
+    localStorage.setItem(USUARIO_KEY, JSON.stringify(atualizado));
   }
 
   getPerfil(): string | null {
