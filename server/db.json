@@ -85,10 +85,10 @@
       "id": 10,
       "nome": "Vini172006v",
       "email": "vini172006v@gmail.com",
+      "telefone": "11948568186",
       "senha": "$2b$10$9WwnYFAsy95BTxklJSJktuLvCmelBlITbk5pP0NTBQcbIeRwnbiiS",
       "perfil": "cliente",
-      "status": "Ativo",
-      "telefone": "11948568186"
+      "status": "Ativo"
     }
   ],
   "categorias": [
@@ -281,8 +281,8 @@
       "prioridade": "Alta",
       "status": "ENCERRADO",
       "dataAbertura": "2026-05-13T15:25:00.000Z",
-      "dataAtualizacao": "2026-05-14T17:59:51.000Z",
-      "dataEncerramento": "2026-05-14T17:59:51.000Z",
+      "dataAtualizacao": "2026-05-14T20:59:51.000Z",
+      "dataEncerramento": "2026-05-14T20:59:51.000Z",
       "anexos": []
     },
     {
@@ -296,8 +296,8 @@
       "prioridade": "Baixa",
       "status": "ENCERRADO",
       "dataAbertura": "2026-05-21T14:07:00.000Z",
-      "dataAtualizacao": "2026-05-23T15:00:21.000Z",
-      "dataEncerramento": "2026-05-23T15:00:21.000Z",
+      "dataAtualizacao": "2026-05-23T18:00:21.000Z",
+      "dataEncerramento": "2026-05-23T18:00:21.000Z",
       "anexos": []
     },
     {
@@ -311,8 +311,8 @@
       "prioridade": "Crítica",
       "status": "ENCERRADO",
       "dataAbertura": "2026-06-09T11:40:00.000Z",
-      "dataAtualizacao": "2026-06-10T12:30:46.000Z",
-      "dataEncerramento": "2026-06-10T12:30:46.000Z",
+      "dataAtualizacao": "2026-06-10T15:30:46.000Z",
+      "dataEncerramento": "2026-06-10T15:30:46.000Z",
       "anexos": []
     },
     {
@@ -326,8 +326,8 @@
       "prioridade": "Baixa",
       "status": "ENCERRADO",
       "dataAbertura": "2026-06-20T13:32:00.000Z",
-      "dataAtualizacao": "2026-06-21T14:09:13.000Z",
-      "dataEncerramento": "2026-06-21T14:09:13.000Z",
+      "dataAtualizacao": "2026-06-21T17:09:13.000Z",
+      "dataEncerramento": "2026-06-21T17:09:13.000Z",
       "anexos": []
     },
     {
@@ -341,8 +341,8 @@
       "prioridade": "Alta",
       "status": "ENCERRADO",
       "dataAbertura": "2026-06-26T15:12:00.000Z",
-      "dataAtualizacao": "2026-06-28T00:42:28.000Z",
-      "dataEncerramento": "2026-06-28T00:42:28.000Z",
+      "dataAtualizacao": "2026-06-28T03:42:28.000Z",
+      "dataEncerramento": "2026-06-28T03:42:28.000Z",
       "anexos": []
     },
     {
@@ -356,8 +356,8 @@
       "prioridade": "Alta",
       "status": "CANCELADO",
       "dataAbertura": "2026-07-04T08:45:00.000Z",
-      "dataAtualizacao": "2026-07-04T17:38:46.000Z",
-      "dataEncerramento": "2026-07-04T17:38:46.000Z",
+      "dataAtualizacao": "2026-07-04T20:38:46.000Z",
+      "dataEncerramento": "2026-07-04T20:38:46.000Z",
       "anexos": []
     },
     {
@@ -371,8 +371,8 @@
       "prioridade": "Alta",
       "status": "ENCERRADO",
       "dataAbertura": "2026-07-13T12:12:00.000Z",
-      "dataAtualizacao": "2026-07-14T13:26:38.000Z",
-      "dataEncerramento": "2026-07-14T13:26:38.000Z",
+      "dataAtualizacao": "2026-07-14T16:26:38.000Z",
+      "dataEncerramento": "2026-07-14T16:26:38.000Z",
       "anexos": []
     },
     {
@@ -386,8 +386,8 @@
       "prioridade": "Crítica",
       "status": "ENCERRADO",
       "dataAbertura": "2026-07-24T13:32:00.000Z",
-      "dataAtualizacao": "2026-07-25T17:30:05.000Z",
-      "dataEncerramento": "2026-07-25T17:30:05.000Z",
+      "dataAtualizacao": "2026-07-25T20:30:05.000Z",
+      "dataEncerramento": "2026-07-25T20:30:05.000Z",
       "anexos": []
     },
     {
@@ -401,8 +401,8 @@
       "prioridade": "Média",
       "status": "ENCERRADO",
       "dataAbertura": "2026-08-02T10:12:00.000Z",
-      "dataAtualizacao": "2026-08-04T00:11:48.000Z",
-      "dataEncerramento": "2026-08-04T00:11:48.000Z",
+      "dataAtualizacao": "2026-08-04T03:11:48.000Z",
+      "dataEncerramento": "2026-08-04T03:11:48.000Z",
       "anexos": []
     },
     {
@@ -416,8 +416,8 @@
       "prioridade": "Média",
       "status": "ENCERRADO",
       "dataAbertura": "2026-08-15T16:40:00.000Z",
-      "dataAtualizacao": "2026-08-17T22:06:38.000Z",
-      "dataEncerramento": "2026-08-17T22:06:38.000Z",
+      "dataAtualizacao": "2026-08-18T01:06:38.000Z",
+      "dataEncerramento": "2026-08-18T01:06:38.000Z",
       "anexos": []
     },
     {
@@ -431,8 +431,8 @@
       "prioridade": "Alta",
       "status": "ENCERRADO",
       "dataAbertura": "2026-08-26T17:00:00.000Z",
-      "dataAtualizacao": "2026-08-27T07:00:05.000Z",
-      "dataEncerramento": "2026-08-27T07:00:05.000Z",
+      "dataAtualizacao": "2026-08-27T10:00:05.000Z",
+      "dataEncerramento": "2026-08-27T10:00:05.000Z",
       "anexos": []
     },
     {
@@ -446,8 +446,8 @@
       "prioridade": "Média",
       "status": "ENCERRADO",
       "dataAbertura": "2026-09-09T17:07:00.000Z",
-      "dataAtualizacao": "2026-09-11T11:14:58.000Z",
-      "dataEncerramento": "2026-09-11T11:14:58.000Z",
+      "dataAtualizacao": "2026-09-11T14:14:58.000Z",
+      "dataEncerramento": "2026-09-11T14:14:58.000Z",
       "anexos": []
     },
     {
@@ -461,8 +461,8 @@
       "prioridade": "Baixa",
       "status": "ENCERRADO",
       "dataAbertura": "2026-09-22T14:51:00.000Z",
-      "dataAtualizacao": "2026-09-24T05:23:45.000Z",
-      "dataEncerramento": "2026-09-24T05:23:45.000Z",
+      "dataAtualizacao": "2026-09-24T08:23:45.000Z",
+      "dataEncerramento": "2026-09-24T08:23:45.000Z",
       "anexos": []
     },
     {
@@ -476,8 +476,8 @@
       "prioridade": "Média",
       "status": "CANCELADO",
       "dataAbertura": "2026-09-22T10:51:00.000Z",
-      "dataAtualizacao": "2026-09-22T13:54:40.000Z",
-      "dataEncerramento": "2026-09-22T13:54:40.000Z",
+      "dataAtualizacao": "2026-09-22T16:54:40.000Z",
+      "dataEncerramento": "2026-09-22T16:54:40.000Z",
       "anexos": []
     },
     {
@@ -491,7 +491,7 @@
       "prioridade": "Média",
       "status": "RESOLVIDO",
       "dataAbertura": "2026-10-01T13:07:00.000Z",
-      "dataAtualizacao": "2026-10-03T14:27:21.000Z",
+      "dataAtualizacao": "2026-10-03T17:27:21.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -506,8 +506,8 @@
       "prioridade": "Baixa",
       "status": "ENCERRADO",
       "dataAbertura": "2026-10-03T15:40:00.000Z",
-      "dataAtualizacao": "2026-10-04T15:07:13.000Z",
-      "dataEncerramento": "2026-10-04T15:07:13.000Z",
+      "dataAtualizacao": "2026-10-04T18:07:13.000Z",
+      "dataEncerramento": "2026-10-04T18:07:13.000Z",
       "anexos": []
     },
     {
@@ -521,7 +521,7 @@
       "prioridade": "Média",
       "status": "RESOLVIDO",
       "dataAbertura": "2026-10-10T17:25:00.000Z",
-      "dataAtualizacao": "2026-10-12T18:20:54.000Z",
+      "dataAtualizacao": "2026-10-12T21:20:54.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -536,7 +536,7 @@
       "prioridade": "Crítica",
       "status": "RESOLVIDO",
       "dataAbertura": "2026-10-16T15:51:00.000Z",
-      "dataAtualizacao": "2026-10-17T00:00:32.000Z",
+      "dataAtualizacao": "2026-10-17T03:00:32.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -551,8 +551,8 @@
       "prioridade": "Crítica",
       "status": "ENCERRADO",
       "dataAbertura": "2026-10-18T16:12:00.000Z",
-      "dataAtualizacao": "2026-10-19T12:22:50.000Z",
-      "dataEncerramento": "2026-10-19T12:22:50.000Z",
+      "dataAtualizacao": "2026-10-19T15:22:50.000Z",
+      "dataEncerramento": "2026-10-19T15:22:50.000Z",
       "anexos": []
     },
     {
@@ -566,7 +566,7 @@
       "prioridade": "Média",
       "status": "RESOLVIDO",
       "dataAbertura": "2026-10-20T16:18:00.000Z",
-      "dataAtualizacao": "2026-10-21T17:03:15.000Z",
+      "dataAtualizacao": "2026-10-21T20:03:15.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -581,7 +581,7 @@
       "prioridade": "Alta",
       "status": "RESOLVIDO",
       "dataAbertura": "2026-10-26T08:18:00.000Z",
-      "dataAtualizacao": "2026-10-27T01:45:58.000Z",
+      "dataAtualizacao": "2026-10-27T04:45:58.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -596,7 +596,7 @@
       "prioridade": "Baixa",
       "status": "EM ATENDIMENTO",
       "dataAbertura": "2026-10-28T14:07:00.000Z",
-      "dataAtualizacao": "2026-10-28T17:56:00.000Z",
+      "dataAtualizacao": "2026-10-28T20:56:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -611,7 +611,7 @@
       "prioridade": "Baixa",
       "status": "EM ATENDIMENTO",
       "dataAbertura": "2026-10-30T14:32:00.000Z",
-      "dataAtualizacao": "2026-10-30T17:39:00.000Z",
+      "dataAtualizacao": "2026-10-30T20:39:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -626,7 +626,7 @@
       "prioridade": "Crítica",
       "status": "AGUARDANDO USUÁRIO",
       "dataAbertura": "2026-10-30T16:07:00.000Z",
-      "dataAtualizacao": "2026-10-30T23:30:53.000Z",
+      "dataAtualizacao": "2026-10-31T02:30:53.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -641,7 +641,7 @@
       "prioridade": "Média",
       "status": "EM ATENDIMENTO",
       "dataAbertura": "2026-10-31T12:18:00.000Z",
-      "dataAtualizacao": "2026-10-31T16:06:00.000Z",
+      "dataAtualizacao": "2026-10-31T19:06:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -656,7 +656,7 @@
       "prioridade": "Média",
       "status": "AGUARDANDO USUÁRIO",
       "dataAbertura": "2026-11-02T09:51:00.000Z",
-      "dataAtualizacao": "2026-11-02T17:37:13.000Z",
+      "dataAtualizacao": "2026-11-02T20:37:13.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -671,7 +671,7 @@
       "prioridade": "Média",
       "status": "EM ATENDIMENTO",
       "dataAbertura": "2026-11-03T12:07:00.000Z",
-      "dataAtualizacao": "2026-11-03T14:43:00.000Z",
+      "dataAtualizacao": "2026-11-03T17:43:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -686,7 +686,7 @@
       "prioridade": "Média",
       "status": "EM ANÁLISE",
       "dataAbertura": "2026-11-04T12:12:00.000Z",
-      "dataAtualizacao": "2026-11-04T12:51:00.000Z",
+      "dataAtualizacao": "2026-11-04T15:51:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -701,7 +701,7 @@
       "prioridade": "Alta",
       "status": "RESOLVIDO",
       "dataAbertura": "2026-11-04T16:25:00.000Z",
-      "dataAtualizacao": "2026-11-05T01:49:24.000Z",
+      "dataAtualizacao": "2026-11-05T04:49:24.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -716,7 +716,7 @@
       "prioridade": "Baixa",
       "status": "EM ATENDIMENTO",
       "dataAbertura": "2026-11-04T15:00:00.000Z",
-      "dataAtualizacao": "2026-11-04T16:56:00.000Z",
+      "dataAtualizacao": "2026-11-04T19:56:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -731,7 +731,7 @@
       "prioridade": "Média",
       "status": "EM ANÁLISE",
       "dataAbertura": "2026-11-05T12:18:00.000Z",
-      "dataAtualizacao": "2026-11-05T14:01:00.000Z",
+      "dataAtualizacao": "2026-11-05T17:01:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -746,7 +746,7 @@
       "prioridade": "Alta",
       "status": "AGUARDANDO USUÁRIO",
       "dataAbertura": "2026-11-05T10:12:00.000Z",
-      "dataAtualizacao": "2026-11-05T16:52:21.000Z",
+      "dataAtualizacao": "2026-11-05T19:52:21.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -761,7 +761,7 @@
       "prioridade": "Baixa",
       "status": "ABERTO",
       "dataAbertura": "2026-11-06T11:07:00.000Z",
-      "dataAtualizacao": "2026-11-06T11:07:00.000Z",
+      "dataAtualizacao": "2026-11-06T14:07:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -776,7 +776,7 @@
       "prioridade": "Alta",
       "status": "EM ANÁLISE",
       "dataAbertura": "2026-11-06T09:45:00.000Z",
-      "dataAtualizacao": "2026-11-06T09:59:00.000Z",
+      "dataAtualizacao": "2026-11-06T12:59:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -791,7 +791,7 @@
       "prioridade": "Baixa",
       "status": "EM ATENDIMENTO",
       "dataAbertura": "2026-11-06T09:07:00.000Z",
-      "dataAtualizacao": "2026-11-06T10:55:00.000Z",
+      "dataAtualizacao": "2026-11-06T13:55:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -806,7 +806,7 @@
       "prioridade": "Alta",
       "status": "ABERTO",
       "dataAbertura": "2026-11-06T08:07:00.000Z",
-      "dataAtualizacao": "2026-11-06T08:07:00.000Z",
+      "dataAtualizacao": "2026-11-06T11:07:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -821,7 +821,7 @@
       "prioridade": "Média",
       "status": "ABERTO",
       "dataAbertura": "2026-11-07T14:00:00.000Z",
-      "dataAtualizacao": "2026-11-07T14:05:00.000Z",
+      "dataAtualizacao": "2026-11-07T17:05:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -836,7 +836,7 @@
       "prioridade": "Média",
       "status": "ABERTO",
       "dataAbertura": "2026-11-07T10:12:00.000Z",
-      "dataAtualizacao": "2026-11-07T10:12:00.000Z",
+      "dataAtualizacao": "2026-11-07T13:12:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -851,7 +851,7 @@
       "prioridade": "Alta",
       "status": "EM ANÁLISE",
       "dataAbertura": "2026-11-07T08:07:00.000Z",
-      "dataAtualizacao": "2026-11-07T09:25:00.000Z",
+      "dataAtualizacao": "2026-11-07T12:25:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     },
@@ -866,7 +866,7 @@
       "prioridade": "Média",
       "status": "ABERTO",
       "dataAbertura": "2026-11-08T09:18:00.000Z",
-      "dataAtualizacao": "2026-11-08T09:18:00.000Z",
+      "dataAtualizacao": "2026-11-08T12:18:00.000Z",
       "dataEncerramento": null,
       "anexos": []
     }
@@ -2147,7 +2147,6 @@
       "id": 1,
       "chamadoId": 2,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Fiz a troca da peça e vou acompanhar por mais um dia.",
       "dataCriacao": "2026-05-21T16:42:00.000Z"
     },
@@ -2155,7 +2154,6 @@
       "id": 2,
       "chamadoId": 3,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Estou verificando o equipamento e os logs do sistema.",
       "dataCriacao": "2026-06-09T16:48:00.000Z"
     },
@@ -2163,7 +2161,6 @@
       "id": 3,
       "chamadoId": 4,
       "usuarioId": 4,
-      "usuarioNome": "Paulo Nunes",
       "comentario": "Atualizei as permissões no servidor de arquivos.",
       "dataCriacao": "2026-06-20T15:19:00.000Z"
     },
@@ -2171,7 +2168,6 @@
       "id": 4,
       "chamadoId": 5,
       "usuarioId": 5,
-      "usuarioNome": "Clara Mendes",
       "comentario": "Obrigado, agora está funcionando normalmente.",
       "dataCriacao": "2026-06-26T15:48:00.000Z"
     },
@@ -2179,7 +2175,6 @@
       "id": 5,
       "chamadoId": 5,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Atualizei as permissões no servidor de arquivos.",
       "dataCriacao": "2026-06-26T18:12:00.000Z"
     },
@@ -2187,7 +2182,6 @@
       "id": 6,
       "chamadoId": 7,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Reinstalei o programa e limpei o cache. Pode testar?",
       "dataCriacao": "2026-07-13T16:11:00.000Z"
     },
@@ -2195,7 +2189,6 @@
       "id": 7,
       "chamadoId": 8,
       "usuarioId": 4,
-      "usuarioNome": "Paulo Nunes",
       "comentario": "Atualizei as permissões no servidor de arquivos.",
       "dataCriacao": "2026-07-24T19:05:00.000Z"
     },
@@ -2203,7 +2196,6 @@
       "id": 8,
       "chamadoId": 9,
       "usuarioId": 3,
-      "usuarioNome": "Carlos Lima",
       "comentario": "O problema começou depois da última atualização.",
       "dataCriacao": "2026-08-02T10:22:00.000Z"
     },
@@ -2211,7 +2203,6 @@
       "id": 9,
       "chamadoId": 9,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Fiz a troca da peça e vou acompanhar por mais um dia.",
       "dataCriacao": "2026-08-02T12:56:00.000Z"
     },
@@ -2219,7 +2210,6 @@
       "id": 10,
       "chamadoId": 11,
       "usuarioId": 4,
-      "usuarioNome": "Paulo Nunes",
       "comentario": "Atualizei as permissões no servidor de arquivos.",
       "dataCriacao": "2026-08-26T20:40:00.000Z"
     },
@@ -2227,7 +2217,6 @@
       "id": 11,
       "chamadoId": 12,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Reinstalei o programa e limpei o cache. Pode testar?",
       "dataCriacao": "2026-09-09T18:55:00.000Z"
     },
@@ -2235,7 +2224,6 @@
       "id": 12,
       "chamadoId": 13,
       "usuarioId": 4,
-      "usuarioNome": "Paulo Nunes",
       "comentario": "Encaminhei o caso para o fornecedor e aguardo retorno.",
       "dataCriacao": "2026-09-22T19:14:00.000Z"
     },
@@ -2243,7 +2231,6 @@
       "id": 13,
       "chamadoId": 15,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Reinstalei o programa e limpei o cache. Pode testar?",
       "dataCriacao": "2026-10-01T16:45:00.000Z"
     },
@@ -2251,7 +2238,6 @@
       "id": 14,
       "chamadoId": 16,
       "usuarioId": 6,
-      "usuarioNome": "Matheus Ramos",
       "comentario": "O problema começou depois da última atualização.",
       "dataCriacao": "2026-10-03T15:54:00.000Z"
     },
@@ -2259,7 +2245,6 @@
       "id": 15,
       "chamadoId": 17,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Encaminhei o caso para o fornecedor e aguardo retorno.",
       "dataCriacao": "2026-10-10T21:00:00.000Z"
     },
@@ -2267,7 +2252,6 @@
       "id": 16,
       "chamadoId": 18,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Fiz a troca da peça e vou acompanhar por mais um dia.",
       "dataCriacao": "2026-10-16T18:52:00.000Z"
     },
@@ -2275,7 +2259,6 @@
       "id": 17,
       "chamadoId": 19,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Reinstalei o programa e limpei o cache. Pode testar?",
       "dataCriacao": "2026-10-18T18:03:00.000Z"
     },
@@ -2283,7 +2266,6 @@
       "id": 18,
       "chamadoId": 20,
       "usuarioId": 8,
-      "usuarioNome": "Ana Duarte",
       "comentario": "Testei agora e continua acontecendo.",
       "dataCriacao": "2026-10-20T16:27:00.000Z"
     },
@@ -2291,7 +2273,6 @@
       "id": 19,
       "chamadoId": 20,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Encaminhei o caso para o fornecedor e aguardo retorno.",
       "dataCriacao": "2026-10-20T21:29:00.000Z"
     },
@@ -2299,7 +2280,6 @@
       "id": 20,
       "chamadoId": 21,
       "usuarioId": 7,
-      "usuarioNome": "Sofia Alencar",
       "comentario": "O problema começou depois da última atualização.",
       "dataCriacao": "2026-10-26T08:27:00.000Z"
     },
@@ -2307,7 +2287,6 @@
       "id": 21,
       "chamadoId": 22,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Fiz a troca da peça e vou acompanhar por mais um dia.",
       "dataCriacao": "2026-10-28T17:56:00.000Z"
     },
@@ -2315,7 +2294,6 @@
       "id": 22,
       "chamadoId": 23,
       "usuarioId": 5,
-      "usuarioNome": "Clara Mendes",
       "comentario": "Consigo trazer o equipamento até a TI amanhã cedo.",
       "dataCriacao": "2026-10-30T14:52:00.000Z"
     },
@@ -2323,7 +2301,6 @@
       "id": 23,
       "chamadoId": 23,
       "usuarioId": 4,
-      "usuarioNome": "Paulo Nunes",
       "comentario": "Fiz a troca da peça e vou acompanhar por mais um dia.",
       "dataCriacao": "2026-10-30T17:39:00.000Z"
     },
@@ -2331,7 +2308,6 @@
       "id": 24,
       "chamadoId": 24,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Estou verificando o equipamento e os logs do sistema.",
       "dataCriacao": "2026-10-30T20:56:00.000Z"
     },
@@ -2339,7 +2315,6 @@
       "id": 25,
       "chamadoId": 26,
       "usuarioId": 8,
-      "usuarioNome": "Ana Duarte",
       "comentario": "O problema começou depois da última atualização.",
       "dataCriacao": "2026-11-02T09:57:00.000Z"
     },
@@ -2347,7 +2322,6 @@
       "id": 26,
       "chamadoId": 26,
       "usuarioId": 4,
-      "usuarioNome": "Paulo Nunes",
       "comentario": "Estou verificando o equipamento e os logs do sistema.",
       "dataCriacao": "2026-11-02T13:20:00.000Z"
     },
@@ -2355,7 +2329,6 @@
       "id": 27,
       "chamadoId": 28,
       "usuarioId": 6,
-      "usuarioNome": "Matheus Ramos",
       "comentario": "O problema começou depois da última atualização.",
       "dataCriacao": "2026-11-04T12:28:00.000Z"
     },
@@ -2363,7 +2336,6 @@
       "id": 28,
       "chamadoId": 30,
       "usuarioId": 1,
-      "usuarioNome": "João Silva",
       "comentario": "Testei agora e continua acontecendo.",
       "dataCriacao": "2026-11-04T15:15:00.000Z"
     },
@@ -2371,7 +2343,6 @@
       "id": 29,
       "chamadoId": 32,
       "usuarioId": 2,
-      "usuarioNome": "Fernanda Souza",
       "comentario": "Fiz a troca da peça e vou acompanhar por mais um dia.",
       "dataCriacao": "2026-11-05T14:41:00.000Z"
     },
@@ -2379,7 +2350,6 @@
       "id": 30,
       "chamadoId": 34,
       "usuarioId": 6,
-      "usuarioNome": "Matheus Ramos",
       "comentario": "Consigo trazer o equipamento até a TI amanhã cedo.",
       "dataCriacao": "2026-11-06T09:52:00.000Z"
     },
@@ -2387,7 +2357,6 @@
       "id": 31,
       "chamadoId": 39,
       "usuarioId": 7,
-      "usuarioNome": "Sofia Alencar",
       "comentario": "Consigo trazer o equipamento até a TI amanhã cedo.",
       "dataCriacao": "2026-11-07T08:22:00.000Z"
     },
@@ -2395,7 +2364,6 @@
       "id": 32,
       "chamadoId": 37,
       "usuarioId": 9,
-      "usuarioNome": "Rafael Costa",
       "comentario": "O problema começou depois da última atualização.",
       "dataCriacao": "2026-11-07T14:05:00.000Z"
     }

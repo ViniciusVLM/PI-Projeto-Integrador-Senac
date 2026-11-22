@@ -30,7 +30,7 @@ function protegerSenhasAntigas() {
 }
 
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
+  origin: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Content-Disposition'],
@@ -39,8 +39,24 @@ app.use(cors({
 
 app.use(express.json({ limit: '1mb' }));
 
+// Sincroniza leitura com o banco MySQL do Aiven antes de atender as rotas
+app.use('/api', async (req, res, next) => {
+  try {
+    if (db.mysqlAtivo) {
+      await db.refreshFromMySQL();
+    }
+  } catch {
+    // segue com cache em memória se houver oscilação momentânea de rede
+  }
+  next();
+});
+
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    database: db.mysqlAtivo ? 'aiven-mysql' : 'local-json',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Mantida por compatibilidade; a rota oficial é /api/usuarios/tecnicos
@@ -72,10 +88,13 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  protegerSenhasAntigas();
-  app.listen(PORT, () => {
-    console.log(`SecureDesk API rodando em http://localhost:${PORT}`);
-  });
+  (async () => {
+    await db.initMySQL();
+    protegerSenhasAntigas();
+    app.listen(PORT, () => {
+      console.log(`SecureDesk API rodando em http://localhost:${PORT}`);
+    });
+  })();
 }
 
 module.exports = app;
