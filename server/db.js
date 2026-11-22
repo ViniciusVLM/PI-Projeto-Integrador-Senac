@@ -45,14 +45,21 @@ let filaSync = Promise.resolve();
 function obterConfigMySQL() {
   if (IS_TEST_FILE || process.env.DISABLE_MYSQL === 'true') return null;
 
-  const fallbackPass = ['AV', 'NS', '_E9zOO_yPzv', '_pW98-5XZ'].join('');
+  // As credenciais ficam só no .env (local) ou nas variáveis de ambiente do Render.
+  // Sem elas, a API usa o server/db.json.
+  const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+  if (!DB_HOST || !DB_USER || !DB_PASSWORD) {
+    console.log('[AIVEN MYSQL] Variáveis DB_HOST, DB_USER e DB_PASSWORD não definidas, usando server/db.json.');
+    return null;
+  }
+
   return {
-    host: process.env.DB_HOST || 'mysql-faculdade-projeto-banco-dados.h.aivencloud.com',
-    port: Number(process.env.DB_PORT || 10310),
-    user: process.env.DB_USER || 'avnadmin',
-    password: process.env.DB_PASSWORD || fallbackPass,
-    database: process.env.DB_NAME || 'SecureDesk',
-    ssl: { rejectUnauthorized: false },
+    host: DB_HOST,
+    port: Number(DB_PORT || 3306),
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME || 'SecureDesk',
+    ssl: process.env.DB_SSL === 'false' ? undefined : { rejectUnauthorized: false },
     waitForConnections: true,
     connectionLimit: 6,
     queueLimit: 0,
