@@ -52,11 +52,31 @@
                         placeholder="exemplo@empresa.com"
                         type="email"
                         autocomplete="email"
+                        [readonly]="codigoEnviado"
                         required
                     >
                 </div>
             </div>
                 
+            <ng-container *ngIf="codigoEnviado">
+            <div class="input-box">
+                <h5>Código de verificação</h5>
+                <div class="campo">
+                    <i class="bx bxs-key"></i>
+                    <input
+                        id="codigo"
+                        name="codigo"
+                        [(ngModel)]="codigo"
+                        placeholder="000000"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="6"
+                        autocomplete="one-time-code"
+                        required
+                    >
+                </div>
+            </div>
+
             <div class="input-box">
                 <h5>Crie sua senha nova</h5>
                 <div class="campo">
@@ -105,9 +125,11 @@
                 </div>
             </div>
 
+            </ng-container>
+
             <button type="submit" [disabled]="carregando">
-                <span *ngIf="!carregando">Redefinir Senha</span>
-                <span *ngIf="carregando">Redefinindo...</span>
+                <span *ngIf="!carregando">{{ codigoEnviado ? 'Redefinir Senha' : 'Enviar código' }}</span>
+                <span *ngIf="carregando">Aguarde...</span>
             </button>
             <div class="voltar-login">
                 <p><a routerLink="/">Voltar ao login</a></p>
