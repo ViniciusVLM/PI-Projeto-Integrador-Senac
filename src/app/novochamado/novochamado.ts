@@ -6,7 +6,9 @@ import { Sidebar } from '../sidebar/sidebar';
 
 interface Opcao { id: number; nome: string; }
 
-const API_URL = 'http://localhost:3000/api';
+// Endereço relativo: em produção a API e a tela ficam no mesmo site;
+// no npm start, o proxy.conf.json encaminha /api para a porta 3000.
+const API_URL = '/api';
 const LIMITE = 10 * 1024 * 1024;
 
 @Component({
