@@ -136,6 +136,21 @@ npm run test:api
 npm run build
 ```
 
+## Banco de dados no Aiven (opcional)
+
+Copie o `.env.example` para `.env` e preencha com os dados do serviço MySQL. Sem o `.env`, a API usa o `server/db.json`. O `.env` não vai para o GitHub: nunca coloque a senha no código.
+
+## Publicação no Render
+
+O arquivo `render.yaml` publica a API e as telas num único endereço. Depois do `npm run build`, o próprio servidor Node entrega o Angular.
+
+1. Entre em [render.com](https://render.com) com a conta do GitHub.
+2. Clique em **New > Blueprint** e escolha este repositório.
+3. Preencha `DB_HOST`, `DB_PORT`, `DB_USER` e `DB_PASSWORD` com os dados do Aiven (ou deixe em branco para usar o `server/db.json`).
+4. Clique em **Apply**. O endereço do site aparece no painel quando o build terminar.
+
+No plano gratuito, o site "dorme" depois de 15 minutos sem acesso e leva cerca de 1 minuto para abrir de novo. Sem o Aiven, os dados voltam ao original a cada novo deploy. O código da recuperação de senha aparece na aba **Logs** do Render.
+
 
 ---
 

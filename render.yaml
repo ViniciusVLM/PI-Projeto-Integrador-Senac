@@ -1,0 +1,27 @@
+# Configuração do Render: um único serviço entrega a API e as telas do Angular.
+# No Render: New > Blueprint > escolher este repositório.
+services:
+  - type: web
+    name: securedesk
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: npm run render:build
+    startCommand: node server/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      # Dados do MySQL no Aiven: preencher no painel do Render (não ficam no GitHub)
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: SecureDesk
+      - key: DB_SSL
+        value: "true"

@@ -22,11 +22,11 @@ export interface CadastroPayload {
   nome?: string;
 }
 
-export interface EsqueciSenhaPayload {
+export interface RedefinirSenhaPayload {
   email: string;
-  novaSenha?: string;
-  confirmarSenha?: string;
-  senha?: string;
+  codigo: string;
+  novaSenha: string;
+  confirmarSenha: string;
 }
 
 export interface MensagemResponse {
@@ -34,7 +34,9 @@ export interface MensagemResponse {
   usuario?: UsuarioPerfil;
 }
 
-const API_URL = 'http://localhost:3000/api';
+// Endereço relativo: em produção a API e a tela ficam no mesmo site;
+// no npm start, o proxy.conf.json encaminha /api para a porta 3000.
+const API_URL = '/api';
 const TOKEN_KEY = 'securedesk_token';
 const USUARIO_KEY = 'securedesk_usuario';
 
@@ -100,11 +102,13 @@ export class AuthService {
     return this.http.post<MensagemResponse>(`${API_URL}/auth/cadastro`, dados);
   }
 
-  esqueciSenha(dados: EsqueciSenhaPayload): Observable<MensagemResponse> {
-    return this.http.post<MensagemResponse>(`${API_URL}/auth/esqueci-senha`, dados);
+  // Passo 1: gera um código de 6 dígitos (aparece no terminal/log da API, o e-mail é simulado)
+  esqueciSenha(email: string): Observable<MensagemResponse> {
+    return this.http.post<MensagemResponse>(`${API_URL}/auth/esqueci-senha`, { email });
   }
 
-  redefinirSenha(email: string, novaSenha: string, confirmarSenha?: string): Observable<MensagemResponse> {
-    return this.esqueciSenha({ email, novaSenha, confirmarSenha });
+  // Passo 2: confere o código e grava a nova senha
+  redefinirSenha(dados: RedefinirSenhaPayload): Observable<MensagemResponse> {
+    return this.http.post<MensagemResponse>(`${API_URL}/auth/redefinir-senha`, dados);
   }
 }

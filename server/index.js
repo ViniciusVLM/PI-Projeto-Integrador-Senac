@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
@@ -74,6 +76,20 @@ app.use('/api/equipamentos', equipamentosRoutes);
 app.use('/api/chamados', chamadosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/relatorios', relatoriosRoutes);
+
+app.use('/api', (req, res) => {
+  res.status(404).json({ erro: `Rota não encontrada: ${req.method} ${req.originalUrl}` });
+});
+
+// Em produção (Render), a própria API entrega as telas do Angular depois do npm run build
+const PASTA_FRONT = path.join(__dirname, '..', 'dist', 'PI-Projeto-Integrador-Senac', 'browser');
+if (fs.existsSync(path.join(PASTA_FRONT, 'index.html'))) {
+  app.use(express.static(PASTA_FRONT));
+  // qualquer rota do Angular (/login, /chamados...) abre o index.html
+  app.get(/^\/(?!api\/).*/, (req, res) => {
+    res.sendFile(path.join(PASTA_FRONT, 'index.html'));
+  });
+}
 
 app.use((req, res) => {
   res.status(404).json({ erro: `Rota não encontrada: ${req.method} ${req.originalUrl}` });

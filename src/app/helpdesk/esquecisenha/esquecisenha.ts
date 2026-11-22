@@ -12,8 +12,10 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class Esquecisenha {
   email = '';
+  codigo = '';
   novaSenha = '';
   confirmarSenha = '';
+  codigoEnviado = false;
   mostrarNovaSenha = false;
   mostrarConfirmarSenha = false;
   carregando = false;
@@ -33,12 +35,47 @@ export class Esquecisenha {
     this.mostrarConfirmarSenha = !this.mostrarConfirmarSenha;
   }
 
+  // O mesmo botão faz as duas etapas: primeiro pede o código, depois troca a senha
   onRedefinirSenha(): void {
+    if (this.codigoEnviado) {
+      this.trocarSenha();
+    } else {
+      this.pedirCodigo();
+    }
+  }
+
+  // Etapa 1: a API gera um código de 6 dígitos (o envio de e-mail é simulado)
+  pedirCodigo(): void {
     this.erroMensagem = '';
     this.sucessoMensagem = '';
 
-    if (!this.email || !this.novaSenha || !this.confirmarSenha) {
-      this.erroMensagem = 'Preencha todos os campos obrigatórios.';
+    if (!this.email) {
+      this.erroMensagem = 'Informe o seu e-mail institucional.';
+      return;
+    }
+
+    this.carregando = true;
+
+    this.authService.esqueciSenha(this.email).subscribe({
+      next: () => {
+        this.carregando = false;
+        this.codigoEnviado = true;
+        this.sucessoMensagem = 'Enviamos um código de 6 dígitos para o seu e-mail. Ele vale por 15 minutos.';
+      },
+      error: (err) => {
+        this.carregando = false;
+        this.erroMensagem = this.mensagemDeErro(err);
+      },
+    });
+  }
+
+  // Etapa 2: confere o código e grava a nova senha
+  trocarSenha(): void {
+    this.erroMensagem = '';
+    this.sucessoMensagem = '';
+
+    if (!this.codigo || !this.novaSenha || !this.confirmarSenha) {
+      this.erroMensagem = 'Preencha o código e a nova senha.';
       return;
     }
 
@@ -54,8 +91,9 @@ export class Esquecisenha {
 
     this.carregando = true;
 
-    this.authService.esqueciSenha({
+    this.authService.redefinirSenha({
       email: this.email,
+      codigo: this.codigo,
       novaSenha: this.novaSenha,
       confirmarSenha: this.confirmarSenha,
     }).subscribe({
@@ -68,14 +106,15 @@ export class Esquecisenha {
       },
       error: (err) => {
         this.carregando = false;
-        if (err.status === 404) {
-          this.erroMensagem = 'Nenhum usuário encontrado com este e-mail.';
-        } else if (err.status === 0) {
-          this.erroMensagem = 'Servidor indisponível. Verifique se o backend está rodando.';
-        } else {
-          this.erroMensagem = err.error?.erro ?? 'Erro ao redefinir senha. Tente novamente.';
-        }
+        this.erroMensagem = this.mensagemDeErro(err);
       },
     });
+  }
+
+  private mensagemDeErro(err: any): string {
+    if (err.status === 0) {
+      return 'Servidor indisponível. Verifique se o backend está rodando.';
+    }
+    return err.error?.erro ?? 'Não foi possível concluir. Tente novamente.';
   }
 }

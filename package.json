@@ -9,7 +9,8 @@
     "test": "ng test",
     "server": "node server/index.js",
     "test:api": "node server/test-api.js",
-    "db:reset": "node server/scripts/resetar-db.js"
+    "db:reset": "node server/scripts/resetar-db.js",
+    "render:build": "npm ci --include=dev && npm run build"
   },
   "private": true,
   "packageManager": "npm@10.9.2",
@@ -37,5 +38,8 @@
     "@angular/compiler-cli": "^21.2.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2"
+  },
+  "engines": {
+    "node": ">=20.19"
   }
 }

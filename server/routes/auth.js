@@ -1,11 +1,34 @@
 const express = require('express');
-const crypto = require('crypto');
 const db = require('../db');
 const authMiddleware = require('../middleware/auth');
-const { hashSenha, conferirSenha, validarNovaSenha } = require('../utils/seguranca');
-const { semSenha, texto } = require('../utils/formatar');
+const {
+  hashSenha,
+  conferirSenha,
+  gerarToken,
+  gerarCodigo,
+  calcularExpiracao,
+  emailValido,
+  validarNovaSenha,
+  CODIGO_VALIDADE_MINUTOS,
+} = require('../utils/seguranca');
+const { semSenha, texto, agora } = require('../utils/formatar');
 
 const router = express.Router();
+
+function buscarPorEmail(email) {
+  const alvo = String(email || '').trim().toLowerCase();
+  return db.data.usuarios.find((u) => u.email.toLowerCase() === alvo);
+}
+
+function dadosDaSessao(usuario) {
+  return {
+    id: usuario.id,
+    nome: usuario.nome,
+    email: usuario.email,
+    telefone: usuario.telefone ?? null,
+    perfil: usuario.perfil,
+  };
+}
 
 router.post('/login', (req, res) => {
   const { email, senha } = req.body;
@@ -14,35 +37,25 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ erro: 'E-mail e senha são obrigatórios.' });
   }
 
-  const usuario = db.data.usuarios.find(
-    (u) => u.email.toLowerCase() === email.toLowerCase() && conferirSenha(senha, u.senha) && u.status === 'Ativo'
-  );
+  const usuario = buscarPorEmail(email);
 
-  if (!usuario) {
+  if (!usuario || usuario.status !== 'Ativo' || !conferirSenha(senha, usuario.senha)) {
     return res.status(401).json({ erro: 'Credenciais inválidas ou usuário inativo.' });
   }
 
-  const token = crypto.randomUUID();
+  const token = gerarToken();
 
+  // remove sessões antigas desse usuário
   db.data.tokens = db.data.tokens.filter((t) => t.usuarioId !== usuario.id);
-
   db.data.tokens.push({
     token,
     usuarioId: usuario.id,
-    criadoEm: new Date().toISOString(),
+    criadoEm: agora(),
+    expiraEm: calcularExpiracao(),
   });
   db.save();
 
-  return res.status(200).json({
-    token,
-    usuario: {
-      id: usuario.id,
-      nome: usuario.nome,
-      email: usuario.email,
-      telefone: usuario.telefone ?? null,
-      perfil: usuario.perfil,
-    },
-  });
+  return res.status(200).json({ token, usuario: dadosDaSessao(usuario) });
 });
 
 router.post('/logout', (req, res) => {
@@ -55,108 +68,148 @@ router.post('/logout', (req, res) => {
   return res.status(200).json({ mensagem: 'Logout realizado com sucesso.' });
 });
 
-const handleCadastro = (req, res) => {
-  const { email, senha, confirmarSenha, nome } = req.body;
+// Cadastro público: toda conta criada por aqui é de cliente
+function cadastrar(req, res) {
+  const email = texto(req.body.email);
+  // se a tela não mandar o nome, usa a parte do e-mail antes do @ (ex.: joao.silva -> Joao Silva)
+  const nome =
+    texto(req.body.nome) ||
+    (typeof email === 'string'
+      ? email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+      : '');
+  const telefone = texto(req.body.telefone) || null;
+  const { senha, confirmarSenha } = req.body;
 
   if (!email || !senha) {
     return res.status(400).json({ erro: 'E-mail e senha são obrigatórios.' });
   }
-
-  if (confirmarSenha && senha !== confirmarSenha) {
-    return res.status(400).json({ erro: 'As senhas não coincidem.' });
+  if (nome.length < 3) {
+    return res.status(400).json({ erro: 'Informe o nome completo.' });
+  }
+  if (!emailValido(email)) {
+    return res.status(400).json({ erro: 'E-mail inválido.' });
   }
 
-  const emailExistente = db.data.usuarios.find(
-    (u) => u.email.toLowerCase() === email.trim().toLowerCase()
-  );
+  const erroSenha = validarNovaSenha(senha);
+  if (erroSenha) return res.status(400).json({ erro: erroSenha });
 
-  if (emailExistente) {
-    return res.status(409).json({ erro: 'Já existe um usuário cadastrado com este e-mail.' });
+  if (confirmarSenha !== undefined && confirmarSenha !== senha) {
+    return res.status(400).json({ erro: 'As senhas não conferem.' });
   }
 
-  const nomeFormatado = nome && nome.trim()
-    ? nome.trim()
-    : email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  if (buscarPorEmail(email)) {
+    return res.status(409).json({ erro: 'Já existe uma conta com este e-mail.' });
+  }
 
-  const novoId = db.nextId('usuarios');
   const novoUsuario = {
-    id: novoId,
-    nome: nomeFormatado,
-    email: email.trim().toLowerCase(),
+    id: db.nextId('usuarios'),
+    nome,
+    email: email.toLowerCase(),
+    telefone,
     senha: hashSenha(senha),
     perfil: 'cliente',
     status: 'Ativo',
+    criadoEm: agora(),
   };
 
   db.data.usuarios.push(novoUsuario);
   db.save();
 
-  return res.status(201).json({
-    mensagem: 'Conta criada com sucesso!',
-    usuario: {
-      id: novoUsuario.id,
-      nome: novoUsuario.nome,
-      email: novoUsuario.email,
-      perfil: novoUsuario.perfil,
-    },
+  const usuario = semSenha(novoUsuario);
+  return res.status(201).json({ ...usuario, mensagem: 'Conta criada com sucesso!', usuario });
+}
+
+router.post('/registro', cadastrar);
+router.post('/cadastro', cadastrar);
+router.post('/register', cadastrar);
+
+// Passo 1 da recuperação: gera um código de 6 dígitos.
+// O sistema não envia e-mail de verdade; o código aparece no terminal da API.
+router.post('/esqueci-senha', (req, res) => {
+  const email = texto(req.body.email);
+
+  if (!emailValido(email)) {
+    return res.status(400).json({ erro: 'Informe um e-mail válido.' });
+  }
+
+  const resposta = {
+    mensagem: 'Se o e-mail estiver cadastrado, enviamos um código de verificação.',
+    validadeMinutos: CODIGO_VALIDADE_MINUTOS,
+  };
+
+  const usuario = buscarPorEmail(email);
+  if (!usuario || usuario.status !== 'Ativo') {
+    // mesma resposta para não revelar quais e-mails existem
+    return res.json(resposta);
+  }
+
+  const codigo = gerarCodigo();
+
+  db.data.redefinicoes = db.data.redefinicoes.filter((r) => r.usuarioId !== usuario.id);
+  db.data.redefinicoes.push({
+    usuarioId: usuario.id,
+    codigoHash: hashSenha(codigo),
+    tentativas: 0,
+    expiraEm: calcularExpiracao(CODIGO_VALIDADE_MINUTOS / 60),
   });
-};
+  db.save();
 
-router.post('/cadastro', handleCadastro);
-router.post('/register', handleCadastro);
-router.post('/registro', handleCadastro);
+  console.log(`[E-MAIL SIMULADO] Código de redefinição para ${usuario.email}: ${codigo}`);
 
-const handleEsqueciSenha = (req, res) => {
-  const { email, senha, novaSenha, confirmarSenha } = req.body;
-  const proximaSenha = novaSenha || senha;
+  return res.json(resposta);
+});
 
-  if (!email) {
-    return res.status(400).json({ erro: 'O e-mail é obrigatório.' });
+// Passo 2 da recuperação: confere o código e grava a nova senha
+router.post('/redefinir-senha', (req, res) => {
+  const email = texto(req.body.email);
+  const codigo = texto(String(req.body.codigo ?? ''));
+  const { novaSenha, confirmarSenha } = req.body;
+
+  if (!email || !codigo || !novaSenha) {
+    return res.status(400).json({ erro: 'Campos obrigatórios: email, codigo, novaSenha.' });
   }
 
-  const usuario = db.data.usuarios.find(
-    (u) => u.email.toLowerCase() === email.trim().toLowerCase()
-  );
+  const erroSenha = validarNovaSenha(novaSenha);
+  if (erroSenha) return res.status(400).json({ erro: erroSenha });
 
-  if (!usuario) {
-    return res.status(404).json({ erro: 'Nenhum usuário encontrado com este e-mail.' });
+  if (confirmarSenha !== undefined && confirmarSenha !== novaSenha) {
+    return res.status(400).json({ erro: 'As senhas não conferem.' });
   }
 
-  if (usuario.status !== 'Ativo') {
-    return res.status(403).json({ erro: 'Este usuário está inativo no sistema.' });
+  const usuario = buscarPorEmail(email);
+  const pedido = usuario && db.data.redefinicoes.find((r) => r.usuarioId === usuario.id);
+  const invalido = { erro: 'Código inválido ou expirado. Solicite um novo código.' };
+
+  if (!pedido || new Date(pedido.expiraEm).getTime() < Date.now() || pedido.tentativas >= 5) {
+    return res.status(400).json(invalido);
   }
 
-  if (proximaSenha) {
-    if (confirmarSenha && proximaSenha !== confirmarSenha) {
-      return res.status(400).json({ erro: 'As senhas não coincidem.' });
-    }
-
-    usuario.senha = hashSenha(proximaSenha);
+  if (!conferirSenha(codigo, pedido.codigoHash)) {
+    pedido.tentativas += 1;
     db.save();
-
-    return res.status(200).json({
-      mensagem: 'Senha redefinida com sucesso!',
-    });
+    return res.status(400).json(invalido);
   }
 
-  return res.status(200).json({
-    mensagem: 'E-mail validado. Você pode redefinir sua senha.',
-  });
-};
+  usuario.senha = hashSenha(novaSenha);
+  db.data.redefinicoes = db.data.redefinicoes.filter((r) => r.usuarioId !== usuario.id);
+  // encerra as sessões abertas com a senha antiga
+  db.data.tokens = db.data.tokens.filter((t) => t.usuarioId !== usuario.id);
+  db.save();
 
-router.post('/esqueci-senha', handleEsqueciSenha);
-router.post('/redefinir-senha', handleEsqueciSenha);
+  return res.json({ mensagem: 'Senha redefinida com sucesso. Faça login com a nova senha.' });
+});
 
 router.get('/me', authMiddleware, (req, res) => {
   return res.json(semSenha(req.usuario));
 });
 
+// Atualiza os dados do próprio perfil (e-mail e perfil de acesso não mudam por aqui)
 router.put('/me', authMiddleware, (req, res) => {
-  const nome = req.body.nome !== undefined ? texto(req.body.nome) : undefined;
+  const nome = texto(req.body.nome);
   const telefone = req.body.telefone !== undefined ? texto(req.body.telefone) || null : undefined;
 
   if (nome !== undefined && (!nome || nome.length < 3)) {
-    return res.status(400).json({ erro: 'Informe o nome completo (mínimo de 3 caracteres).' });
+    return res.status(400).json({ erro: 'Informe o nome completo.' });
   }
 
   if (nome !== undefined) req.usuario.nome = nome;
@@ -184,6 +237,7 @@ router.put('/me/senha', authMiddleware, (req, res) => {
   }
 
   req.usuario.senha = hashSenha(novaSenha);
+  // mantém só a sessão atual
   db.data.tokens = db.data.tokens.filter((t) => t.usuarioId !== req.usuario.id || t.token === req.token);
   db.save();
 

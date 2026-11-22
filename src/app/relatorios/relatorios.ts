@@ -40,7 +40,9 @@ interface RelatorioDados {
   geradoEm: string;
 }
 
-const API_URL = 'http://localhost:3000/api';
+// Endereço relativo: em produção a API e a tela ficam no mesmo site;
+// no npm start, o proxy.conf.json encaminha /api para a porta 3000.
+const API_URL = '/api';
 
 @Component({
   selector: 'app-relatorios',
