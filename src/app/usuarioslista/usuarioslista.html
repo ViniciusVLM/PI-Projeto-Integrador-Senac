@@ -13,7 +13,7 @@
           <i class="bi bi-search"></i>
           <input type="text" placeholder="Buscar usuário..." (input)="onBusca($event)" />
         </label>
-        <button type="button" class="btn btn-enviar btn-novo">
+        <button type="button" class="btn btn-enviar btn-novo" (click)="abrirModal()">
           <i class="bi bi-plus-lg"></i> Novo usuário
         </button>
       </div>
@@ -49,5 +49,87 @@
 
       <p class="rodape-tabela">Total: <strong>{{ filtrados().length }}</strong> usuários</p>
     </section>
+
+    @if (modalAberto) {
+      <div class="modal-backdrop" (click)="fecharModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+          <div class="modal-topo">
+            <h2>Novo usuário</h2>
+            <button type="button" class="modal-fechar" (click)="fecharModal()">&times;</button>
+          </div>
+
+          @if (erroModal) {
+            <div class="modal-erro">{{ erroModal }}</div>
+          }
+
+          <form (ngSubmit)="salvarUsuario()" class="modal-form">
+            <div class="campo-modal">
+              <label for="usr-nome">Nome completo *</label>
+              <input
+                id="usr-nome"
+                type="text"
+                [(ngModel)]="novoNome"
+                name="novoNome"
+                placeholder="Ex.: Lucas Prado"
+                required
+              />
+            </div>
+
+            <div class="campo-modal">
+              <label for="usr-email">E-mail institucional *</label>
+              <input
+                id="usr-email"
+                type="email"
+                [(ngModel)]="novoEmail"
+                name="novoEmail"
+                placeholder="lucas.prado@empresa.com"
+                required
+              />
+            </div>
+
+            <div class="linha-modal">
+              <div class="campo-modal">
+                <label for="usr-telefone">Telefone</label>
+                <input
+                  id="usr-telefone"
+                  type="text"
+                  [(ngModel)]="novoTelefone"
+                  name="novoTelefone"
+                  placeholder="(11) 90000-0000"
+                />
+              </div>
+
+              <div class="campo-modal">
+                <label for="usr-perfil">Perfil *</label>
+                <select id="usr-perfil" [(ngModel)]="novoPerfil" name="novoPerfil">
+                  <option value="cliente">Solicitante (Cliente)</option>
+                  <option value="tecnico">Técnico</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="campo-modal">
+              <label for="usr-senha">Senha inicial (mín. 6 caracteres) *</label>
+              <input
+                id="usr-senha"
+                type="password"
+                [(ngModel)]="novaSenha"
+                name="novaSenha"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <div class="modal-acoes">
+              <button type="button" class="btn btn-cancelar" (click)="fecharModal()">Cancelar</button>
+              <button type="submit" class="btn btn-enviar" [disabled]="salvando">
+                {{ salvando ? 'Salvando...' : 'Cadastrar usuário' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
   </main>
 </div>

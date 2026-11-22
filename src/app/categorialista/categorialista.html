@@ -1,9 +1,7 @@
-<!-- Layout geral: sidebar à esquerda e conteúdo à direita -->
 <div class="container-dash">
-  <app-sidebar />   <!-- componente reutilizável do menu lateral -->
+  <app-sidebar />
 
   <main class="lado-direito-dash">
-    <!-- Topo: título e subtítulo à esquerda, botão de ação à direita -->
     <header class="topo">
       <div class="titulo-pagina">
         <h1>Categorias</h1>
@@ -11,13 +9,12 @@
       </div>
 
       <div class="topo-acoes">
-        <button type="button" class="btn btn-enviar btn-novo">
+        <button type="button" class="btn btn-enviar btn-novo" (click)="abrirModal()">
           <i class="ti ti-plus"></i> Nova categoria
         </button>
       </div>
     </header>
 
-    <!-- Tabela de categorias -->
     <section class="card-tabela">
       <table class="tabela">
         <thead>
@@ -28,31 +25,73 @@
           </tr>
         </thead>
         <tbody>
-          <!-- @for: repete a linha para cada categoria
-               track c.id: identifica cada item para atualizar a tela com eficiência -->
           @for (c of categorias(); track c.id) {
             <tr>
               <td class="col-nome">{{ c.nome }}</td>
               <td class="col-secundaria">{{ c.descricao }}</td>
               <td>
-                <!-- [class.badge-inativo]: aplica a classe só quando a categoria está inativa -->
                 <span class="badge" [class.badge-inativo]="!c.ativo">
                   {{ c.ativo ? 'Ativo' : 'Inativo' }}
                 </span>
               </td>
             </tr>
           } @empty {
-            <!-- @empty: exibido quando não há categorias cadastradas -->
             <tr><td colspan="3" class="sem-resultado">Nenhuma categoria cadastrada.</td></tr>
           }
         </tbody>
       </table>
 
-      <!-- Total de registros exibidos -->
       <p class="rodape-tabela">
         Mostrando <strong>1-{{ categorias().length }}</strong> de
         <strong>{{ categorias().length }}</strong> categorias cadastradas
       </p>
     </section>
+
+    @if (modalAberto) {
+      <div class="modal-backdrop" (click)="fecharModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+          <div class="modal-topo">
+            <h2>Nova categoria</h2>
+            <button type="button" class="modal-fechar" (click)="fecharModal()">&times;</button>
+          </div>
+
+          @if (erroModal) {
+            <div class="modal-erro">{{ erroModal }}</div>
+          }
+
+          <form (ngSubmit)="salvarCategoria()" class="modal-form">
+            <div class="campo-modal">
+              <label for="cat-nome">Nome da categoria *</label>
+              <input
+                id="cat-nome"
+                type="text"
+                [(ngModel)]="novoNome"
+                name="novoNome"
+                placeholder="Ex.: Telefonia"
+                required
+              />
+            </div>
+
+            <div class="campo-modal">
+              <label for="cat-desc">Descrição</label>
+              <input
+                id="cat-desc"
+                type="text"
+                [(ngModel)]="novaDescricao"
+                name="novaDescricao"
+                placeholder="Ex.: Ramais, aparelhos telefônicos e celulares corporativos"
+              />
+            </div>
+
+            <div class="modal-acoes">
+              <button type="button" class="btn btn-cancelar" (click)="fecharModal()">Cancelar</button>
+              <button type="submit" class="btn btn-enviar" [disabled]="salvando">
+                {{ salvando ? 'Salvando...' : 'Cadastrar categoria' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
   </main>
 </div>

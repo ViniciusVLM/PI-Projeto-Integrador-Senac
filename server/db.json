@@ -87,7 +87,8 @@
       "email": "vini172006v@gmail.com",
       "senha": "$2b$10$9WwnYFAsy95BTxklJSJktuLvCmelBlITbk5pP0NTBQcbIeRwnbiiS",
       "perfil": "cliente",
-      "status": "Ativo"
+      "status": "Ativo",
+      "telefone": "11948568186"
     }
   ],
   "categorias": [
@@ -2401,9 +2402,9 @@
   ],
   "tokens": [
     {
-      "token": "4455fdc5-47d8-4090-a32a-17ac9f4e7a13",
+      "token": "b59d7245-b265-4419-8078-cf33d539ecf2",
       "usuarioId": 10,
-      "criadoEm": "2026-11-19T00:47:53.948Z"
+      "criadoEm": "2026-11-21T23:12:23.009Z"
     }
   ],
   "redefinicoes": []

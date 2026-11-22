@@ -13,7 +13,7 @@
           <i class="bi bi-search"></i>
           <input type="text" placeholder="Buscar equipamento..." (input)="onBusca($event)" />
         </label>
-        <button type="button" class="btn btn-enviar btn-novo">
+        <button type="button" class="btn btn-enviar btn-novo" (click)="abrirModal()">
           <i class="bi bi-plus-lg"></i> Novo equipamento
         </button>
       </div>
@@ -39,7 +39,7 @@
               <td class="col-secundaria">{{ e.usuario }}</td>
               <td>
                 <span class="badge" [class.badge-inativo]="!e.ativo">
-                  {{ e.ativo ? 'Ativo' : 'Inativo' }}
+                  {{ e.status }}
                 </span>
               </td>
             </tr>
@@ -51,5 +51,88 @@
 
       <p class="rodape-tabela">Total: <strong>{{ filtrados().length }}</strong> equipamentos</p>
     </section>
+
+    @if (modalAberto) {
+      <div class="modal-backdrop" (click)="fecharModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+          <div class="modal-topo">
+            <h2>Novo equipamento</h2>
+            <button type="button" class="modal-fechar" (click)="fecharModal()">&times;</button>
+          </div>
+
+          @if (erroModal) {
+            <div class="modal-erro">{{ erroModal }}</div>
+          }
+
+          <form (ngSubmit)="salvarEquipamento()" class="modal-form">
+            <div class="linha-modal">
+              <div class="campo-modal">
+                <label for="eq-tipo">Tipo *</label>
+                <select id="eq-tipo" [(ngModel)]="novoTipo" name="novoTipo">
+                  @for (t of tiposValidos; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="campo-modal">
+                <label for="eq-patrimonio">Nº Patrimônio *</label>
+                <input
+                  id="eq-patrimonio"
+                  type="text"
+                  [(ngModel)]="novoPatrimonio"
+                  name="novoPatrimonio"
+                  placeholder="Ex.: PAT-00200"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="linha-modal">
+              <div class="campo-modal">
+                <label for="eq-marca">Marca *</label>
+                <input
+                  id="eq-marca"
+                  type="text"
+                  [(ngModel)]="novaMarca"
+                  name="novaMarca"
+                  placeholder="Ex.: Dell"
+                  required
+                />
+              </div>
+
+              <div class="campo-modal">
+                <label for="eq-modelo">Modelo *</label>
+                <input
+                  id="eq-modelo"
+                  type="text"
+                  [(ngModel)]="novoModelo"
+                  name="novoModelo"
+                  placeholder="Ex.: Latitude 5440"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="campo-modal">
+              <label for="eq-usuario">Usuário responsável (opcional)</label>
+              <select id="eq-usuario" [(ngModel)]="novoUsuarioId" name="novoUsuarioId">
+                <option value="">Sem responsável atribuído</option>
+                @for (u of usuariosOpcoes; track u.id) {
+                  <option [value]="u.id">{{ u.nome }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="modal-acoes">
+              <button type="button" class="btn btn-cancelar" (click)="fecharModal()">Cancelar</button>
+              <button type="submit" class="btn btn-enviar" [disabled]="salvando">
+                {{ salvando ? 'Salvando...' : 'Cadastrar equipamento' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
   </main>
 </div>
