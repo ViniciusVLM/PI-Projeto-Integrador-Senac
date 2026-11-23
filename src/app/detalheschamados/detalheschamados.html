@@ -65,10 +65,15 @@
                     @for (e of eventos; track $index) {
                         <li [class.atual]="e.atual">
                             <p><strong>{{ e.autor }}</strong> {{ e.acao }}</p>
+                            @if (e.observacao) {
+                                <p class="evento-obs">{{ e.observacao }}</p>
+                            }
                             @if (e.data) {
                                 <span>{{ e.data | date:"dd/MM 'às' HH:mm" }}</span>
                             }
                         </li>
+                    } @empty {
+                        <li class="vazio">Nenhuma atividade registrada.</li>
                     }
                 </ul>
             </ng-template>
@@ -112,6 +117,21 @@
                                     <div class="texto-descricao">
                                         <p>{{ chamado.descricao }}</p>
                                     </div>
+
+                                    @if ((chamado.comentarios?.length ?? 0) > 0) {
+                                        <div class="conversa-comentarios">
+                                            <h3>Comentários ({{ chamado.comentarios?.length }})</h3>
+                                            @for (cm of chamado.comentarios ?? []; track cm.id) {
+                                                <div class="item-comentario">
+                                                    <div class="comentario-topo">
+                                                        <strong>{{ cm.usuarioNome }}</strong>
+                                                        <span>{{ cm.dataCriacao | date:"dd/MM/yyyy 'às' HH:mm" }}</span>
+                                                    </div>
+                                                    <p>{{ cm.comentario }}</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
                                 }
                                 @case ('historico') {
                                     <ng-container [ngTemplateOutlet]="historico" />

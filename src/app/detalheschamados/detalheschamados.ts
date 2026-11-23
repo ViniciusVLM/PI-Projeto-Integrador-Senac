@@ -56,6 +56,7 @@ interface ChamadoDetalhe {
 interface Evento {
   autor: string;
   acao: string;
+  observacao?: string | null;
   data?: string;
   atual: boolean;
 }
@@ -329,38 +330,33 @@ export class DetalhesChamados implements OnInit {
     });
   }
 
-  // Linha do tempo montada a partir dos dados do chamado (mais recente primeiro)
+  // Linha do tempo real combinando histórico de status e comentários (mais recente primeiro)
   get eventos(): Evento[] {
     const c = this.chamado;
     if (!c) return [];
 
-    const lista: Evento[] = [];
+    const itensHistorico = (c.historico ?? []).map((h) => ({
+      autor: h.usuarioNome || 'Sistema',
+      acao: h.statusAnterior
+        ? `alterou o status de ${this.formatarStatus(h.statusAnterior)} para ${this.formatarStatus(h.statusNovo)}`
+        : 'abriu este chamado',
+      observacao: h.observacao || null,
+      data: h.dataEvento,
+    }));
 
-    if (c.dataAtualizacao && c.dataAtualizacao !== c.dataAbertura) {
-      lista.push({
-        autor: c.tecnicoNome || 'Sistema',
-        acao: `alterou o status para ${this.formatarStatus(c.status)}`,
-        data: c.dataAtualizacao,
-        atual: true,
-      });
-    }
+    const itensComentarios = (c.comentarios ?? []).map((cm) => ({
+      autor: cm.usuarioNome || 'Usuário',
+      acao: 'comentou',
+      observacao: cm.comentario,
+      data: cm.dataCriacao,
+    }));
 
-    if (c.tecnicoNome) {
-      lista.push({
-        autor: 'Sistema',
-        acao: `atribuiu este chamado para ${c.tecnicoNome}`,
-        atual: lista.length === 0,
-      });
-    }
-
-    lista.push({
-      autor: c.solicitanteNome || 'Usuário',
-      acao: 'abriu este chamado',
-      data: c.dataAbertura,
-      atual: lista.length === 0,
-    });
-
-    return lista;
+    return [...itensHistorico, ...itensComentarios]
+      .sort((a, b) => new Date(b.data || 0).getTime() - new Date(a.data || 0).getTime())
+      .map((item, idx) => ({
+        ...item,
+        atual: idx === 0,
+      }));
   }
 
   private normalizar(v: string): string {
