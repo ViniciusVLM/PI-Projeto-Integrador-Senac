@@ -1,8 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../core/services/auth.service';
 import { Sidebar } from '../sidebar/sidebar';
 
 export interface HistoricoItem {
@@ -59,6 +60,8 @@ interface Evento {
   atual: boolean;
 }
 
+type ModalAcaoTipo = 'aguardando' | 'reabrir' | 'cancelar' | null;
+
 // Endereço relativo: em produção a API e a tela ficam no mesmo site;
 // no npm start, o proxy.conf.json encaminha /api para a porta 3000.
 const API_URL = '/api';
@@ -72,6 +75,9 @@ const API_URL = '/api';
 export class DetalhesChamados implements OnInit {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
+
+  @ViewChild('menuAcoesRef') menuAcoesRef?: ElementRef<HTMLElement>;
 
   chamado: ChamadoDetalhe | null = null;
   carregando = true;
@@ -82,8 +88,43 @@ export class DetalhesChamados implements OnInit {
   enviandoComentario = false;
   erroComentario = '';
 
+  menuAcoesAberto = false;
+  executandoAcao = false;
+  mensagemSucesso = '';
+  mensagemErroAcao = '';
+
+  modalTipo: ModalAcaoTipo = null;
+  modalTexto = '';
+  modalErro = '';
+
+  private readonly rotulosTransicao: Record<string, string> = {
+    'EM ANÁLISE': 'Mover para Em análise',
+    'EM ATENDIMENTO': 'Iniciar atendimento',
+    'AGUARDANDO USUÁRIO': 'Aguardar resposta do usuário',
+    'RESOLVIDO': 'Marcar como resolvido',
+    'ENCERRADO': 'Encerrar chamado',
+    'CANCELADO': 'Cancelar chamado',
+  };
+
   ngOnInit(): void {
     this.carregarChamado();
+  }
+
+  @HostListener('document:click', ['$event'])
+  aoClicarDocumento(event: MouseEvent): void {
+    if (!this.menuAcoesAberto) return;
+    const alvo = event.target as Node | null;
+    if (alvo && this.menuAcoesRef?.nativeElement.contains(alvo)) return;
+    this.menuAcoesAberto = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  aoPressionarEsc(): void {
+    if (this.modalTipo) {
+      this.fecharModalAcao();
+      return;
+    }
+    this.menuAcoesAberto = false;
   }
 
   carregarChamado(mostrarLoading = true): void {
@@ -125,6 +166,167 @@ export class DetalhesChamados implements OnInit {
           this.erroComentario = err.error?.erro || 'Não foi possível enviar o comentário.';
         },
       });
+  }
+
+  get podeAssumir(): boolean {
+    const c = this.chamado;
+    if (!c || this.authService.getPerfil() !== 'tecnico') return false;
+    if (!['ABERTO', 'EM ANÁLISE'].includes(c.status)) return false;
+    const usuarioId = this.authService.getUsuario()?.id;
+    return !c.tecnicoId || c.tecnicoId !== usuarioId;
+  }
+
+  get transicoesDisponiveis(): string[] {
+    return this.chamado?.transicoesPermitidas ?? [];
+  }
+
+  get podeReabrir(): boolean {
+    const c = this.chamado;
+    if (!c) return false;
+    return c.status === 'RESOLVIDO' || c.status === 'ENCERRADO';
+  }
+
+  get temAcoesDisponiveis(): boolean {
+    return this.podeAssumir || this.transicoesDisponiveis.length > 0 || this.podeReabrir;
+  }
+
+  alternarMenuAcoes(): void {
+    if (!this.temAcoesDisponiveis || this.executandoAcao) return;
+    this.menuAcoesAberto = !this.menuAcoesAberto;
+  }
+
+  rotuloTransicao(status: string): string {
+    return this.rotulosTransicao[status] || `Mover para ${this.formatarStatus(status)}`;
+  }
+
+  assumirChamado(): void {
+    if (!this.chamado || this.executandoAcao) return;
+    this.menuAcoesAberto = false;
+    this.executandoAcao = true;
+    this.mensagemSucesso = '';
+    this.mensagemErroAcao = '';
+
+    this.http.patch(`${API_URL}/chamados/${this.chamado.id}/assumir`, {}).subscribe({
+      next: () => {
+        this.executandoAcao = false;
+        this.mensagemSucesso = 'Chamado assumido com sucesso.';
+        this.carregarChamado(false);
+      },
+      error: (err) => {
+        this.executandoAcao = false;
+        this.mensagemErroAcao = err.error?.erro || 'Não foi possível assumir o chamado.';
+      },
+    });
+  }
+
+  acionarTransicao(novoStatus: string): void {
+    this.menuAcoesAberto = false;
+    if (novoStatus === 'AGUARDANDO USUÁRIO') {
+      this.modalTipo = 'aguardando';
+      this.modalTexto = '';
+      this.modalErro = '';
+      return;
+    }
+    if (novoStatus === 'CANCELADO') {
+      this.modalTipo = 'cancelar';
+      this.modalTexto = '';
+      this.modalErro = '';
+      return;
+    }
+    this.executarMudancaStatus(novoStatus);
+  }
+
+  abrirModalReabrir(): void {
+    this.menuAcoesAberto = false;
+    this.modalTipo = 'reabrir';
+    this.modalTexto = '';
+    this.modalErro = '';
+  }
+
+  fecharModalAcao(): void {
+    if (this.executandoAcao) return;
+    this.modalTipo = null;
+    this.modalTexto = '';
+    this.modalErro = '';
+  }
+
+  confirmarModalAcao(): void {
+    if (!this.chamado || this.executandoAcao) return;
+    const texto = this.modalTexto.trim();
+
+    if (this.modalTipo === 'aguardando') {
+      if (!texto) {
+        this.modalErro = 'Informe o que o usuário precisa responder.';
+        return;
+      }
+      this.executarMudancaStatus('AGUARDANDO USUÁRIO', texto);
+      return;
+    }
+
+    if (this.modalTipo === 'cancelar') {
+      this.executarMudancaStatus('CANCELADO', texto || undefined);
+      return;
+    }
+
+    if (this.modalTipo === 'reabrir') {
+      if (!texto) {
+        this.modalErro = 'Informe o motivo da reabertura.';
+        return;
+      }
+      this.executarReabertura(texto);
+    }
+  }
+
+  private executarMudancaStatus(novoStatus: string, observacao?: string): void {
+    if (!this.chamado) return;
+    this.executandoAcao = true;
+    this.mensagemSucesso = '';
+    this.mensagemErroAcao = '';
+    this.modalErro = '';
+
+    const corpo: { novoStatus: string; observacao?: string } = { novoStatus };
+    if (observacao) corpo.observacao = observacao;
+
+    this.http.patch(`${API_URL}/chamados/${this.chamado.id}/status`, corpo).subscribe({
+      next: () => {
+        this.executandoAcao = false;
+        this.modalTipo = null;
+        this.modalTexto = '';
+        this.mensagemSucesso = `Status atualizado para ${this.formatarStatus(novoStatus)}.`;
+        this.carregarChamado(false);
+      },
+      error: (err) => {
+        this.executandoAcao = false;
+        const msg = err.error?.erro || 'Não foi possível alterar o status.';
+        if (this.modalTipo) {
+          this.modalErro = msg;
+        } else {
+          this.mensagemErroAcao = msg;
+        }
+      },
+    });
+  }
+
+  private executarReabertura(motivo: string): void {
+    if (!this.chamado) return;
+    this.executandoAcao = true;
+    this.mensagemSucesso = '';
+    this.mensagemErroAcao = '';
+    this.modalErro = '';
+
+    this.http.patch(`${API_URL}/chamados/${this.chamado.id}/reabrir`, { motivo }).subscribe({
+      next: () => {
+        this.executandoAcao = false;
+        this.modalTipo = null;
+        this.modalTexto = '';
+        this.mensagemSucesso = 'Chamado reaberto com sucesso.';
+        this.carregarChamado(false);
+      },
+      error: (err) => {
+        this.executandoAcao = false;
+        this.modalErro = err.error?.erro || 'Não foi possível reabrir o chamado.';
+      },
+    });
   }
 
   // Linha do tempo montada a partir dos dados do chamado (mais recente primeiro)

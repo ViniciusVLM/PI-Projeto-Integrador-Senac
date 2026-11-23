@@ -7,14 +7,56 @@
                 <i class="ti ti-arrow-left"></i>
                 Voltar para a lista
             </a>
-            <button type="button" class="btn btn-filtro">
-                Ações
-                <i class="ti ti-chevron-down"></i>
-            </button>
+
+            @if (chamado) {
+                <div class="acoes-dropdown" #menuAcoesRef>
+                    <button
+                        type="button"
+                        class="btn btn-filtro"
+                        [disabled]="!temAcoesDisponiveis || executandoAcao"
+                        (click)="alternarMenuAcoes()"
+                    >
+                        Ações
+                        <i class="ti ti-chevron-down"></i>
+                    </button>
+
+                    @if (menuAcoesAberto) {
+                        <div class="menu-acoes">
+                            @if (podeAssumir) {
+                                <button type="button" class="item-acao" (click)="assumirChamado()">
+                                    <i class="ti ti-user-check"></i>
+                                    Assumir chamado
+                                </button>
+                            }
+
+                            @for (st of transicoesDisponiveis; track st) {
+                                <button
+                                    type="button"
+                                    class="item-acao"
+                                    [class.item-perigo]="st === 'CANCELADO'"
+                                    (click)="acionarTransicao(st)"
+                                >
+                                    <i class="ti ti-arrow-right"></i>
+                                    {{ rotuloTransicao(st) }}
+                                </button>
+                            }
+
+                            @if (podeReabrir) {
+                                <button type="button" class="item-acao" (click)="abrirModalReabrir()">
+                                    <i class="ti ti-refresh"></i>
+                                    Reabrir chamado
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
         @if (carregando) { <p class="msg-estado">Carregando...</p> }
         @if (erro) { <p class="msg-estado msg-erro">{{ erro }}</p> }
+        @if (mensagemErroAcao) { <p class="msg-estado msg-erro msg-feedback">{{ mensagemErroAcao }}</p> }
+        @if (mensagemSucesso) { <p class="msg-estado msg-sucesso msg-feedback">{{ mensagemSucesso }}</p> }
 
         @if (chamado) {
             <!-- Lista de atividades, usada na aba "Histórico" e no card da direita -->
@@ -119,6 +161,43 @@
                 <div class="card">
                     <h2>Histórico de atividades</h2>
                     <ng-container [ngTemplateOutlet]="historico" />
+                </div>
+            </div>
+        }
+
+        @if (modalTipo) {
+            <div class="modal-backdrop" (click)="fecharModalAcao()">
+                <div class="modal-card" (click)="$event.stopPropagation()">
+                    @if (modalTipo === 'aguardando') {
+                        <h3>Aguardar resposta do usuário</h3>
+                        <p class="modal-sub">Explique o que o solicitante precisa informar ou testar:</p>
+                    } @else if (modalTipo === 'reabrir') {
+                        <h3>Reabrir chamado</h3>
+                        <p class="modal-sub">Informe o motivo para reabrir este chamado:</p>
+                    } @else if (modalTipo === 'cancelar') {
+                        <h3>Cancelar chamado</h3>
+                        <p class="modal-sub">Tem certeza de que deseja cancelar este chamado? Você pode informar uma observação opcional abaixo:</p>
+                    }
+
+                    @if (modalErro) {
+                        <p class="msg-estado msg-erro msg-feedback">{{ modalErro }}</p>
+                    }
+
+                    <textarea
+                        rows="3"
+                        class="modal-textarea"
+                        [(ngModel)]="modalTexto"
+                        [placeholder]="modalTipo === 'cancelar' ? 'Observação (opcional)...' : 'Digite aqui...'"
+                    ></textarea>
+
+                    <div class="modal-acoes">
+                        <button type="button" class="btn btn-filtro" [disabled]="executandoAcao" (click)="fecharModalAcao()">
+                            Voltar
+                        </button>
+                        <button type="button" class="btn btn-novo" [disabled]="executandoAcao" (click)="confirmarModalAcao()">
+                            {{ executandoAcao ? 'Processando...' : 'Confirmar' }}
+                        </button>
+                    </div>
                 </div>
             </div>
         }
