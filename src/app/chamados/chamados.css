@@ -293,3 +293,59 @@ tbody tr:hover {
         width: 100%;
     }
 }
+
+
+/* ---------- PAINEL DE FILTROS ---------- */
+.btn-filtro.ativo {
+    border-color: #0f4aa8;
+    color: #0f4aa8;
+    background: #eff6ff;
+}
+
+.painel-filtros {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+.filtro-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.filtro-campo label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.filtro-campo select {
+    height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #0f172a;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+}
+
+.filtro-campo select:focus {
+    border-color: #2f6bff;
+    box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
+}
+
+.btn-limpar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

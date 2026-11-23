@@ -13,7 +13,7 @@
                     <i class="ti ti-search"></i>
                     <input type="text" placeholder="Pesquisar chamados..." [(ngModel)]="busca" (ngModelChange)="buscar()">
                 </label>
-                <button type="button" class="btn btn-filtro">
+                <button type="button" class="btn btn-filtro" [class.ativo]="mostrarFiltros || temFiltrosAtivos" (click)="alternarFiltros()">
                     <i class="ti ti-filter"></i>
                     Filtros
                 </button>
@@ -23,6 +23,45 @@
                 </a>
             </div>
         </div>
+
+        @if (mostrarFiltros) {
+            <div class="painel-filtros">
+                <div class="filtro-campo">
+                    <label for="f-status">Status</label>
+                    <select id="f-status" [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+                        <option value="">Todos os status</option>
+                        @for (s of statusOpcoes; track s) {
+                            <option [value]="s">{{ formatarStatus(s) }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filtro-campo">
+                    <label for="f-prioridade">Prioridade</label>
+                    <select id="f-prioridade" [(ngModel)]="filtroPrioridade" (change)="aplicarFiltros()">
+                        <option value="">Todas as prioridades</option>
+                        @for (p of prioridadeOpcoes; track p) {
+                            <option [value]="p">{{ p }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filtro-campo">
+                    <label for="f-categoria">Categoria</label>
+                    <select id="f-categoria" [(ngModel)]="filtroCategoriaId" (change)="aplicarFiltros()">
+                        <option value="">Todas as categorias</option>
+                        @for (cat of categorias; track cat.id) {
+                            <option [value]="cat.id">{{ cat.nome }}</option>
+                        }
+                    </select>
+                </div>
+
+                <button type="button" class="btn btn-filtro btn-limpar" [disabled]="!temFiltrosAtivos" (click)="limparFiltros()">
+                    <i class="ti ti-filter-off"></i>
+                    Limpar filtros
+                </button>
+            </div>
+        }
 
         <div class="card-tabela">
             @if (erro) { <p class="erro-msg">{{ erro }}</p> }
