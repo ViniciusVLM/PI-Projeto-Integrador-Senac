@@ -77,7 +77,7 @@
                                 @case ('anexos') {
                                     <ul class="lista-anexos">
                                         @for (a of chamado.anexos ?? []; track $index) {
-                                            <li><i class="ti ti-paperclip"></i> {{ a.nome }}</li>
+                                            <li><i class="ti ti-paperclip"></i> {{ a.nomeOriginal }}</li>
                                         } @empty {
                                             <li class="vazio">Nenhum anexo.</li>
                                         }
@@ -86,16 +86,33 @@
                             }
                         </div>
 
-                        <div class="resposta">
-                            <input type="text" placeholder="Digite uma resposta ou atualização pública sobre o caso...">
-                            <div class="resposta-acoes">
-                                <a href="#" class="anexar">
-                                    <i class="ti ti-paperclip"></i>
-                                    Anexar arquivo
-                                </a>
-                                <button type="button" class="btn btn-novo">Enviar</button>
+                        @if (chamado.status !== 'CANCELADO') {
+                            <div class="resposta">
+                                @if (erroComentario) {
+                                    <p class="msg-estado msg-erro msg-comentario-erro">{{ erroComentario }}</p>
+                                }
+                                <textarea
+                                    rows="3"
+                                    placeholder="Digite uma resposta ou atualização pública sobre o caso... (Ctrl+Enter para enviar)"
+                                    [(ngModel)]="novoComentario"
+                                    (keydown.control.enter)="enviarComentario()"
+                                ></textarea>
+                                <div class="resposta-acoes">
+                                    <a href="#" class="anexar">
+                                        <i class="ti ti-paperclip"></i>
+                                        Anexar arquivo
+                                    </a>
+                                    <button
+                                        type="button"
+                                        class="btn btn-novo"
+                                        [disabled]="!novoComentario.trim() || enviandoComentario"
+                                        (click)="enviarComentario()"
+                                    >
+                                        {{ enviandoComentario ? 'Enviando...' : 'Enviar' }}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
 

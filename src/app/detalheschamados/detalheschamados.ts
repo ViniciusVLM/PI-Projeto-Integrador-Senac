@@ -2,7 +2,33 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Sidebar } from '../sidebar/sidebar';
+
+export interface HistoricoItem {
+  id: number;
+  statusAnterior: string | null;
+  statusNovo: string;
+  observacao: string | null;
+  usuarioNome: string;
+  dataEvento: string;
+}
+
+export interface ComentarioItem {
+  id: number;
+  usuarioId: number;
+  usuarioNome: string;
+  comentario: string;
+  dataCriacao: string;
+}
+
+export interface AnexoItem {
+  id: number;
+  nomeOriginal: string;
+  tipo: string;
+  tamanho: number;
+  url: string;
+}
 
 interface ChamadoDetalhe {
   id: number;
@@ -13,12 +39,17 @@ interface ChamadoDetalhe {
   categoriaNome: string;
   equipamentoNome?: string;
   equipamentoPatrimonio?: string;
+  solicitanteId?: number;
   solicitanteNome?: string;
   solicitanteSetor?: string;
+  tecnicoId?: number | null;
   tecnicoNome?: string;
   dataAbertura: string;
   dataAtualizacao?: string;
-  anexos?: { nome: string }[];
+  historico?: HistoricoItem[];
+  comentarios?: ComentarioItem[];
+  anexos?: AnexoItem[];
+  transicoesPermitidas?: string[];
 }
 
 interface Evento {
@@ -34,7 +65,7 @@ const API_URL = '/api';
 
 @Component({
   selector: 'app-detalheschamados',
-  imports: [RouterLink, DatePipe, NgTemplateOutlet, Sidebar],
+  imports: [RouterLink, DatePipe, NgTemplateOutlet, FormsModule, Sidebar],
   templateUrl: './detalheschamados.html',
   styleUrl: './detalheschamados.css',
 })
@@ -47,18 +78,53 @@ export class DetalhesChamados implements OnInit {
   erro = '';
   aba: 'descricao' | 'historico' | 'anexos' = 'descricao';
 
+  novoComentario = '';
+  enviandoComentario = false;
+  erroComentario = '';
+
   ngOnInit(): void {
+    this.carregarChamado();
+  }
+
+  carregarChamado(mostrarLoading = true): void {
     const id = this.route.snapshot.paramMap.get('id');
+    if (mostrarLoading) {
+      this.carregando = true;
+    }
+    this.erro = '';
+
     this.http.get<ChamadoDetalhe>(`${API_URL}/chamados/${id}`).subscribe({
       next: (c) => {
         this.chamado = c;
         this.carregando = false;
       },
-      error: () => {
-        this.erro = 'Chamado não encontrado.';
+      error: (err) => {
+        this.erro = err.error?.erro || 'Chamado não encontrado.';
         this.carregando = false;
       },
     });
+  }
+
+  enviarComentario(): void {
+    const texto = this.novoComentario.trim();
+    if (!texto || this.enviandoComentario || !this.chamado) return;
+
+    this.enviandoComentario = true;
+    this.erroComentario = '';
+
+    this.http
+      .post(`${API_URL}/chamados/${this.chamado.id}/comentarios`, { comentario: texto })
+      .subscribe({
+        next: () => {
+          this.enviandoComentario = false;
+          this.novoComentario = '';
+          this.carregarChamado(false);
+        },
+        error: (err) => {
+          this.enviandoComentario = false;
+          this.erroComentario = err.error?.erro || 'Não foi possível enviar o comentário.';
+        },
+      });
   }
 
   // Linha do tempo montada a partir dos dados do chamado (mais recente primeiro)
