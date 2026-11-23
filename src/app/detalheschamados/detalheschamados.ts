@@ -169,6 +169,31 @@ export class DetalhesChamados implements OnInit {
       });
   }
 
+  baixarAnexo(anexo: AnexoItem): void {
+    this.mensagemErroAcao = '';
+    this.http.get(anexo.url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = anexo.nomeOriginal || 'anexo';
+        link.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.mensagemErroAcao = err.error?.erro || 'Não foi possível baixar o anexo.';
+      },
+    });
+  }
+
+  formatarTamanho(bytes?: number): string {
+    if (!bytes || bytes <= 0) return '0 KB';
+    if (bytes < 1024 * 1024) {
+      return `${Math.max(0.1, Math.round((bytes / 1024) * 10) / 10)} KB`;
+    }
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+
   get podeAssumir(): boolean {
     const c = this.chamado;
     if (!c || this.authService.getPerfil() !== 'tecnico') return false;

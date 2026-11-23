@@ -288,9 +288,32 @@
 
 .resposta-acoes {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-top: 12px;
+}
+
+.link-anexo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #0f4aa8;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.link-anexo:hover {
+    background: #eff6ff;
+}
+
+.tamanho-anexo {
+    font-size: 11px;
+    color: #64748b;
 }
 
 .anexar {

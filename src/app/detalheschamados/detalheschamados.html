@@ -138,8 +138,15 @@
                                 }
                                 @case ('anexos') {
                                     <ul class="lista-anexos">
-                                        @for (a of chamado.anexos ?? []; track $index) {
-                                            <li><i class="ti ti-paperclip"></i> {{ a.nomeOriginal }}</li>
+                                        @for (a of chamado.anexos ?? []; track a.id) {
+                                            <li>
+                                                <button type="button" class="link-anexo" (click)="baixarAnexo(a)">
+                                                    <i class="ti ti-paperclip"></i>
+                                                    <span>{{ a.nomeOriginal }}</span>
+                                                    <small class="tamanho-anexo">({{ formatarTamanho(a.tamanho) }})</small>
+                                                    <i class="ti ti-download"></i>
+                                                </button>
+                                            </li>
                                         } @empty {
                                             <li class="vazio">Nenhum anexo.</li>
                                         }
@@ -160,10 +167,6 @@
                                     (keydown.control.enter)="enviarComentario()"
                                 ></textarea>
                                 <div class="resposta-acoes">
-                                    <a href="#" class="anexar">
-                                        <i class="ti ti-paperclip"></i>
-                                        Anexar arquivo
-                                    </a>
                                     <button
                                         type="button"
                                         class="btn btn-novo"
