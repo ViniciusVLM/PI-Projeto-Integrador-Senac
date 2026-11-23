@@ -39,7 +39,7 @@ export class Chamados implements OnInit {
   categorias: CategoriaOpcao[] = [];
   busca = '';
   pagina = 1;
-  porPagina = 5;
+  porPagina = 10;
   carregando = true;
   erro = '';
 
