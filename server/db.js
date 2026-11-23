@@ -80,6 +80,12 @@ function paraIso(valor) {
 }
 
 function load() {
+  if (!fs.existsSync(DB_PATH)) {
+    const seedPath = path.join(__dirname, 'db.seed.json');
+    if (fs.existsSync(seedPath)) {
+      fs.copyFileSync(seedPath, DB_PATH);
+    }
+  }
   const raw = fs.readFileSync(DB_PATH, 'utf-8');
   data = JSON.parse(raw);
 

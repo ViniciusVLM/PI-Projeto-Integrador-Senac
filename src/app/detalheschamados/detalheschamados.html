@@ -7,14 +7,56 @@
                 <i class="ti ti-arrow-left"></i>
                 Voltar para a lista
             </a>
-            <button type="button" class="btn btn-filtro">
-                Ações
-                <i class="ti ti-chevron-down"></i>
-            </button>
+
+            @if (chamado) {
+                <div class="acoes-dropdown" #menuAcoesRef>
+                    <button
+                        type="button"
+                        class="btn btn-filtro"
+                        [disabled]="!temAcoesDisponiveis || executandoAcao"
+                        (click)="alternarMenuAcoes()"
+                    >
+                        Ações
+                        <i class="ti ti-chevron-down"></i>
+                    </button>
+
+                    @if (menuAcoesAberto) {
+                        <div class="menu-acoes">
+                            @if (podeAssumir) {
+                                <button type="button" class="item-acao" (click)="assumirChamado()">
+                                    <i class="ti ti-user-check"></i>
+                                    Assumir chamado
+                                </button>
+                            }
+
+                            @for (st of transicoesDisponiveis; track st) {
+                                <button
+                                    type="button"
+                                    class="item-acao"
+                                    [class.item-perigo]="st === 'CANCELADO'"
+                                    (click)="acionarTransicao(st)"
+                                >
+                                    <i class="ti ti-arrow-right"></i>
+                                    {{ rotuloTransicao(st) }}
+                                </button>
+                            }
+
+                            @if (podeReabrir) {
+                                <button type="button" class="item-acao" (click)="abrirModalReabrir()">
+                                    <i class="ti ti-refresh"></i>
+                                    Reabrir chamado
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
         @if (carregando) { <p class="msg-estado">Carregando...</p> }
         @if (erro) { <p class="msg-estado msg-erro">{{ erro }}</p> }
+        @if (mensagemErroAcao) { <p class="msg-estado msg-erro msg-feedback">{{ mensagemErroAcao }}</p> }
+        @if (mensagemSucesso) { <p class="msg-estado msg-sucesso msg-feedback">{{ mensagemSucesso }}</p> }
 
         @if (chamado) {
             <!-- Lista de atividades, usada na aba "Histórico" e no card da direita -->
@@ -23,10 +65,15 @@
                     @for (e of eventos; track $index) {
                         <li [class.atual]="e.atual">
                             <p><strong>{{ e.autor }}</strong> {{ e.acao }}</p>
+                            @if (e.observacao) {
+                                <p class="evento-obs">{{ e.observacao }}</p>
+                            }
                             @if (e.data) {
                                 <span>{{ e.data | date:"dd/MM 'às' HH:mm" }}</span>
                             }
                         </li>
+                    } @empty {
+                        <li class="vazio">Nenhuma atividade registrada.</li>
                     }
                 </ul>
             </ng-template>
@@ -70,14 +117,36 @@
                                     <div class="texto-descricao">
                                         <p>{{ chamado.descricao }}</p>
                                     </div>
+
+                                    @if ((chamado.comentarios?.length ?? 0) > 0) {
+                                        <div class="conversa-comentarios">
+                                            <h3>Comentários ({{ chamado.comentarios?.length }})</h3>
+                                            @for (cm of chamado.comentarios ?? []; track cm.id) {
+                                                <div class="item-comentario">
+                                                    <div class="comentario-topo">
+                                                        <strong>{{ cm.usuarioNome }}</strong>
+                                                        <span>{{ cm.dataCriacao | date:"dd/MM/yyyy 'às' HH:mm" }}</span>
+                                                    </div>
+                                                    <p>{{ cm.comentario }}</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
                                 }
                                 @case ('historico') {
                                     <ng-container [ngTemplateOutlet]="historico" />
                                 }
                                 @case ('anexos') {
                                     <ul class="lista-anexos">
-                                        @for (a of chamado.anexos ?? []; track $index) {
-                                            <li><i class="ti ti-paperclip"></i> {{ a.nome }}</li>
+                                        @for (a of chamado.anexos ?? []; track a.id) {
+                                            <li>
+                                                <button type="button" class="link-anexo" (click)="baixarAnexo(a)">
+                                                    <i class="ti ti-paperclip"></i>
+                                                    <span>{{ a.nomeOriginal }}</span>
+                                                    <small class="tamanho-anexo">({{ formatarTamanho(a.tamanho) }})</small>
+                                                    <i class="ti ti-download"></i>
+                                                </button>
+                                            </li>
                                         } @empty {
                                             <li class="vazio">Nenhum anexo.</li>
                                         }
@@ -86,22 +155,72 @@
                             }
                         </div>
 
-                        <div class="resposta">
-                            <input type="text" placeholder="Digite uma resposta ou atualização pública sobre o caso...">
-                            <div class="resposta-acoes">
-                                <a href="#" class="anexar">
-                                    <i class="ti ti-paperclip"></i>
-                                    Anexar arquivo
-                                </a>
-                                <button type="button" class="btn btn-novo">Enviar</button>
+                        @if (chamado.status !== 'CANCELADO') {
+                            <div class="resposta">
+                                @if (erroComentario) {
+                                    <p class="msg-estado msg-erro msg-comentario-erro">{{ erroComentario }}</p>
+                                }
+                                <textarea
+                                    rows="3"
+                                    placeholder="Digite uma resposta ou atualização pública sobre o caso... (Ctrl+Enter para enviar)"
+                                    [(ngModel)]="novoComentario"
+                                    (keydown.control.enter)="enviarComentario()"
+                                ></textarea>
+                                <div class="resposta-acoes">
+                                    <button
+                                        type="button"
+                                        class="btn btn-novo"
+                                        [disabled]="!novoComentario.trim() || enviandoComentario"
+                                        (click)="enviarComentario()"
+                                    >
+                                        {{ enviandoComentario ? 'Enviando...' : 'Enviar' }}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
 
                 <div class="card">
                     <h2>Histórico de atividades</h2>
                     <ng-container [ngTemplateOutlet]="historico" />
+                </div>
+            </div>
+        }
+
+        @if (modalTipo) {
+            <div class="modal-backdrop" (click)="fecharModalAcao()">
+                <div class="modal-card" (click)="$event.stopPropagation()">
+                    @if (modalTipo === 'aguardando') {
+                        <h3>Aguardar resposta do usuário</h3>
+                        <p class="modal-sub">Explique o que o solicitante precisa informar ou testar:</p>
+                    } @else if (modalTipo === 'reabrir') {
+                        <h3>Reabrir chamado</h3>
+                        <p class="modal-sub">Informe o motivo para reabrir este chamado:</p>
+                    } @else if (modalTipo === 'cancelar') {
+                        <h3>Cancelar chamado</h3>
+                        <p class="modal-sub">Tem certeza de que deseja cancelar este chamado? Você pode informar uma observação opcional abaixo:</p>
+                    }
+
+                    @if (modalErro) {
+                        <p class="msg-estado msg-erro msg-feedback">{{ modalErro }}</p>
+                    }
+
+                    <textarea
+                        rows="3"
+                        class="modal-textarea"
+                        [(ngModel)]="modalTexto"
+                        [placeholder]="modalTipo === 'cancelar' ? 'Observação (opcional)...' : 'Digite aqui...'"
+                    ></textarea>
+
+                    <div class="modal-acoes">
+                        <button type="button" class="btn btn-filtro" [disabled]="executandoAcao" (click)="fecharModalAcao()">
+                            Voltar
+                        </button>
+                        <button type="button" class="btn btn-novo" [disabled]="executandoAcao" (click)="confirmarModalAcao()">
+                            {{ executandoAcao ? 'Processando...' : 'Confirmar' }}
+                        </button>
+                    </div>
                 </div>
             </div>
         }

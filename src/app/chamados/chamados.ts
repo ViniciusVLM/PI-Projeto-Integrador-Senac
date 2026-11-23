@@ -10,9 +10,16 @@ interface Chamado {
   solicitanteNome?: string;
   prioridade: string;
   status: string;
+  categoriaId?: number;
+  categoriaNome?: string;
   tecnicoNome?: string;
   dataAbertura: string;
   dataAtualizacao?: string;
+}
+
+interface CategoriaOpcao {
+  id: number;
+  nome: string;
 }
 
 // Endereço relativo: em produção a API e a tela ficam no mesmo site;
@@ -29,16 +36,51 @@ export class Chamados implements OnInit {
   private http = inject(HttpClient);
 
   chamados: Chamado[] = [];
+  categorias: CategoriaOpcao[] = [];
   busca = '';
   pagina = 1;
-  porPagina = 5;
+  porPagina = 10;
   carregando = true;
   erro = '';
 
+  mostrarFiltros = false;
+  filtroStatus = '';
+  filtroPrioridade = '';
+  filtroCategoriaId = '';
+
+  statusOpcoes = [
+    'ABERTO',
+    'EM ANÁLISE',
+    'EM ATENDIMENTO',
+    'AGUARDANDO USUÁRIO',
+    'RESOLVIDO',
+    'ENCERRADO',
+    'CANCELADO',
+  ];
+
+  prioridadeOpcoes = ['Baixa', 'Média', 'Alta', 'Crítica'];
+
   ngOnInit(): void {
-    this.http.get<Chamado[]>(`${API_URL}/chamados`).subscribe({
+    this.http.get<CategoriaOpcao[]>(`${API_URL}/categorias`).subscribe({
+      next: (dados) => (this.categorias = dados),
+      error: () => {},
+    });
+    this.carregarChamados();
+  }
+
+  carregarChamados(): void {
+    this.carregando = true;
+    this.erro = '';
+
+    const params: Record<string, string> = {};
+    if (this.filtroStatus) params['status'] = this.filtroStatus;
+    if (this.filtroPrioridade) params['prioridade'] = this.filtroPrioridade;
+    if (this.filtroCategoriaId) params['categoriaId'] = this.filtroCategoriaId;
+
+    this.http.get<Chamado[]>(`${API_URL}/chamados`, { params }).subscribe({
       next: (dados) => {
         this.chamados = dados;
+        this.pagina = 1;
         this.carregando = false;
       },
       error: () => {
@@ -46,6 +88,25 @@ export class Chamados implements OnInit {
         this.carregando = false;
       },
     });
+  }
+
+  alternarFiltros(): void {
+    this.mostrarFiltros = !this.mostrarFiltros;
+  }
+
+  aplicarFiltros(): void {
+    this.carregarChamados();
+  }
+
+  limparFiltros(): void {
+    this.filtroStatus = '';
+    this.filtroPrioridade = '';
+    this.filtroCategoriaId = '';
+    this.carregarChamados();
+  }
+
+  get temFiltrosAtivos(): boolean {
+    return !!(this.filtroStatus || this.filtroPrioridade || this.filtroCategoriaId);
   }
 
   // Lista filtrada pela busca (título, solicitante ou ID)

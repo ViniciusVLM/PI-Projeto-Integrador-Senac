@@ -45,6 +45,7 @@ Thumbs.db
 
 # Arquivos enviados como anexo pelos chamados
 /server/uploads/
+/server/db.json
 
 # Variáveis de ambiente
 .env
