@@ -1,311 +1,275 @@
-<div class="container-dash">
+<div class="sd-shell">
   <app-sidebar />
 
-  <main class="lado-direito-dash">
-    <header class="topo">
-      <div class="titulo-pagina">
-        <h1>Configurações</h1>
-        <p>Gerencie seus dados pessoais e as preferências do sistema</p>
+  <main class="sd-main">
+    <header class="sd-page-header">
+      <div>
+        <span class="sd-eyebrow">
+          <i class="ti ti-settings"></i>
+          Preferências &amp; Governança
+        </span>
+        <h1 class="sd-page-title">Configurações</h1>
+        <p class="sd-page-subtitle">
+          Gerencie seu perfil, foto de identificação, segurança, parâmetros de SLA e servidor SMTP de e-mails.
+        </p>
       </div>
     </header>
 
     @if (erroMensagem) {
-      <div class="alerta alerta-erro" role="alert">
+      <div class="sd-alert sd-alert-error" role="alert">
         <i class="ti ti-alert-circle"></i>
         <span>{{ erroMensagem }}</span>
       </div>
     }
 
     @if (sucessoMensagem) {
-      <div class="alerta alerta-sucesso" role="status">
+      <div class="sd-alert sd-alert-success" role="status">
         <i class="ti ti-circle-check"></i>
         <span>{{ sucessoMensagem }}</span>
       </div>
     }
 
     <div class="config-layout">
-      <!-- Submenu lateral -->
-      <aside class="config-menu">
-        <button
-          type="button"
-          class="menu-btn"
-          [class.ativo]="secaoAtiva === 'perfil'"
-          (click)="selecionarSecao('perfil', 'secao-perfil')"
-        >
-          <i class="ti ti-user"></i>
-          <span>Meu perfil</span>
+      <!-- Navegação lateral de seções -->
+      <aside class="sd-card config-menu">
+        <button type="button" class="menu-btn" [class.ativo]="secaoAtiva === 'perfil'" (click)="selecionarSecao('perfil')">
+          <i class="ti ti-user-circle"></i>
+          <span>Meu perfil &amp; foto</span>
         </button>
 
-        <button
-          type="button"
-          class="menu-btn"
-          [class.ativo]="secaoAtiva === 'senha'"
-          (click)="selecionarSecao('senha', 'secao-senha')"
-        >
-          <i class="ti ti-lock"></i>
-          <span>Alterar senha</span>
+        <button type="button" class="menu-btn" [class.ativo]="secaoAtiva === 'senha'" (click)="selecionarSecao('senha')">
+          <i class="ti ti-shield-lock"></i>
+          <span>Segurança &amp; senha</span>
         </button>
 
-        <button
-          type="button"
-          class="menu-btn"
-          [class.ativo]="secaoAtiva === 'notificacoes'"
-          (click)="selecionarSecao('notificacoes', 'secao-notificacoes')"
-        >
-          <i class="ti ti-bell"></i>
-          <span>Notificações</span>
+        <button type="button" class="menu-btn" [class.ativo]="secaoAtiva === 'preferencias'" (click)="selecionarSecao('preferencias')">
+          <i class="ti ti-bell-ringing"></i>
+          <span>Alertas &amp; interface</span>
         </button>
 
-        <button
-          type="button"
-          class="menu-btn"
-          [class.ativo]="secaoAtiva === 'preferencias'"
-          (click)="selecionarSecao('preferencias', 'secao-preferencias')"
-        >
-          <i class="ti ti-adjustments-horizontal"></i>
-          <span>Preferências</span>
+        <div class="menu-sep"></div>
+
+        <button type="button" class="menu-btn" [class.ativo]="secaoAtiva === 'parametros'" (click)="selecionarSecao('parametros')">
+          <i class="ti ti-clock-cog"></i>
+          <span>Regras de SLA</span>
+          <span class="tag-adm">Admin</span>
         </button>
 
-        <button
-          type="button"
-          class="menu-btn menu-btn-admin"
-          [class.ativo]="secaoAtiva === 'parametros'"
-          (click)="selecionarSecao('parametros', 'secao-parametros')"
-        >
-          <i class="ti ti-server"></i>
-          <span class="texto-quebra">Parâmetros<br />do sistema</span>
-          <span class="badge-admin">Admin</span>
+        <button type="button" class="menu-btn" [class.ativo]="secaoAtiva === 'smtp'" (click)="selecionarSecao('smtp')">
+          <i class="ti ti-mail-cog"></i>
+          <span>E-mail (SMTP)</span>
+          <span class="tag-adm">Admin</span>
         </button>
       </aside>
 
-      <!-- Conteúdo principal -->
+      <!-- Conteúdo -->
       <section class="config-conteudo">
-        <!-- Card 1: Meu perfil -->
-        <div class="painel" id="secao-perfil">
-          <h2>Meu perfil</h2>
+        @if (secaoAtiva === 'perfil') {
+          <div class="sd-card painel">
+            <div class="painel-topo">
+              <div>
+                <h2>Identidade do colaborador</h2>
+                <p>Sua foto e cargo aparecem nos chamados, comentários e listagens da equipe.</p>
+              </div>
+            </div>
 
-          <div class="perfil-topo">
-            <div class="perfil-identidade">
-              @if (config.fotoBase64) {
-                <img [src]="config.fotoBase64" alt="Foto do perfil" class="avatar-grande avatar-img" />
-              } @else {
-                <div class="avatar-grande">{{ inicial }}</div>
-              }
-              <div class="perfil-nomes">
+            <div class="perfil-foto-bar">
+              <span class="sd-avatar sd-avatar-xl">
+                @if (avatarUrl) {
+                  <img [src]="avatarUrl" [alt]="nome || 'Foto de perfil'" />
+                } @else {
+                  {{ iniciais(nome) }}
+                }
+              </span>
+
+              <div class="perfil-foto-info">
                 <strong>{{ nome || 'Usuário' }}</strong>
-                <span>{{ cargoSubtitulo }}</span>
+                <span>{{ cargo || perfilExibicao }}{{ departamento ? ' • ' + departamento : '' }}</span>
+                <div class="foto-botoes">
+                  <label class="sd-btn sd-btn-secondary sd-btn-sm">
+                    <i class="ti ti-upload"></i>
+                    <span>{{ enviandoFoto ? 'Enviando...' : 'Enviar nova foto' }}</span>
+                    <input type="file" accept="image/*" hidden (change)="aoSelecionarFoto($event)" [disabled]="enviandoFoto" />
+                  </label>
+                  @if (avatarUrl) {
+                    <button type="button" class="sd-btn sd-btn-ghost sd-btn-sm" (click)="removerFoto()">
+                      Remover foto
+                    </button>
+                  }
+                </div>
               </div>
             </div>
 
-            <div>
-              <input
-                #fotoInput
-                type="file"
-                accept="image/*"
-                hidden
-                (change)="aoSelecionarFoto($event)"
-              />
-              <button type="button" class="btn-foto" (click)="fotoInput.click()">
-                <i class="ti ti-camera"></i>
-                <span>Alterar foto</span>
-              </button>
+            <div class="sd-grid-2">
+              <div class="sd-field">
+                <label for="cfg-nome">Nome completo *</label>
+                <input id="cfg-nome" type="text" [(ngModel)]="nome" name="nome" placeholder="Informe seu nome completo" />
+              </div>
+
+              <div class="sd-field">
+                <label for="cfg-email">E-mail institucional</label>
+                <input id="cfg-email" type="email" [value]="email" disabled readonly class="campo-bloqueado" />
+              </div>
+
+              <div class="sd-field">
+                <label for="cfg-depto">Departamento / Área</label>
+                <input id="cfg-depto" type="text" [(ngModel)]="departamento" name="departamento" placeholder="Ex.: Financeiro, Infraestrutura" />
+              </div>
+
+              <div class="sd-field">
+                <label for="cfg-cargo">Cargo / Função</label>
+                <input id="cfg-cargo" type="text" [(ngModel)]="cargo" name="cargo" placeholder="Ex.: Analista de Suporte" />
+              </div>
+
+              <div class="sd-field">
+                <label for="cfg-tel">Telefone / Ramal</label>
+                <input id="cfg-tel" type="tel" [(ngModel)]="telefone" name="telefone" placeholder="(11) 90000-0000" />
+              </div>
+
+              <div class="sd-field">
+                <label for="cfg-perfil">Nível de permissão</label>
+                <input id="cfg-perfil" type="text" [value]="perfilExibicao" disabled readonly class="campo-bloqueado" />
+              </div>
             </div>
           </div>
+        }
 
-          <div class="grid-2col">
-            <div class="campo">
-              <label for="cfg-nome">Nome completo</label>
-              <input
-                id="cfg-nome"
-                type="text"
-                [(ngModel)]="nome"
-                name="nome"
-                placeholder="Informe seu nome completo"
-              />
+        @if (secaoAtiva === 'senha') {
+          <div class="sd-card painel">
+            <div class="painel-topo">
+              <div>
+                <h2>Alterar senha de acesso</h2>
+                <p>Ao trocar sua senha, sessões abertas em outros dispositivos são encerradas automaticamente.</p>
+              </div>
             </div>
 
-            <div class="campo">
-              <label for="cfg-email">E-mail institucional</label>
-              <div class="input-bloqueado">
+            <div class="sd-grid-3">
+              <div class="sd-field">
+                <label for="cfg-senha-atual">Senha atual</label>
                 <input
-                  id="cfg-email"
-                  type="email"
-                  [value]="email"
-                  disabled
-                  readonly
+                  id="cfg-senha-atual"
+                  type="password"
+                  [(ngModel)]="senhaAtual"
+                  name="senhaAtual"
+                  placeholder="Senha atual"
+                  autocomplete="current-password"
                 />
-                <i class="ti ti-lock"></i>
               </div>
-            </div>
 
-            <div class="campo">
-              <label for="cfg-telefone">Telefone</label>
-              <input
-                id="cfg-telefone"
-                type="text"
-                [(ngModel)]="telefone"
-                name="telefone"
-                placeholder="(11) 90000-0000"
-              />
-            </div>
-
-            <div class="campo">
-              <label for="cfg-perfil">Perfil de acesso</label>
-              <div class="input-bloqueado">
+              <div class="sd-field">
+                <label for="cfg-nova-senha">Nova senha (mín. 6)</label>
                 <input
-                  id="cfg-perfil"
-                  type="text"
-                  [value]="perfilExibicao"
-                  disabled
-                  readonly
+                  id="cfg-nova-senha"
+                  type="password"
+                  [(ngModel)]="novaSenha"
+                  name="novaSenha"
+                  placeholder="Nova senha"
+                  autocomplete="new-password"
                 />
-                <i class="ti ti-lock"></i>
+              </div>
+
+              <div class="sd-field">
+                <label for="cfg-conf-senha">Confirmar nova senha</label>
+                <input
+                  id="cfg-conf-senha"
+                  type="password"
+                  [(ngModel)]="confirmarSenha"
+                  name="confirmarSenha"
+                  placeholder="Repita a nova senha"
+                  autocomplete="new-password"
+                />
               </div>
             </div>
           </div>
-        </div>
+        }
 
-        <!-- Card 2: Alterar senha -->
-        <div class="painel" id="secao-senha">
-          <h2>Alterar senha</h2>
-
-          <div class="grid-3col">
-            <div class="campo">
-              <label for="cfg-senha-atual">Senha atual</label>
-              <input
-                id="cfg-senha-atual"
-                type="password"
-                [(ngModel)]="senhaAtual"
-                name="senhaAtual"
-                placeholder="••••••••••"
-                autocomplete="current-password"
-              />
-            </div>
-
-            <div class="campo">
-              <label for="cfg-nova-senha">Nova senha</label>
-              <input
-                id="cfg-nova-senha"
-                type="password"
-                [(ngModel)]="novaSenha"
-                name="novaSenha"
-                placeholder="••••••••••"
-                autocomplete="new-password"
-              />
-            </div>
-
-            <div class="campo">
-              <label for="cfg-confirmar-senha">Confirmar nova senha</label>
-              <input
-                id="cfg-confirmar-senha"
-                type="password"
-                [(ngModel)]="confirmarSenha"
-                name="confirmarSenha"
-                placeholder="••••••••••"
-                autocomplete="new-password"
-              />
-            </div>
-          </div>
-
-          <small class="dica-senha">Use ao menos 6 caracteres.</small>
-        </div>
-
-        <!-- Card 3: Notificações -->
-        <div class="painel" id="secao-notificacoes">
-          <h2>Notificações</h2>
-
-          <div class="lista-switches">
-            <label class="linha-switch">
-              <span>Receber e-mail quando um chamado for atribuído a mim</span>
-              <input type="checkbox" [(ngModel)]="config.notifAtribuido" name="notifAtribuido" />
-              <span class="slider"></span>
-            </label>
-
-            <label class="linha-switch">
-              <span>Avisar quando o status de um chamado for alterado</span>
-              <input type="checkbox" [(ngModel)]="config.notifStatus" name="notifStatus" />
-              <span class="slider"></span>
-            </label>
-
-            <label class="linha-switch">
-              <span>Receber resumo semanal de indicadores</span>
-              <input type="checkbox" [(ngModel)]="config.notifResumo" name="notifResumo" />
-              <span class="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Card 4: Preferências (exibido ao clicar na aba Preferências) -->
         @if (secaoAtiva === 'preferencias') {
-          <div class="painel" id="secao-preferencias">
-            <h2>Preferências</h2>
+          <div class="sd-card painel">
+            <div class="painel-topo">
+              <div>
+                <h2>Alertas e preferências de navegação</h2>
+                <p>Personalize como a interface exibe listagens e notificações da central.</p>
+              </div>
+            </div>
 
-            <div class="grid-2col">
-              <div class="campo">
-                <label for="cfg-idioma">Idioma da interface</label>
-                <select id="cfg-idioma" [(ngModel)]="config.idioma" name="idioma">
-                  <option value="pt-BR">Português (Brasil)</option>
-                  <option value="en-US">English (US)</option>
-                  <option value="es-ES">Español</option>
+            <div class="sd-grid-2">
+              <div class="sd-field">
+                <label for="cfg-itens">Registros por página na fila de chamados</label>
+                <select id="cfg-itens" [(ngModel)]="config.itensPorPagina" name="itensPorPagina">
+                  <option value="5">5 chamados por página</option>
+                  <option value="10">10 chamados por página</option>
+                  <option value="20">20 chamados por página</option>
                 </select>
               </div>
 
-              <div class="campo">
-                <label for="cfg-itens">Itens por página nas listagens</label>
-                <select id="cfg-itens" [(ngModel)]="config.itensPorPagina" name="itensPorPagina">
-                  <option value="5">5 itens por página</option>
-                  <option value="10">10 itens por página</option>
-                  <option value="20">20 itens por página</option>
+              <div class="sd-field">
+                <label for="cfg-idioma">Formato regional</label>
+                <select id="cfg-idioma" [(ngModel)]="config.idioma" name="idioma">
+                  <option value="pt-BR">Português (Brasil) — Horário de Brasília</option>
                 </select>
               </div>
             </div>
 
-            <div class="lista-switches">
-              <label class="linha-switch">
-                <span>Exibir visualização compacta nas tabelas do sistema</span>
-                <input type="checkbox" [(ngModel)]="config.dashboardCompacto" name="dashboardCompacto" />
-                <span class="slider"></span>
+            <div class="switches-lista">
+              <label class="switch-row">
+                <div>
+                  <strong>Notificar novas atribuições</strong>
+                  <span>Receber aviso quando um chamado for direcionado para mim</span>
+                </div>
+                <input type="checkbox" [(ngModel)]="config.notifAtribuido" name="notifAtribuido" />
+              </label>
+
+              <label class="switch-row">
+                <div>
+                  <strong>Acompanhar mudanças de status</strong>
+                  <span>Avisar quando o andamento de um chamado que abri for alterado</span>
+                </div>
+                <input type="checkbox" [(ngModel)]="config.notifStatus" name="notifStatus" />
               </label>
             </div>
           </div>
         }
 
-        <!-- Card 5: Parâmetros do sistema (exibido ao clicar na aba Parâmetros do sistema) -->
         @if (secaoAtiva === 'parametros') {
-          <div class="painel" id="secao-parametros">
-            <div class="painel-cabecalho">
-              <h2>Parâmetros do sistema</h2>
-              <span class="badge-admin">Admin</span>
+          <div class="sd-card painel">
+            <div class="painel-topo">
+              <div>
+                <h2>Acordos de Nível de Serviço (SLA) e Regras</h2>
+                <p>Prazos máximos de resolução por prioridade aplicados a toda a operação.</p>
+              </div>
+              <span class="sd-badge sd-status-resolvido">Governança</span>
             </div>
 
             @if (!isAdmin) {
-              <p class="aviso-restrito">
-                Os parâmetros globais do sistema são exibidos apenas para consulta e só podem ser alterados por um <strong>Administrador</strong>.
-              </p>
+              <div class="sd-alert sd-alert-info">
+                <i class="ti ti-info-circle"></i>
+                <span>Visualização somente leitura. Apenas Administradores podem alterar metas globais de SLA.</span>
+              </div>
             }
 
-            <div class="grid-2col">
-              <div class="campo">
-                <label for="cfg-sla">Prazo padrão de atendimento SLA (horas)</label>
-                <input
-                  id="cfg-sla"
-                  type="number"
-                  min="1"
-                  max="168"
-                  [(ngModel)]="config.slaPadraoHoras"
-                  name="slaPadraoHoras"
-                  [disabled]="!isAdmin"
-                />
+            <div class="sla-grid-4">
+              <div class="sd-field">
+                <label for="sla-crit">Prioridade Crítica (h)</label>
+                <input id="sla-crit" type="number" min="1" max="168" [(ngModel)]="slaPorPrioridade['Crítica']" [disabled]="!isAdmin" />
               </div>
+              <div class="sd-field">
+                <label for="sla-alta">Prioridade Alta (h)</label>
+                <input id="sla-alta" type="number" min="1" max="168" [(ngModel)]="slaPorPrioridade['Alta']" [disabled]="!isAdmin" />
+              </div>
+              <div class="sd-field">
+                <label for="sla-med">Prioridade Média (h)</label>
+                <input id="sla-med" type="number" min="1" max="168" [(ngModel)]="slaPorPrioridade['Média']" [disabled]="!isAdmin" />
+              </div>
+              <div class="sd-field">
+                <label for="sla-baixa">Prioridade Baixa (h)</label>
+                <input id="sla-baixa" type="number" min="1" max="336" [(ngModel)]="slaPorPrioridade['Baixa']" [disabled]="!isAdmin" />
+              </div>
+            </div>
 
-              <div class="campo">
-                <label for="cfg-prio">Prioridade padrão na abertura de chamados</label>
-                <select
-                  id="cfg-prio"
-                  [(ngModel)]="config.prioridadePadrao"
-                  name="prioridadePadrao"
-                  [disabled]="!isAdmin"
-                >
+            <div class="sd-grid-2">
+              <div class="sd-field">
+                <label for="cfg-prio">Prioridade padrão na abertura</label>
+                <select id="cfg-prio" [(ngModel)]="prioridadePadrao" [disabled]="!isAdmin">
                   <option value="Baixa">Baixa</option>
                   <option value="Média">Média</option>
                   <option value="Alta">Alta</option>
@@ -314,30 +278,167 @@
               </div>
             </div>
 
-            <div class="lista-switches">
-              <label class="linha-switch">
-                <span>Permitir auto-cadastro público de novos clientes na tela de login</span>
-                <input
-                  type="checkbox"
-                  [(ngModel)]="config.cadastroPublicoAtivo"
-                  name="cadastroPublicoAtivo"
-                  [disabled]="!isAdmin"
-                />
-                <span class="slider"></span>
+            <div class="switches-lista">
+              <label class="switch-row">
+                <div>
+                  <strong>Permitir auto-cadastro público na tela inicial</strong>
+                  <span>Habilita que novos colaboradores criem conta de Solicitante pela rota /cadastro</span>
+                </div>
+                <input type="checkbox" [(ngModel)]="cadastroPublicoAtivo" [disabled]="!isAdmin" />
+              </label>
+
+              <label class="switch-row">
+                <div>
+                  <strong>Disparar notificações de chamado também por e-mail</strong>
+                  <span>Envia e-mail transacional quando o servidor SMTP estiver ativo</span>
+                </div>
+                <input type="checkbox" [(ngModel)]="notificarPorEmail" [disabled]="!isAdmin" />
               </label>
             </div>
           </div>
         }
 
-        <!-- Ações no rodapé -->
-        <div class="acoes-rodape">
-          <button type="button" class="btn-cancelar" [disabled]="salvando" (click)="restaurar()">
-            Cancelar
-          </button>
-          <button type="button" class="btn-salvar" [disabled]="salvando" (click)="salvarAlteracoes()">
-            {{ salvando ? 'Salvando...' : 'Salvar alterações' }}
-          </button>
-        </div>
+        @if (secaoAtiva === 'smtp') {
+          <div class="sd-card painel">
+            <div class="painel-topo">
+              <div>
+                <h2>Servidor de E-mail Externo Gratuito (SMTP)</h2>
+                <p>
+                  Configure Gmail (Senha de App) ou Brevo gratuito para enviar códigos reais de recuperação de senha para a caixa de entrada dos usuários.
+                </p>
+              </div>
+              <span class="sd-badge" [class]="smtpAtivo ? 'sd-status-aberto' : 'sd-status-encerrado'">
+                <span class="sd-badge-dot"></span>
+                {{ smtpAtivo ? 'SMTP Real Ativo' : 'Modo Simulado' }}
+              </span>
+            </div>
+
+            @if (!isAdmin) {
+              <div class="sd-alert sd-alert-info">
+                <i class="ti ti-lock"></i>
+                <span>Somente Administradores podem configurar ou testar credenciais do servidor de e-mail.</span>
+              </div>
+            } @else {
+              <div class="presets-smtp">
+                <span class="presets-label">Preencher provedor gratuito recomendado:</span>
+                <div class="presets-botoes">
+                  @for (p of provedoresSmtp; track p.id) {
+                    <button
+                      type="button"
+                      class="sd-btn sd-btn-secondary sd-btn-sm"
+                      [class.preset-selecionado]="smtpHost === p.host"
+                      (click)="aplicarPresetSmtp(p)"
+                    >
+                      <i class="ti ti-mail-forward"></i>
+                      <span>{{ p.nome }}</span>
+                    </button>
+                  }
+                </div>
+                @if (instrucaoProvedorAtual) {
+                  <p class="preset-dica">
+                    <i class="ti ti-bulb"></i>
+                    <span>{{ instrucaoProvedorAtual }}</span>
+                  </p>
+                }
+              </div>
+
+              <label class="switch-row smtp-toggle">
+                <div>
+                  <strong>Ativar envio real de e-mails via SMTP</strong>
+                  <span>Quando desativado, o código de 6 dígitos é exibido apenas nos logs do servidor.</span>
+                </div>
+                <input type="checkbox" [(ngModel)]="smtpAtivo" name="smtpAtivo" />
+              </label>
+
+              <div class="sd-grid-3">
+                <div class="sd-field">
+                  <label for="smtp-host">Servidor Host SMTP *</label>
+                  <input id="smtp-host" type="text" class="sd-mono" [(ngModel)]="smtpHost" placeholder="smtp.gmail.com" />
+                </div>
+
+                <div class="sd-field">
+                  <label for="smtp-port">Porta *</label>
+                  <input id="smtp-port" type="number" class="sd-mono" [(ngModel)]="smtpPort" placeholder="587" />
+                </div>
+
+                <div class="sd-field">
+                  <label for="smtp-sec">Criptografia</label>
+                  <select id="smtp-sec" [(ngModel)]="smtpSecure">
+                    <option [ngValue]="false">STARTTLS (Porta 587 / 2525)</option>
+                    <option [ngValue]="true">SSL / TLS Direto (Porta 465)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="sd-grid-2">
+                <div class="sd-field">
+                  <label for="smtp-user">Usuário / E-mail autenticado *</label>
+                  <input
+                    id="smtp-user"
+                    type="email"
+                    [(ngModel)]="smtpUser"
+                    placeholder="seuemail@gmail.com"
+                    autocorrect="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                  />
+                </div>
+
+                <div class="sd-field">
+                  <label for="smtp-pass">
+                    Senha de App / Chave SMTP {{ smtpPossuiSenha ? '(já salva — preencha apenas para trocar)' : '*' }}
+                  </label>
+                  <input
+                    id="smtp-pass"
+                    type="password"
+                    [(ngModel)]="smtpPass"
+                    [placeholder]="smtpPossuiSenha ? '••••••••••••••••' : 'Senha de App de 16 caracteres'"
+                    autocomplete="new-password"
+                  />
+                </div>
+              </div>
+
+              <div class="sd-grid-2">
+                <div class="sd-field">
+                  <label for="smtp-nome">Nome do remetente</label>
+                  <input id="smtp-nome" type="text" [(ngModel)]="smtpFromName" placeholder="SecureDesk Central de TI" />
+                </div>
+
+                <div class="sd-field">
+                  <label for="smtp-from">E-mail do remetente</label>
+                  <input id="smtp-from" type="email" [(ngModel)]="smtpFromEmail" [placeholder]="smtpUser || 'mesmo e-mail autenticado'" />
+                </div>
+              </div>
+
+              <div class="teste-smtp-box">
+                <div class="sd-field teste-campo">
+                  <label for="smtp-dest">Validar configuração enviando e-mail real de teste para:</label>
+                  <input id="smtp-dest" type="email" [(ngModel)]="emailDestinoTeste" placeholder="destinatario@email.com" />
+                </div>
+                <button type="button" class="sd-btn sd-btn-secondary" [disabled]="testandoSmtp" (click)="enviarTesteSmtp()">
+                  <i class="ti ti-send"></i>
+                  <span>{{ testandoSmtp ? 'Testando conexão...' : 'Enviar e-mail de teste' }}</span>
+                </button>
+                <button type="button" class="sd-btn sd-btn-primary" [disabled]="salvandoSmtp" (click)="salvarConfigSmtp()">
+                  <i class="ti ti-device-floppy"></i>
+                  <span>{{ salvandoSmtp ? 'Salvando...' : 'Salvar SMTP' }}</span>
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        @if (secaoAtiva !== 'smtp') {
+          <div class="acoes-rodape">
+            <button type="button" class="sd-btn sd-btn-secondary" [disabled]="salvando" (click)="restaurar()">
+              Descartar alterações
+            </button>
+            <button type="button" class="sd-btn sd-btn-primary" [disabled]="salvando" (click)="salvarAlteracoes()">
+              <i class="ti ti-check"></i>
+              <span>{{ salvando ? 'Salvando...' : 'Salvar configurações' }}</span>
+            </button>
+          </div>
+        }
       </section>
     </div>
   </main>

@@ -71,7 +71,7 @@ Invalida o token atual.
 
 ### Recuperação de senha — tela "Esqueci minha senha"
 
-O fluxo tem dois passos. O sistema **não envia e-mail de verdade**: o código aparece no terminal onde a API está rodando, na linha `[E-MAIL SIMULADO]`.
+O fluxo tem dois passos e utiliza **envio real via SMTP externo** (ex.: Gmail com Senha de App ou Brevo gratuito) quando configurado em `.env` ou pela tela **Configurações > E-mail (SMTP)**. Sem credenciais SMTP, a API mantém o fallback seguro exibindo `[E-MAIL SIMULADO]` no log do servidor.
 
 1. `POST /auth/esqueci-senha` (pública)
 
@@ -93,15 +93,17 @@ O fluxo tem dois passos. O sistema **não envia e-mail de verdade**: o código a
 
 ### `GET /auth/me`
 
-Devolve o usuário logado.
+Devolve o usuário logado (`id`, `nome`, `email`, `telefone`, `perfil`, `avatarUrl`, `departamento`, `cargo`).
 
 ### `PUT /auth/me` — tela de Configurações (Meu perfil)
 
 ```json
-{ "nome": "João da Silva", "telefone": "(11) 95555-0000" }
+{ "nome": "João da Silva", "telefone": "(11) 95555-0000", "departamento": "Financeiro", "cargo": "Analista" }
 ```
 
-E-mail e perfil não mudam por aqui.
+### `POST /auth/me/avatar` — Upload de foto do próprio perfil
+
+Aceita `multipart/form-data` com o campo `avatar` (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif` até 3MB) e grava a foto em `/api/uploads/avatars/...`.
 
 ### `PUT /auth/me/senha` — tela de Configurações (Alterar senha)
 
@@ -243,14 +245,27 @@ Volta para `EM ATENDIMENTO` (ou `ABERTO`, se não tiver técnico).
 ### `POST /chamados/:id/comentarios`
 
 ```json
-{ "comentario": "Testei e continua acontecendo." }
+{ "comentario": "Testei e continua acontecendo.", "interno": false }
 ```
 
-A rota antiga `POST /chamados/:id/observacoes` continua funcionando.
+- Técnicos e administradores podem enviar `"interno": true` para registrar notas técnicas internas ocultas para clientes.
+- A rota antiga `POST /chamados/:id/observacoes` continua funcionando.
 
-### `GET /chamados/:id/anexos/:anexoId` — baixar anexo
+### `POST /chamados/:id/anexos`
 
-Exige o token, então um link `<a href>` comum não funciona. No Angular, baixe com o `HttpClient` usando `responseType: 'blob'` e depois crie a URL do arquivo com `URL.createObjectURL`.
+Adiciona novos anexos (`multipart/form-data`, campo `anexos`) a um chamado em aberto/andamento.
+
+### `PATCH /chamados/:id/avaliar`
+
+```json
+{ "nota": 5, "comentario": "Atendimento ágil e objetivo." }
+```
+
+Permite ao solicitante avaliar o suporte (1 a 5 estrelas) após o chamado ser `RESOLVIDO` ou `ENCERRADO`.
+
+### `GET /chamados/:id/anexos/:anexoId` — baixar ou pré-visualizar anexo
+
+Exige o token (`?inline=1` entrega imagens inline para visualização em tela). No Angular, baixe com o `HttpClient` usando `responseType: 'blob'` e depois crie a URL do arquivo com `URL.createObjectURL`.
 
 ---
 

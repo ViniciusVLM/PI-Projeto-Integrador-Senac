@@ -1,25 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
-const cors = require('cors');
-
+const env = require('./config/env');
 const db = require('./db');
-const authMiddleware = require('./middleware/auth');
+const app = require('./app');
 const { hashSenha, senhaEhHash } = require('./utils/seguranca');
-const { semSenha } = require('./utils/formatar');
 
-const authRoutes = require('./routes/auth');
-const usuariosRoutes = require('./routes/usuarios');
-const categoriasRoutes = require('./routes/categorias');
-const equipamentosRoutes = require('./routes/equipamentos');
-const chamadosRoutes = require('./routes/chamados');
-const dashboardRoutes = require('./routes/dashboard');
-const relatoriosRoutes = require('./routes/relatorios');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Senhas antigas gravadas em texto puro passam a ser salvas com hash
 function protegerSenhasAntigas() {
   const pendentes = db.data.usuarios.filter((u) => u.senha && !senhaEhHash(u.senha));
   pendentes.forEach((u) => {
@@ -27,90 +10,21 @@ function protegerSenhasAntigas() {
   });
   if (pendentes.length) {
     db.save();
-    console.log(`${pendentes.length} senha(s) antiga(s) convertida(s) para hash.`);
+    console.log(`[SEGURANÇA] ${pendentes.length} senha(s) antiga(s) convertida(s) para hash bcrypt.`);
   }
 }
 
-app.use(cors({
-  origin: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Disposition'],
-  credentials: true,
-}));
+async function bootstrap() {
+  await db.initMySQL();
+  protegerSenhasAntigas();
 
-app.use(express.json({ limit: '1mb' }));
-
-// Sincroniza leitura com o banco MySQL do Aiven antes de atender as rotas
-app.use('/api', async (req, res, next) => {
-  try {
-    if (db.mysqlAtivo) {
-      await db.refreshFromMySQL();
-    }
-  } catch {
-    // segue com cache em memória se houver oscilação momentânea de rede
-  }
-  next();
-});
-
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    database: db.mysqlAtivo ? 'aiven-mysql' : 'local-json',
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Mantida por compatibilidade; a rota oficial é /api/usuarios/tecnicos
-app.get('/api/tecnicos', authMiddleware, (req, res) => {
-  const tecnicos = db.data.usuarios
-    .filter((u) => u.perfil === 'tecnico' && u.status === 'Ativo')
-    .map(semSenha);
-  return res.json(tecnicos);
-});
-
-app.use('/api/auth', authRoutes);
-app.use('/api/usuarios', usuariosRoutes);
-app.use('/api/categorias', categoriasRoutes);
-app.use('/api/equipamentos', equipamentosRoutes);
-app.use('/api/chamados', chamadosRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/relatorios', relatoriosRoutes);
-
-app.use('/api', (req, res) => {
-  res.status(404).json({ erro: `Rota não encontrada: ${req.method} ${req.originalUrl}` });
-});
-
-// Em produção (Render), a própria API entrega as telas do Angular depois do npm run build
-const PASTA_FRONT = path.join(__dirname, '..', 'dist', 'PI-Projeto-Integrador-Senac', 'browser');
-if (fs.existsSync(path.join(PASTA_FRONT, 'index.html'))) {
-  app.use(express.static(PASTA_FRONT));
-  // qualquer rota do Angular (/login, /chamados...) abre o index.html
-  app.get(/^\/(?!api\/).*/, (req, res) => {
-    res.sendFile(path.join(PASTA_FRONT, 'index.html'));
+  app.listen(env.PORT, () => {
+    console.log(`SecureDesk API rodando em http://localhost:${env.PORT}`);
   });
 }
-
-app.use((req, res) => {
-  res.status(404).json({ erro: `Rota não encontrada: ${req.method} ${req.originalUrl}` });
-});
-
-app.use((err, req, res, next) => {
-  if (err.type === 'entity.parse.failed') {
-    return res.status(400).json({ erro: 'JSON inválido no corpo da requisição.' });
-  }
-  console.error('[ERRO]', err.message);
-  res.status(500).json({ erro: 'Erro interno do servidor.' });
-});
 
 if (require.main === module) {
-  (async () => {
-    await db.initMySQL();
-    protegerSenhasAntigas();
-    app.listen(PORT, () => {
-      console.log(`SecureDesk API rodando em http://localhost:${PORT}`);
-    });
-  })();
+  bootstrap();
 }
 
 module.exports = app;

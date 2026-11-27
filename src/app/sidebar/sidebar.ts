@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { NotificacaoItem, NotificacaoService } from '../core/services/notificacao.service';
+import { extrairIniciais, tempoRelativoCurto } from '../core/utils/ui.utils';
 
 @Component({
   selector: 'app-sidebar',
@@ -9,26 +11,80 @@ import { AuthService } from '../core/services/auth.service';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
-export class Sidebar {
-  private authService = inject(AuthService);
+export class Sidebar implements OnInit {
+  readonly authService = inject(AuthService);
+  readonly notifService = inject(NotificacaoService);
+  private router = inject(Router);
+
+  painelNotifAberto = signal(false);
+  erroImagemAvatar = signal(false);
+
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.notifService.carregar();
+    }
+  }
+
+  get usuario() {
+    return this.authService.usuarioAtual();
+  }
 
   get nomeUsuario(): string {
-    return this.authService.getUsuario()?.nome || 'Administrador';
+    return this.usuario?.nome || 'Usuário';
+  }
+
+  get avatarUrl(): string | null {
+    if (this.erroImagemAvatar()) return null;
+    return this.usuario?.avatarUrl || null;
   }
 
   get cargoUsuario(): string {
-    const perfil = this.authService.getPerfil();
-    if (perfil === 'admin') return 'Administrador';
-    if (perfil === 'tecnico') return 'Técnico de TI';
-    if (perfil === 'cliente') return 'Usuário';
-    return 'Perfil de acesso';
+    const u = this.usuario;
+    if (u?.cargo) return u.cargo;
+    const perfil = u?.perfil;
+    if (perfil === 'admin') return 'Administrador de TI';
+    if (perfil === 'tecnico') return 'Analista de Suporte';
+    return 'Solicitante';
   }
 
   get iniciais(): string {
-    const nome = this.nomeUsuario.trim();
-    if (!nome) return 'AD';
-    const partes = nome.split(/\s+/);
-    if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
-    return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+    return extrairIniciais(this.nomeUsuario);
+  }
+
+  get podeVerRelatorios(): boolean {
+    return this.authService.temPerfil('tecnico', 'admin');
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.temPerfil('admin');
+  }
+
+  alternarNotificacoes(): void {
+    const novo = !this.painelNotifAberto();
+    this.painelNotifAberto.set(novo);
+    if (novo) this.notifService.carregar();
+  }
+
+  abrirNotificacao(item: NotificacaoItem): void {
+    if (!item.lida) {
+      this.notifService.marcarComoLida(item.id);
+    }
+    this.painelNotifAberto.set(false);
+    if (item.chamadoId) {
+      this.router.navigate(['/detalhes-chamados', item.chamadoId]);
+    }
+  }
+
+  tempoRelativo(data: string): string {
+    return tempoRelativoCurto(data);
+  }
+
+  aoFalharAvatar(): void {
+    this.erroImagemAvatar.set(true);
+  }
+
+  sair(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

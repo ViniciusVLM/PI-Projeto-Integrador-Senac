@@ -1,43 +1,128 @@
-<aside class="lado-esquerdo-dash">
-  <div class="logo">
-    <i class="bi bi-shield-check"></i>
-    <div>
-      <h3>SecureDesk</h3>
-      <p>Gestão de chamados de TI</p>
-    </div>
+<aside class="sd-sidebar">
+  <div class="sd-brand-row">
+    <a routerLink="/dashboard" class="sd-brand">
+      <span class="sd-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 3v5c0 5-3.2 8.7-7 10-3.8-1.3-7-5-7-10V6l7-3z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </span>
+      <div class="sd-brand-text">
+        <span class="sd-brand-name">SecureDesk</span>
+        <span class="sd-brand-sub">Central de Serviços de TI</span>
+      </div>
+    </a>
+
+    <button
+      type="button"
+      class="sd-notif-btn"
+      [class.active]="painelNotifAberto()"
+      (click)="alternarNotificacoes()"
+      aria-label="Abrir notificações"
+    >
+      <i class="ti ti-bell"></i>
+      @if (notifService.naoLidas() > 0) {
+        <span class="sd-notif-badge">{{ notifService.naoLidas() }}</span>
+      }
+    </button>
   </div>
 
-  <nav class="menuItems">
-    <a class="menuItem" routerLink="/dashboard" routerLinkActive="active">
-      <i class="bi bi-grid"></i><h4>Dashboard</h4>
+  @if (painelNotifAberto()) {
+    <div class="sd-notif-panel">
+      <div class="sd-notif-header">
+        <span>Notificações</span>
+        @if (notifService.naoLidas() > 0) {
+          <button type="button" class="sd-notif-markall" (click)="notifService.marcarTodasComoLidas()">
+            Marcar lidas
+          </button>
+        }
+      </div>
+
+      <ul class="sd-notif-list">
+        @for (n of notifService.itens().slice(0, 6); track n.id) {
+          <li>
+            <button
+              type="button"
+              class="sd-notif-item"
+              [class.nao-lida]="!n.lida"
+              (click)="abrirNotificacao(n)"
+            >
+              <div class="sd-notif-top">
+                <strong>{{ n.titulo }}</strong>
+                <time>{{ tempoRelativo(n.criadaEm) }}</time>
+              </div>
+              <p>{{ n.mensagem }}</p>
+            </button>
+          </li>
+        } @empty {
+          <li class="sd-notif-empty">Nenhuma notificação recente.</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="sd-cta-wrap">
+    <a routerLink="/novochamado" class="sd-new-ticket-btn">
+      <i class="ti ti-plus"></i>
+      <span>Abrir chamado</span>
     </a>
-    <a class="menuItem" routerLink="/chamados" routerLinkActive="active">
-      <i class="bi bi-ticket-perforated"></i><h4>Chamados</h4>
+  </div>
+
+  <nav class="sd-nav" aria-label="Menu principal">
+    <span class="sd-nav-section">Operação</span>
+    <a class="sd-nav-item" routerLink="/dashboard" routerLinkActive="active">
+      <i class="ti ti-layout-dashboard"></i>
+      <span>Visão Geral</span>
     </a>
-    <a class="menuItem" routerLink="/usuarios" routerLinkActive="active">
-      <i class="bi bi-people"></i><h4>Usuários</h4>
+    <a class="sd-nav-item" routerLink="/chamados" routerLinkActive="active">
+      <i class="ti ti-ticket"></i>
+      <span>Chamados</span>
     </a>
-    <a class="menuItem" routerLink="/equipamentos" routerLinkActive="active">
-      <i class="bi bi-pc-display"></i><h4>Equipamentos</h4>
+
+    <span class="sd-nav-section">Ativos &amp; Diretório</span>
+    <a class="sd-nav-item" routerLink="/equipamentos" routerLinkActive="active">
+      <i class="ti ti-devices"></i>
+      <span>Equipamentos</span>
     </a>
-    <a class="menuItem" routerLink="/categorias" routerLinkActive="active">
-      <i class="bi bi-tags"></i><h4>Categorias</h4>
+    <a class="sd-nav-item" routerLink="/categorias" routerLinkActive="active">
+      <i class="ti ti-category-2"></i>
+      <span>Categorias &amp; SLA</span>
     </a>
-    <a class="menuItem" routerLink="/relatorios" routerLinkActive="active">
-      <i class="bi bi-bar-chart"></i><h4>Relatórios</h4>
+    <a class="sd-nav-item" routerLink="/usuarios" routerLinkActive="active">
+      <i class="ti ti-users"></i>
+      <span>{{ isAdmin ? 'Usuários & Equipe' : 'Meu Diretório' }}</span>
     </a>
-    <a class="menuItem" routerLink="/configuracoes" routerLinkActive="active">
-      <i class="bi bi-gear"></i><h4>Configurações</h4>
+
+    <span class="sd-nav-section">Gestão</span>
+    @if (podeVerRelatorios) {
+      <a class="sd-nav-item" routerLink="/relatorios" routerLinkActive="active">
+        <i class="ti ti-chart-bar"></i>
+        <span>Relatórios &amp; Indicadores</span>
+      </a>
+    }
+    <a class="sd-nav-item" routerLink="/configuracoes" routerLinkActive="active">
+      <i class="ti ti-settings"></i>
+      <span>Configurações</span>
     </a>
   </nav>
 
-  <footer>
-    <div class="user-info">
-      <div class="avatar">{{ iniciais }}</div>
-      <div class="user-text">
-        <h4>{{ nomeUsuario }}</h4>
-        <p>{{ cargoUsuario }}</p>
+  <footer class="sd-sidebar-footer">
+    <a routerLink="/configuracoes" class="sd-profile-card" title="Editar meu perfil">
+      <span class="sd-avatar sd-sidebar-avatar">
+        @if (avatarUrl) {
+          <img [src]="avatarUrl" [alt]="nomeUsuario" (error)="aoFalharAvatar()" />
+        } @else {
+          {{ iniciais }}
+        }
+      </span>
+      <div class="sd-profile-info">
+        <strong>{{ nomeUsuario }}</strong>
+        <span>{{ cargoUsuario }}</span>
       </div>
-    </div>
+    </a>
+
+    <button type="button" class="sd-logout-btn" (click)="sair()" title="Encerrar sessão" aria-label="Encerrar sessão">
+      <i class="ti ti-logout"></i>
+    </button>
   </footer>
 </aside>

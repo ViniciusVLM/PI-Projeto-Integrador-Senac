@@ -1,119 +1,260 @@
-<div class="container-dash">
-    <app-sidebar />
+<div class="sd-shell">
+  <app-sidebar />
 
-    <main class="lado-direito-dash">
-        <div class="cabecalho">
-            <div>
-                <h1>Chamados de TI</h1>
-                <p class="subtitulo">Gerencie e acompanhe todos os incidentes e solicitações de suporte.</p>
-            </div>
+  <main class="sd-main">
+    <header class="sd-page-header">
+      <div>
+        <span class="sd-eyebrow">
+          <i class="ti ti-ticket"></i>
+          Central de Atendimento
+        </span>
+        <h1 class="sd-page-title">Chamados de TI</h1>
+        <p class="sd-page-subtitle">Acompanhe solicitações, prazos de SLA e atribuições da equipe técnica.</p>
+      </div>
 
-            <div class="acoes-topo">
-                <label class="busca">
-                    <i class="ti ti-search"></i>
-                    <input type="text" placeholder="Pesquisar chamados..." [(ngModel)]="busca" (ngModelChange)="buscar()">
-                </label>
-                <button type="button" class="btn btn-filtro" [class.ativo]="mostrarFiltros || temFiltrosAtivos" (click)="alternarFiltros()">
-                    <i class="ti ti-filter"></i>
-                    Filtros
-                </button>
-                <a routerLink="/novochamado" class="btn btn-novo">
-                    <i class="ti ti-plus"></i>
-                    Novo chamado
-                </a>
-            </div>
+      <div class="sd-header-actions">
+        <search>
+          <label class="sd-search">
+            <i class="ti ti-search"></i>
+            <input
+              type="search"
+              placeholder="Buscar por #ID, título, patrimônio ou pessoa..."
+              [(ngModel)]="busca"
+              (ngModelChange)="buscar()"
+              autocorrect="off"
+              spellcheck="false"
+            />
+          </label>
+        </search>
+
+        <button
+          type="button"
+          class="sd-btn sd-btn-secondary"
+          [class.filtro-ativo]="mostrarFiltros || temFiltrosAtivos"
+          [attr.aria-expanded]="mostrarFiltros"
+          (click)="alternarFiltros()"
+        >
+          <i class="ti ti-adjustments-horizontal"></i>
+          <span>Filtros</span>
+        </button>
+
+        <a routerLink="/novochamado" class="sd-btn sd-btn-primary">
+          <i class="ti ti-plus"></i>
+          <span>Abrir chamado</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Abas rápidas de fila -->
+    <div class="sd-pill-tabs" role="tablist" aria-label="Filas rápidas de chamados">
+      <button type="button" class="sd-pill-tab" [class.active]="abaFila === 'todos'" (click)="selecionarAbaFila('todos')">
+        Todos <span class="sd-pill-count">{{ contarAba('todos') }}</span>
+      </button>
+
+      @if (ehTecnico) {
+        <button type="button" class="sd-pill-tab" [class.active]="abaFila === 'minha_fila'" (click)="selecionarAbaFila('minha_fila')">
+          Atribuídos a mim <span class="sd-pill-count">{{ contarAba('minha_fila') }}</span>
+        </button>
+      }
+
+      @if (ehEquipeTi) {
+        <button type="button" class="sd-pill-tab" [class.active]="abaFila === 'sem_tecnico'" (click)="selecionarAbaFila('sem_tecnico')">
+          Fila sem técnico <span class="sd-pill-count">{{ contarAba('sem_tecnico') }}</span>
+        </button>
+      }
+
+      <button type="button" class="sd-pill-tab" [class.active]="abaFila === 'abertos'" (click)="selecionarAbaFila('abertos')">
+        Abertos <span class="sd-pill-count">{{ contarAba('abertos') }}</span>
+      </button>
+
+      <button type="button" class="sd-pill-tab" [class.active]="abaFila === 'aguardando'" (click)="selecionarAbaFila('aguardando')">
+        Aguardando usuário <span class="sd-pill-count">{{ contarAba('aguardando') }}</span>
+      </button>
+
+      <button type="button" class="sd-pill-tab" [class.active]="abaFila === 'sla_critico'" (click)="selecionarAbaFila('sla_critico')">
+        SLA em atenção <span class="sd-pill-count">{{ contarAba('sla_critico') }}</span>
+      </button>
+
+      <button type="button" class="sd-pill-tab" [class.active]="abaFila === 'concluidos'" (click)="selecionarAbaFila('concluidos')">
+        Concluídos <span class="sd-pill-count">{{ contarAba('concluidos') }}</span>
+      </button>
+    </div>
+
+    @if (mostrarFiltros) {
+      <section class="sd-card painel-filtros" aria-label="Filtros avançados">
+        <div class="sd-field">
+          <label for="f-status">Status</label>
+          <select id="f-status" [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+            <option value="">Todos os status</option>
+            @for (s of statusOpcoes; track s) {
+              <option [value]="s">{{ formatarStatus(s) }}</option>
+            }
+          </select>
         </div>
 
-        @if (mostrarFiltros) {
-            <div class="painel-filtros">
-                <div class="filtro-campo">
-                    <label for="f-status">Status</label>
-                    <select id="f-status" [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
-                        <option value="">Todos os status</option>
-                        @for (s of statusOpcoes; track s) {
-                            <option [value]="s">{{ formatarStatus(s) }}</option>
-                        }
-                    </select>
-                </div>
+        <div class="sd-field">
+          <label for="f-prioridade">Prioridade</label>
+          <select id="f-prioridade" [(ngModel)]="filtroPrioridade" (change)="aplicarFiltros()">
+            <option value="">Todas as prioridades</option>
+            @for (p of prioridadeOpcoes; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
 
-                <div class="filtro-campo">
-                    <label for="f-prioridade">Prioridade</label>
-                    <select id="f-prioridade" [(ngModel)]="filtroPrioridade" (change)="aplicarFiltros()">
-                        <option value="">Todas as prioridades</option>
-                        @for (p of prioridadeOpcoes; track p) {
-                            <option [value]="p">{{ p }}</option>
-                        }
-                    </select>
-                </div>
+        <div class="sd-field">
+          <label for="f-categoria">Categoria</label>
+          <select id="f-categoria" [(ngModel)]="filtroCategoriaId" (change)="aplicarFiltros()">
+            <option value="">Todas as categorias</option>
+            @for (cat of categorias; track cat.id) {
+              <option [value]="cat.id">{{ cat.nome }}</option>
+            }
+          </select>
+        </div>
 
-                <div class="filtro-campo">
-                    <label for="f-categoria">Categoria</label>
-                    <select id="f-categoria" [(ngModel)]="filtroCategoriaId" (change)="aplicarFiltros()">
-                        <option value="">Todas as categorias</option>
-                        @for (cat of categorias; track cat.id) {
-                            <option [value]="cat.id">{{ cat.nome }}</option>
-                        }
-                    </select>
-                </div>
+        <button
+          type="button"
+          class="sd-btn sd-btn-ghost"
+          [disabled]="!temFiltrosAtivos && abaFila === 'todos' && !busca"
+          (click)="limparFiltros()"
+        >
+          <i class="ti ti-filter-off"></i>
+          <span>Limpar tudo</span>
+        </button>
+      </section>
+    }
 
-                <button type="button" class="btn btn-filtro btn-limpar" [disabled]="!temFiltrosAtivos" (click)="limparFiltros()">
-                    <i class="ti ti-filter-off"></i>
-                    Limpar filtros
-                </button>
-            </div>
-        }
+    <section class="sd-card card-tabela">
+      @if (erro) {
+        <div class="estado-msg erro">{{ erro }}</div>
+      }
 
-        <div class="card-tabela">
-            @if (erro) { <p class="erro-msg">{{ erro }}</p> }
-            @if (carregando) { <p class="erro-msg">Carregando...</p> }
-
-            <div class="tabela-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Título do incidente</th>
-                            <th>Solicitante</th>
-                            <th>Prioridade</th>
-                            <th>Status</th>
-                            <th>Técnico</th>
-                            <th>Atualizado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (c of paginados; track c.id) {
-                            <tr>
-                                <td class="id-chamado"><a [routerLink]="['/detalhes-chamados', c.id]">#{{ c.id }}</a></td>
-                                <td class="titulo-chamado"><a [routerLink]="['/detalhes-chamados', c.id]">{{ c.titulo }}</a></td>
-                                <td>{{ c.solicitanteNome || '—' }}</td>
-                                <td><span class="badge prioridade {{ prioridadeClasse(c.prioridade) }}">{{ c.prioridade }}</span></td>
-                                <td><span class="badge {{ statusClasse(c.status) }}">{{ formatarStatus(c.status) }}</span></td>
-                                <td>{{ c.tecnicoNome || 'Aguardando Atrib.' }}</td>
-                                <td>{{ tempoRelativo(c.dataAtualizacao || c.dataAbertura) }}</td>
-                            </tr>
-                        } @empty {
-                            @if (!carregando) {
-                                <tr><td colspan="7" class="sem-resultado">Nenhum chamado encontrado.</td></tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="rodape-tabela">
-                <span>Mostrando <strong>{{ inicio }}-{{ fim }}</strong> de <strong>{{ filtrados.length }}</strong> chamados</span>
-                <div class="paginacao">
-                    <button type="button" [disabled]="pagina === 1" (click)="irPara(pagina - 1)"><i class="ti ti-chevron-left"></i></button>
-                    @for (p of paginas; track $index) {
-                        @if (p === '...') {
-                            <span class="reticencias">...</span>
+      @if (carregando) {
+        <div class="estado-msg">Carregando fila de chamados...</div>
+      } @else {
+        <div tabindex="0" role="region" aria-label="Lista de chamados" class="sd-table-scroll">
+          <table class="sd-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Incidente &amp; Classificação</th>
+                <th>Solicitante</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th>SLA</th>
+                <th>Técnico Responsável</th>
+                <th>Atualizado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of paginados; track c.id) {
+                <tr>
+                  <td>
+                    <a [routerLink]="['/detalhes-chamados', c.id]" class="id-link sd-mono">#{{ c.id }}</a>
+                  </td>
+                  <td class="col-incidente">
+                    <a [routerLink]="['/detalhes-chamados', c.id]" class="titulo-chamado">{{ c.titulo }}</a>
+                    <div class="meta-chamado">
+                      <span><i class="ti {{ c.categoriaIcone || 'ti-tag' }}"></i> {{ c.categoriaNome || 'Geral' }}</span>
+                      @if (c.equipamentoPatrimonio) {
+                        <span class="sd-mono meta-tag">{{ c.equipamentoPatrimonio }}</span>
+                      }
+                      @if ((c.totalAnexos ?? 0) > 0) {
+                        <span><i class="ti ti-paperclip"></i> {{ c.totalAnexos }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <div class="sd-user-cell">
+                      <span class="sd-avatar sd-avatar-sm">
+                        @if (c.solicitanteAvatar) {
+                          <img [src]="c.solicitanteAvatar" [alt]="c.solicitanteNome || ''" loading="lazy" />
                         } @else {
-                            <button type="button" [class.atual]="p === pagina" (click)="irPara(p)">{{ p }}</button>
+                          {{ iniciais(c.solicitanteNome) }}
                         }
+                      </span>
+                      <div class="sd-user-meta">
+                        <span class="sd-user-name">{{ c.solicitanteNome || '—' }}</span>
+                        @if (c.solicitanteDepartamento) {
+                          <span class="sd-user-sub">{{ c.solicitanteDepartamento }}</span>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="sd-badge {{ prioridadeClasse(c.prioridade) }}">{{ c.prioridade }}</span>
+                  </td>
+                  <td>
+                    <span class="sd-badge {{ statusClasse(c.status) }}">
+                      <span class="sd-badge-dot"></span>
+                      {{ formatarStatus(c.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (c.sla) {
+                      <span class="sd-sla {{ slaClasse(c.sla.situacao) }}">{{ slaTexto(c.sla) }}</span>
                     }
-                    <button type="button" [disabled]="pagina === totalPaginas" (click)="irPara(pagina + 1)"><i class="ti ti-chevron-right"></i></button>
-                </div>
-            </div>
+                  </td>
+                  <td>
+                    @if (c.tecnicoNome) {
+                      <div class="sd-user-cell">
+                        <span class="sd-avatar sd-avatar-xs">
+                          @if (c.tecnicoAvatar) {
+                            <img [src]="c.tecnicoAvatar" [alt]="c.tecnicoNome" loading="lazy" />
+                          } @else {
+                            {{ iniciais(c.tecnicoNome) }}
+                          }
+                        </span>
+                        <span class="tec-nome">{{ c.tecnicoNome }}</span>
+                      </div>
+                    } @else if (ehTecnico && c.status === 'ABERTO') {
+                      <button
+                        type="button"
+                        class="btn-assumir-inline"
+                        [disabled]="assumindoId === c.id"
+                        (click)="assumirRapido(c, $event)"
+                      >
+                        <i class="ti ti-user-plus"></i>
+                        {{ assumindoId === c.id ? 'Assumindo...' : 'Assumir' }}
+                      </button>
+                    } @else {
+                      <span class="sem-atrib">Não atribuído</span>
+                    }
+                  </td>
+                  <td class="col-tempo sd-tabular">{{ tempoRelativo(c.dataAtualizacao || c.dataAbertura) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="sem-resultado">
+                    Nenhum chamado corresponde aos filtros selecionados.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-    </main>
+
+        <footer class="rodape-tabela">
+          <span class="sd-tabular">
+            Exibindo <strong>{{ inicio }}–{{ fim }}</strong> de <strong>{{ filtrados.length }}</strong> chamados
+          </span>
+          <div class="paginacao">
+            <button type="button" [disabled]="pagina === 1" (click)="irPara(pagina - 1)" aria-label="Página anterior">
+              <i class="ti ti-chevron-left"></i>
+            </button>
+            @for (p of paginas; track $index) {
+              @if (p === '...') {
+                <span class="reticencias">…</span>
+              } @else {
+                <button type="button" [class.atual]="p === pagina" (click)="irPara(p)">{{ p }}</button>
+              }
+            }
+            <button type="button" [disabled]="pagina === totalPaginas" (click)="irPara(pagina + 1)" aria-label="Próxima página">
+              <i class="ti ti-chevron-right"></i>
+            </button>
+          </div>
+        </footer>
+      }
+    </section>
+  </main>
 </div>

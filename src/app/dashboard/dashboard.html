@@ -1,90 +1,163 @@
-<div class="dashboard-layout">
+<div class="sd-shell">
   <app-sidebar />
 
-  <main class="dashboard-main">
-
-    <header class="dash-header">
+  <main class="sd-main">
+    <header class="sd-page-header">
       <div>
-        <h1>Olá, {{ primeiroNome }}!</h1>
-        <p>Central de Atendimento Técnica - Visão Geral dos Chamados</p>
+        <span class="sd-eyebrow">
+          <i class="ti ti-activity-heartbeat"></i>
+          Central de Operações
+        </span>
+        <h1 class="sd-page-title">Olá, {{ primeiroNome }}</h1>
+        <p class="sd-page-subtitle">{{ subtituloPainel }}</p>
       </div>
 
-      <label class="periodo">
-        <i class="bx bx-calendar"></i>
-        <select (change)="onPeriodo($event)">
-          <option value="">Quantidade do período</option>
-          <option value="1">Hoje</option>
-          <option value="7">Últimos 7 dias</option>
-          <option value="30">Últimos 30 dias</option>
-          <option value="90">Últimos 90 dias</option>
-        </select>
-      </label>
+      <div class="sd-header-actions">
+        <search>
+          <label class="filtro-periodo" aria-label="Filtrar período das métricas">
+            <i class="ti ti-calendar-stats"></i>
+            <select (change)="onPeriodo($event)">
+              <option value="">Todo o histórico</option>
+              <option value="7">Últimos 7 dias</option>
+              <option value="30">Últimos 30 dias</option>
+              <option value="90">Últimos 90 dias</option>
+              <option value="365">Últimos 12 meses</option>
+            </select>
+          </label>
+        </search>
+
+        <a routerLink="/novochamado" class="sd-btn sd-btn-primary">
+          <i class="ti ti-plus"></i>
+          <span>Novo chamado</span>
+        </a>
+      </div>
     </header>
 
     @if (carregando) {
-      <p class="estado">Carregando métricas...</p>
+      <div class="sd-card estado-box">
+        <p>Atualizando indicadores da central...</p>
+      </div>
     } @else if (erro) {
-      <div class="estado erro">
+      <div class="sd-card estado-box estado-erro">
         <p>{{ erro }}</p>
-        <button type="button" (click)="carregarMetricas()">Tentar novamente</button>
+        <button type="button" class="sd-btn sd-btn-primary" (click)="carregarMetricas()">Tentar novamente</button>
       </div>
     } @else if (metricas) {
+      <!-- Strip operacional secundária para técnicos e admins -->
+      @if (metricas.escopo === 'todos') {
+        <section class="op-strip sd-card">
+          <div class="op-item">
+            <i class="ti ti-inbox"></i>
+            <span>Sem técnico atribuído:</span>
+            <strong class="sd-tabular">{{ metricas.chamadosSemTecnico ?? 0 }}</strong>
+          </div>
+          <div class="op-divider"></div>
+          <div class="op-item" [class.op-alerta]="(metricas.slaVencidos ?? 0) > 0">
+            <i class="ti ti-alert-triangle"></i>
+            <span>SLA vencido:</span>
+            <strong class="sd-tabular">{{ metricas.slaVencidos ?? 0 }}</strong>
+          </div>
+          <div class="op-divider"></div>
+          <div class="op-item">
+            <i class="ti ti-clock-hour-4"></i>
+            <span>Tempo médio de solução:</span>
+            <strong class="sd-tabular">{{ metricas.tempoMedioResolucaoHoras ? metricas.tempoMedioResolucaoHoras + 'h' : '—' }}</strong>
+          </div>
+          @if (metricas.mediaSatisfacao) {
+            <div class="op-divider"></div>
+            <div class="op-item">
+              <i class="ti ti-star-filled star-ouro"></i>
+              <span>Satisfação CSAT:</span>
+              <strong class="sd-tabular">{{ metricas.mediaSatisfacao }} / 5.0</strong>
+            </div>
+          }
+          @if (metricas.atribuidosAMim !== undefined) {
+            <div class="op-divider"></div>
+            <div class="op-item">
+              <i class="ti ti-user-check"></i>
+              <span>Na minha fila:</span>
+              <strong class="sd-tabular">{{ metricas.atribuidosAMim }}</strong>
+            </div>
+          }
+        </section>
+      }
 
-      <!-- Cards de resumo -->
+      <!-- Cards principais -->
       <section class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">Abertos</span>
-          <span class="dot dot-verde"></span>
-          <strong class="kpi-valor">{{ metricas.chamadosAbertos }}</strong>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Em andamento</span>
-          <span class="dot dot-amarelo"></span>
-          <strong class="kpi-valor">{{ metricas.chamadosEmAndamento }}</strong>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Resolvidos</span>
-          <span class="dot dot-azul"></span>
-          <strong class="kpi-valor">{{ metricas.chamadosResolvidos }}</strong>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Aguardando usuário</span>
-          <span class="dot dot-vermelho"></span>
-          <strong class="kpi-valor">{{ aguardando }}</strong>
-        </div>
+        <a routerLink="/chamados" class="sd-card kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Abertos na fila</span>
+            <span class="kpi-icon kpi-green"><i class="ti ti-ticket"></i></span>
+          </div>
+          <strong class="kpi-valor sd-tabular">{{ metricas.chamadosAbertos }}</strong>
+          <span class="kpi-foot">Aguardando triagem inicial</span>
+        </a>
+
+        <a routerLink="/chamados" class="sd-card kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Em atendimento</span>
+            <span class="kpi-icon kpi-amber"><i class="ti ti-tool"></i></span>
+          </div>
+          <strong class="kpi-valor sd-tabular">{{ metricas.chamadosEmAtendimento }}</strong>
+          <span class="kpi-foot">Em diagnóstico ou execução</span>
+        </a>
+
+        <a routerLink="/chamados" class="sd-card kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Aguardando usuário</span>
+            <span class="kpi-icon kpi-red"><i class="ti ti-message-exclamation"></i></span>
+          </div>
+          <strong class="kpi-valor sd-tabular">{{ aguardando }}</strong>
+          <span class="kpi-foot">Pendentes de retorno ou teste</span>
+        </a>
+
+        <a routerLink="/chamados" class="sd-card kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Concluídos</span>
+            <span class="kpi-icon kpi-blue"><i class="ti ti-circle-check"></i></span>
+          </div>
+          <strong class="kpi-valor sd-tabular">{{ metricas.chamadosResolvidos }}</strong>
+          <span class="kpi-foot">de {{ metricas.totalChamados }} chamados no período</span>
+        </a>
       </section>
 
-      <!-- Gráficos -->
-      <section class="graficos">
-        <div class="painel">
-          <h2>Chamados por Status</h2>
+      <!-- Gráficos de distribuição -->
+      <section class="graficos-grid">
+        <div class="sd-card painel">
+          <div class="painel-header">
+            <h2>Distribuição por status</h2>
+            <span class="painel-sub">Volume total: {{ metricas.totalChamados }}</span>
+          </div>
           <div class="status-corpo">
             <div class="donut" [style.background]="donutGradiente">
               <div class="donut-centro">
-                <strong>{{ metricas.totalChamados }}</strong>
-                <span>Total</span>
+                <strong class="sd-tabular">{{ metricas.totalChamados }}</strong>
+                <span>Chamados</span>
               </div>
             </div>
 
             <ul class="legenda">
               @for (s of statusLegenda; track s.nome) {
                 <li>
-                  <span class="dot" [style.background]="s.cor"></span>
+                  <span class="leg-dot" [style.background]="s.cor"></span>
                   <span class="leg-nome">{{ s.nome }}</span>
-                  <strong>{{ s.total }}</strong>
+                  <strong class="sd-tabular">{{ s.total }}</strong>
                 </li>
               }
             </ul>
           </div>
         </div>
 
-        <div class="painel">
-          <h2>Chamados por Prioridade</h2>
+        <div class="sd-card painel">
+          <div class="painel-header">
+            <h2>Volume por criticidade</h2>
+            <span class="painel-sub">{{ metricas.prioridadeAltaCritica }} alta/crítica</span>
+          </div>
           <div class="barras">
             @for (p of prioridades; track p.nome) {
               <div class="barra-col">
-                <div class="barra-area">
-                  <span class="barra-valor">{{ p.total }}</span>
+                <span class="barra-valor sd-tabular">{{ p.total }}</span>
+                <div class="barra-trilha">
                   <div class="barra" [style.height.%]="alturaBarra(p.total)" [style.background]="p.cor"></div>
                 </div>
                 <span class="barra-label">{{ p.nome }}</span>
@@ -92,47 +165,120 @@
             }
           </div>
         </div>
+
+        <div class="sd-card painel">
+          <div class="painel-header">
+            <h2>Principais categorias</h2>
+            <span class="painel-sub">Demandas mais recorrentes</span>
+          </div>
+          <div class="cat-lista">
+            @for (cat of topCategorias; track cat.categoriaId) {
+              <div class="cat-item">
+                <div class="cat-meta">
+                  <span>{{ cat.categoriaNome }}</span>
+                  <strong class="sd-tabular">{{ cat.total }}</strong>
+                </div>
+                <div class="cat-bar-bg">
+                  <div class="cat-bar-fill" [style.width.%]="larguraCategoria(cat.total)"></div>
+                </div>
+              </div>
+            } @empty {
+              <p class="vazio-msg">Sem dados no período.</p>
+            }
+          </div>
+        </div>
       </section>
 
-      <!-- Chamados recentes -->
-      <section class="painel painel-tabela">
-        <div class="painel-topo">
-          <h2>Chamados Recentes</h2>
-          <a routerLink="/chamados" class="link-todos">Ver todos os chamados</a>
+      <!-- Tabela de chamados recentes com fotos reais -->
+      <section class="sd-card painel-tabela">
+        <div class="painel-tabela-topo">
+          <div>
+            <h2>Atividade recente na fila</h2>
+            <p>Últimos chamados movimentados no sistema</p>
+          </div>
+          <a routerLink="/chamados" class="sd-btn sd-btn-secondary sd-btn-sm">
+            <span>Ver fila completa</span>
+            <i class="ti ti-arrow-right"></i>
+          </a>
         </div>
 
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Título do incidente</th>
-              <th>Solicitante</th>
-              <th>Prioridade</th>
-              <th>Status</th>
-              <th>Atualização</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (c of recentes; track c.id) {
+        <div tabindex="0" role="region" aria-label="Chamados recentes" class="sd-table-scroll">
+          <table class="sd-table">
+            <thead>
               <tr>
-                <td><a class="link-id" [routerLink]="['/detalhes-chamados', c.id]">#{{ c.id }}</a></td>
-                <td>{{ c.titulo }}</td>
-                <td>{{ c.solicitanteNome ?? '—' }}</td>
-                <td>
-                  <span class="badge badge-prio {{ getPrioridadeClass(c.prioridade) }}">{{ c.prioridade }}</span>
-                </td>
-                <td>
-                  <span class="badge {{ getStatusClass(c.status) }}">{{ formatarStatus(c.status) }}</span>
-                </td>
-                <td>{{ tempoRelativo(c.dataAbertura) }}</td>
+                <th>Chamado</th>
+                <th>Incidente / Categoria</th>
+                <th>Solicitante</th>
+                <th>Responsável</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th>SLA</th>
+                <th>Atualizado</th>
               </tr>
-            } @empty {
-              <tr><td colspan="6" class="sem-resultado">Nenhum chamado recente.</td></tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (c of metricas.recentes; track c.id) {
+                <tr>
+                  <td>
+                    <a class="link-id sd-mono" [routerLink]="['/detalhes-chamados', c.id]">#{{ c.id }}</a>
+                  </td>
+                  <td>
+                    <a class="titulo-link" [routerLink]="['/detalhes-chamados', c.id]">{{ c.titulo }}</a>
+                    <span class="cat-sub">{{ c.categoriaNome || 'Geral' }}</span>
+                  </td>
+                  <td>
+                    <div class="sd-user-cell">
+                      <span class="sd-avatar sd-avatar-sm">
+                        @if (c.solicitanteAvatar) {
+                          <img [src]="c.solicitanteAvatar" [alt]="c.solicitanteNome || ''" loading="lazy" />
+                        } @else {
+                          {{ iniciais(c.solicitanteNome) }}
+                        }
+                      </span>
+                      <span class="sd-user-name">{{ c.solicitanteNome || '—' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    @if (c.tecnicoNome) {
+                      <div class="sd-user-cell">
+                        <span class="sd-avatar sd-avatar-xs">
+                          @if (c.tecnicoAvatar) {
+                            <img [src]="c.tecnicoAvatar" [alt]="c.tecnicoNome" loading="lazy" />
+                          } @else {
+                            {{ iniciais(c.tecnicoNome) }}
+                          }
+                        </span>
+                        <span class="nome-tec">{{ c.tecnicoNome }}</span>
+                      </div>
+                    } @else {
+                      <span class="sem-tecnico">Aguardando atribuição</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="sd-badge {{ getPrioridadeClass(c.prioridade) }}">{{ c.prioridade }}</span>
+                  </td>
+                  <td>
+                    <span class="sd-badge {{ getStatusClass(c.status) }}">
+                      <span class="sd-badge-dot"></span>
+                      {{ formatarStatus(c.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (c.sla) {
+                      <span class="sd-sla {{ getSlaClass(c.sla.situacao) }}">{{ getSlaTexto(c.sla) }}</span>
+                    }
+                  </td>
+                  <td class="sd-tabular col-tempo">{{ tempoRelativo(c.dataAtualizacao || c.dataAbertura) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="vazio-msg">Nenhum chamado registrado neste período.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </section>
-
     }
   </main>
 </div>

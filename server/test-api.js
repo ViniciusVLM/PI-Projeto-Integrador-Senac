@@ -421,6 +421,46 @@ async function executar() {
     verificar('exportação em CSV funciona', csv.status === 200 && (csv.headers.get('content-type') || '').includes('text/csv') && String(csv.body).includes('Título;Categoria'));
 
     // ---------------------------------------------------------------
+    console.log('\nNovas funcionalidades (SLA, notas internas, CSAT, notificações, avatares e SMTP)');
+    verificar('usuários possuem avatarUrl e departamento', listaAdmin.body.some((u) => u.avatarUrl && u.departamento));
+    verificar('chamados enriquecidos trazem indicador de SLA e avatar', !!detalhe.body.sla && 'solicitanteAvatar' in detalhe.body);
+
+    const notaInterna = await api('POST', `/api/chamados/${paraAtribuir.body.id}/comentarios`, {
+      token: tecnico,
+      corpo: { comentario: 'Verificado no switch do 2º andar: porta VLAN 20.', interno: true },
+    });
+    verificar('técnico registra nota interna no chamado', notaInterna.status === 201 && notaInterna.body.interno === true);
+
+    const visaoClienteNota = await api('GET', `/api/chamados/${paraAtribuir.body.id}`, { token: cliente });
+    verificar('cliente não visualiza notas internas da equipe técnica', visaoClienteNota.body.comentarios.every((c) => !c.interno));
+
+    const visaoTecnicoNota = await api('GET', `/api/chamados/${paraAtribuir.body.id}`, { token: tecnico });
+    verificar('técnico visualiza notas internas', visaoTecnicoNota.body.comentarios.some((c) => c.interno));
+
+    const avaliar = await api('PATCH', `/api/chamados/${idNovo}/avaliar`, {
+      token: cliente,
+      corpo: { nota: 5, comentario: 'Excelente suporte, problema resolvido rapidamente!' },
+    });
+    verificar('cliente avalia atendimento encerrado (CSAT 1-5)', avaliar.status === 200 && avaliar.body.avaliacao?.nota === 5);
+
+    const formAvatar = new FormData();
+    formAvatar.append('avatar', new Blob(['fake-png-bytes'], { type: 'image/png' }), 'foto-perfil.png');
+    const upAvatar = await api('POST', '/api/auth/me/avatar', { token: cliente, form: formAvatar });
+    verificar('upload de foto de perfil salva avatarUrl no servidor', upAvatar.status === 200 && String(upAvatar.body.avatarUrl).startsWith('/api/uploads/avatars/'));
+
+    const notifs = await api('GET', '/api/notificacoes', { token: cliente });
+    verificar('central de notificações lista alertas do usuário', notifs.status === 200 && Array.isArray(notifs.body.itens) && typeof notifs.body.naoLidas === 'number');
+
+    const cfgAdmin = await api('GET', '/api/configuracoes', { token: admin });
+    verificar('admin consulta configurações globais e provedores SMTP gratuitos', cfgAdmin.status === 200 && Array.isArray(cfgAdmin.body.smtp?.provedoresSugeridos));
+
+    const salvarCfg = await api('PUT', '/api/configuracoes', {
+      token: admin,
+      corpo: { slaPadraoHoras: 18, prioridadePadrao: 'Média' },
+    });
+    verificar('admin salva parâmetros globais de SLA no servidor', salvarCfg.status === 200 && salvarCfg.body.slaPadraoHoras === 18);
+
+    // ---------------------------------------------------------------
     console.log('\nSessão');
     const logout = await api('POST', '/api/auth/logout', { token: cliente });
     const depoisLogout = await api('GET', '/api/chamados', { token: cliente });

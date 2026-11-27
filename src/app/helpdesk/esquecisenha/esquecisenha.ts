@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-esquecisenha',
-  imports: [RouterLink, FormsModule, NgIf],
+  imports: [RouterLink, FormsModule],
   templateUrl: './esquecisenha.html',
   styleUrl: './esquecisenha.css',
 })
@@ -16,6 +15,7 @@ export class Esquecisenha {
   novaSenha = '';
   confirmarSenha = '';
   codigoEnviado = false;
+  smtpRealAtivo = false;
   mostrarNovaSenha = false;
   mostrarConfirmarSenha = false;
   carregando = false;
@@ -24,7 +24,7 @@ export class Esquecisenha {
 
   constructor(
     private authService: AuthService,
-    private router: Router,
+    private router: Router
   ) {}
 
   alternarNovaSenha(): void {
@@ -35,7 +35,13 @@ export class Esquecisenha {
     this.mostrarConfirmarSenha = !this.mostrarConfirmarSenha;
   }
 
-  // O mesmo botão faz as duas etapas: primeiro pede o código, depois troca a senha
+  voltarEtapaEmail(): void {
+    this.codigoEnviado = false;
+    this.codigo = '';
+    this.erroMensagem = '';
+    this.sucessoMensagem = '';
+  }
+
   onRedefinirSenha(): void {
     if (this.codigoEnviado) {
       this.trocarSenha();
@@ -44,23 +50,25 @@ export class Esquecisenha {
     }
   }
 
-  // Etapa 1: a API gera um código de 6 dígitos (o envio de e-mail é simulado)
   pedirCodigo(): void {
     this.erroMensagem = '';
     this.sucessoMensagem = '';
 
-    if (!this.email) {
+    if (!this.email.trim()) {
       this.erroMensagem = 'Informe o seu e-mail institucional.';
       return;
     }
 
     this.carregando = true;
 
-    this.authService.esqueciSenha(this.email).subscribe({
-      next: () => {
+    this.authService.esqueciSenha(this.email.trim()).subscribe({
+      next: (resp) => {
         this.carregando = false;
         this.codigoEnviado = true;
-        this.sucessoMensagem = 'Enviamos um código de 6 dígitos para o seu e-mail. Ele vale por 15 minutos.';
+        this.smtpRealAtivo = Boolean(resp.smtpAtivo);
+        this.sucessoMensagem = this.smtpRealAtivo
+          ? 'Enviamos um código de 6 dígitos para sua caixa de e-mail (válido por 15 minutos).'
+          : 'Código de 6 dígitos gerado (válido por 15 min). Como o SMTP externo ainda não foi ativado, consulte o log do servidor ou configure o SMTP em Configurações.';
       },
       error: (err) => {
         this.carregando = false;
@@ -69,13 +77,12 @@ export class Esquecisenha {
     });
   }
 
-  // Etapa 2: confere o código e grava a nova senha
   trocarSenha(): void {
     this.erroMensagem = '';
     this.sucessoMensagem = '';
 
-    if (!this.codigo || !this.novaSenha || !this.confirmarSenha) {
-      this.erroMensagem = 'Preencha o código e a nova senha.';
+    if (!this.codigo.trim() || !this.novaSenha || !this.confirmarSenha) {
+      this.erroMensagem = 'Preencha o código de verificação e a nova senha.';
       return;
     }
 
@@ -91,30 +98,32 @@ export class Esquecisenha {
 
     this.carregando = true;
 
-    this.authService.redefinirSenha({
-      email: this.email,
-      codigo: this.codigo,
-      novaSenha: this.novaSenha,
-      confirmarSenha: this.confirmarSenha,
-    }).subscribe({
-      next: (resp) => {
-        this.carregando = false;
-        this.sucessoMensagem = resp.mensagem || 'Senha redefinida com sucesso! Redirecionando...';
-        setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 1500);
-      },
-      error: (err) => {
-        this.carregando = false;
-        this.erroMensagem = this.mensagemDeErro(err);
-      },
-    });
+    this.authService
+      .redefinirSenha({
+        email: this.email.trim(),
+        codigo: this.codigo.trim(),
+        novaSenha: this.novaSenha,
+        confirmarSenha: this.confirmarSenha,
+      })
+      .subscribe({
+        next: (resp) => {
+          this.carregando = false;
+          this.sucessoMensagem = resp.mensagem || 'Senha redefinida com sucesso! Redirecionando...';
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 1500);
+        },
+        error: (err) => {
+          this.carregando = false;
+          this.erroMensagem = this.mensagemDeErro(err);
+        },
+      });
   }
 
   private mensagemDeErro(err: any): string {
     if (err.status === 0) {
       return 'Servidor indisponível. Verifique se o backend está rodando.';
     }
-    return err.error?.erro ?? 'Não foi possível concluir. Tente novamente.';
+    return err.error?.erro ?? 'Não foi possível concluir a solicitação. Tente novamente.';
   }
 }

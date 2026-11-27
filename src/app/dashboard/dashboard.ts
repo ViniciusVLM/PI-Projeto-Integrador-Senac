@@ -3,14 +3,40 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { AuthService, UsuarioPerfil } from '../core/services/auth.service';
 import { Sidebar } from '../sidebar/sidebar';
+import {
+  classeBadgePrioridade,
+  classeBadgeStatus,
+  classeSla,
+  extrairIniciais,
+  formatarStatusChamado,
+  tempoRelativoCurto,
+  textoResumoSla,
+} from '../core/utils/ui.utils';
+
+interface SlaInfo {
+  prazoHoras: number;
+  dataLimite: string;
+  situacao: string;
+  rotulo: string;
+  horasRestantes: number | null;
+}
 
 interface Metricas {
+  escopo: 'meus-chamados' | 'todos';
   totalChamados: number;
   prioridadeAltaCritica: number;
   chamadosAbertos: number;
   chamadosEmAndamento: number;
+  chamadosEmAtendimento: number;
+  chamadosAguardando: number;
   chamadosResolvidos: number;
   chamadosCancelados: number;
+  chamadosSemTecnico?: number;
+  slaVencidos?: number;
+  slaEmAtencao?: number;
+  tempoMedioResolucaoHoras?: number | null;
+  mediaSatisfacao?: number | null;
+  atribuidosAMim?: number;
   porCategoria: { categoriaId: number; categoriaNome: string; total: number }[];
   porStatus: { status: string; total: number }[];
   porPrioridade: { prioridade: string; total: number }[];
@@ -20,15 +46,18 @@ interface Metricas {
     status: string;
     prioridade: string;
     categoriaNome: string;
-    tecnicoNome: string;
-    solicitanteNome?: string;
+    categoriaIcone?: string;
+    tecnicoNome: string | null;
+    tecnicoAvatar?: string | null;
+    solicitanteNome?: string | null;
+    solicitanteAvatar?: string | null;
     dataAbertura: string;
+    dataAtualizacao: string;
+    sla?: SlaInfo | null;
   }[];
   geradoEm: string;
 }
 
-// Endereço relativo: em produção a API e a tela ficam no mesmo site;
-// no npm start, o proxy.conf.json encaminha /api para a porta 3000.
 const API_URL = '/api';
 
 @Component({
@@ -44,9 +73,17 @@ export class Dashboard implements OnInit {
   erro = '';
   periodo = '';
 
+  readonly iniciais = extrairIniciais;
+  readonly formatarStatus = formatarStatusChamado;
+  readonly getStatusClass = classeBadgeStatus;
+  readonly getPrioridadeClass = classeBadgePrioridade;
+  readonly getSlaClass = classeSla;
+  readonly getSlaTexto = textoResumoSla;
+  readonly tempoRelativo = tempoRelativoCurto;
+
   constructor(
     private authService: AuthService,
-    private http: HttpClient,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +106,7 @@ export class Dashboard implements OnInit {
         this.erro =
           err.status === 0
             ? 'Não foi possível conectar ao servidor. Execute: npm run server'
-            : 'Erro ao carregar métricas.';
+            : 'Erro ao carregar métricas operacionais.';
       },
     });
   }
@@ -80,29 +117,30 @@ export class Dashboard implements OnInit {
   }
 
   get primeiroNome(): string {
-    return this.usuario?.nome?.split(' ')[0] ?? 'Usuário';
+    return this.authService.usuarioAtual()?.nome?.split(' ')[0] ?? 'Usuário';
   }
 
-  // Total de chamados aguardando usuário (vem de porStatus)
+  get subtituloPainel(): string {
+    if (this.metricas?.escopo === 'meus-chamados') {
+      return 'Acompanhe o andamento das suas solicitações registradas na Central de TI.';
+    }
+    return 'Monitoramento operacional de fila, prazos de SLA e atendimentos em tempo real.';
+  }
+
   get aguardando(): number {
-    return (
-      this.metricas?.porStatus.find((s) => s.status.toUpperCase() === 'AGUARDANDO USUÁRIO')
-        ?.total ?? 0
-    );
+    return this.metricas?.chamadosAguardando ?? 0;
   }
 
-  // Legenda do gráfico de rosca
   get statusLegenda() {
     const m = this.metricas;
     return [
-      { nome: 'Resolvidos', total: m?.chamadosResolvidos ?? 0, cor: '#2563eb' },
-      { nome: 'Abertos', total: m?.chamadosAbertos ?? 0, cor: '#22c55e' },
-      { nome: 'Em andamento', total: m?.chamadosEmAndamento ?? 0, cor: '#eab308' },
-      { nome: 'Aguardando usuário', total: this.aguardando, cor: '#ef4444' },
+      { nome: 'Resolvidos / Encerrados', total: m?.chamadosResolvidos ?? 0, cor: '#1d4ed8' },
+      { nome: 'Em atendimento / Análise', total: m?.chamadosEmAtendimento ?? 0, cor: '#d97706' },
+      { nome: 'Abertos na fila', total: m?.chamadosAbertos ?? 0, cor: '#16a34a' },
+      { nome: 'Aguardando usuário', total: this.aguardando, cor: '#dc2626' },
     ];
   }
 
-  // Monta o conic-gradient da rosca com a proporção de cada status
   get donutGradiente(): string {
     const total = this.metricas?.totalChamados ?? 0;
     if (!total) return '#e2e8f0';
@@ -113,17 +151,16 @@ export class Dashboard implements OnInit {
       acumulado += (s.total / total) * 100;
       return `${s.cor} ${inicio}% ${acumulado}%`;
     });
-    if (acumulado < 100) partes.push(`#e2e8f0 ${acumulado}% 100%`);
+    if (acumulado < 100) partes.push(`#cbd5e1 ${acumulado}% 100%`);
     return `conic-gradient(${partes.join(', ')})`;
   }
 
-  // Barras do gráfico de prioridade, sempre na mesma ordem
   get prioridades() {
     const ordem = [
-      { nome: 'Baixa', cor: '#2563eb' },
-      { nome: 'Média', cor: '#eab308' },
-      { nome: 'Alta', cor: '#f97316' },
-      { nome: 'Crítica', cor: '#ef4444' },
+      { nome: 'Baixa', cor: '#64748b' },
+      { nome: 'Média', cor: '#2563eb' },
+      { nome: 'Alta', cor: '#ea580c' },
+      { nome: 'Crítica', cor: '#dc2626' },
     ];
     const lista = this.metricas?.porPrioridade ?? [];
     return ordem.map((o) => ({
@@ -132,49 +169,17 @@ export class Dashboard implements OnInit {
     }));
   }
 
-  // Altura da barra (em %) proporcional ao maior valor
   alturaBarra(total: number): number {
     const maior = Math.max(1, ...this.prioridades.map((p) => p.total));
-    return (total / maior) * 75;
+    return Math.max(4, Math.round((total / maior) * 100));
   }
 
-  // Tabela mostra só os 4 mais recentes
-  get recentes() {
-    return (this.metricas?.recentes ?? []).slice(0, 4);
+  get topCategorias() {
+    return (this.metricas?.porCategoria ?? []).slice(0, 5);
   }
 
-  formatarStatus(status: string): string {
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-  }
-
-  getStatusClass(status: string): string {
-    const mapa: Record<string, string> = {
-      'ABERTO': 'badge-aberto',
-      'EM ANÁLISE': 'badge-andamento',
-      'EM ATENDIMENTO': 'badge-andamento',
-      'AGUARDANDO USUÁRIO': 'badge-aguardando',
-      'RESOLVIDO': 'badge-resolvido',
-    };
-    return mapa[status.toUpperCase()] ?? 'badge-default';
-  }
-
-  getPrioridadeClass(prioridade: string): string {
-    const mapa: Record<string, string> = {
-      'Baixa': 'prioridade-baixa',
-      'Média': 'prioridade-media',
-      'Alta': 'prioridade-alta',
-      'Crítica': 'prioridade-critica',
-    };
-    return mapa[prioridade] ?? '';
-  }
-
-  // Ex.: "Há 5 min", "Há 2 horas", "Há 1 dia"
-  tempoRelativo(data: string): string {
-    const min = Math.max(0, Math.floor((Date.now() - new Date(data).getTime()) / 60000));
-    if (min < 60) return `Há ${min} min`;
-    const horas = Math.floor(min / 60);
-    if (horas < 24) return `Há ${horas} ${horas === 1 ? 'hora' : 'horas'}`;
-    const dias = Math.floor(horas / 24);
-    return `Há ${dias} ${dias === 1 ? 'dia' : 'dias'}`;
+  larguraCategoria(total: number): number {
+    const maior = Math.max(1, ...this.topCategorias.map((c) => c.total));
+    return Math.max(8, Math.round((total / maior) * 100));
   }
 }

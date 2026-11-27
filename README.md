@@ -1,159 +1,141 @@
-#  SecureDesk
+# SecureDesk — Central Corporativa de Serviços de TI
 
-> Sistema de chamados de TI desenvolvido como Projeto Integrador do curso de **Análise e Desenvolvimento de Sistemas — Senac**.
+> Plataforma fullstack de Service Desk, inventário patrimonial e gestão de SLA desenvolvida como **Projeto Integrador — Análise e Desenvolvimento de Sistemas (Senac)**.
 
-![Angular](https://img.shields.io/badge/Angular-21.2-DD0031?style=for-the-badge&logo=angular&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![SQL](https://img.shields.io/badge/SQL-Database-4479A1?style=for-the-badge&logo=postgresql&logoColor=white)
-
----
-
-## Sobre o projeto
-
-O **SecureDesk** é uma aplicação web fullstack para gerenciamento de chamados de suporte técnico de TI. Permite que usuários registrem ocorrências, acompanhem o status dos chamados e que técnicos gerenciem e resolvam as demandas de forma organizada.
-
-O projeto foi construído com arquitetura desacoplada: um frontend em **Angular** consumindo uma API REST em **Node.js/Express**, com persistência em banco de dados **SQL**.
+![Angular](https://img.shields.io/badge/Angular-21.2-DD0031?style=flat-square&logo=angular&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-Express_4-339933?style=flat-square&logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql&logoColor=white)
 
 ---
 
-## Funcionalidades
+## Visão geral
 
--  Abertura e registro de chamados de suporte
--  Acompanhamento do status dos chamados em tempo real
--  Painel para técnicos gerenciarem e atualizarem chamados
--  Autenticação de usuários por perfil (usuário / técnico)
--  Histórico e rastreabilidade de atendimentos
--  Interface responsiva e acessível
+O **SecureDesk** centraliza a operação de suporte técnico interno de uma organização, conectando colaboradores solicitantes, analistas de suporte e gestores de TI em um fluxo rastreável do registro até a avaliação pós-atendimento.
 
----
+### Principais funcionalidades
 
-## Tecnologias
-
-| Camada      | Tecnologia                            |
-|-------------|---------------------------------------|
-| Frontend    | Angular 21.2, TypeScript 5.9, RxJS    |
-| Backend     | Node.js, Express 4, CORS              |
-| Banco       | SQL (arquivo de schema em `/database`)|
-| Utilitários | UUID, Prettier, Angular CLI           |
+- **Gestão completa de chamados**: abertura com múltiplos anexos, filas rápidas (`Minha fila`, `Sem técnico`, `SLA em atenção`), linha do tempo auditável, visualização inline de imagens anexadas e reabertura justificada.
+- **Monitoramento automático de SLA**: cálculo dinâmico de prazos por criticidade (`Crítica`, `Alta`, `Média`, `Baixa`) e categoria, indicando chamados no prazo, próximos do vencimento ou vencidos.
+- **Notas técnicas internas e avaliação CSAT**: analistas podem registrar notas internas visíveis apenas para a equipe de TI, e solicitantes avaliam o atendimento de 1 a 5 estrelas após a solução.
+- **Diretório de usuários com foto real**: upload de foto de perfil persistido no servidor, identificação visual em todas as tabelas, comentários e barra lateral, além de controle completo de cargos, setores e permissões.
+- **Inventário patrimonial integrado**: catálogo visual de notebooks, estações, monitores, impressoras e ativos de rede com número de série, localização física e abertura rápida de chamado vinculada ao patrimônio.
+- **Envio real de e-mail via SMTP gratuito**: envio transacional de códigos de 6 dígitos para recuperação de senha e alertas de chamados via **Gmail (Senha de App)**, **Brevo** ou qualquer servidor SMTP, configurável por `.env` ou diretamente pelo painel administrativo com disparo de teste em tempo real.
+- **Central de notificações e relatórios exportáveis**: alertas internos de movimentação na barra lateral e exportação de indicadores gerenciais em CSV compatível com Excel.
 
 ---
 
-## Estrutura do projeto
+## Arquitetura do projeto
 
-```
+```text
 PI-Projeto-Integrador-Senac/
-├── database/          # Scripts SQL (DDL, seed)
-├── icons/             # Ícones e assets do sistema
-├── public/            # Arquivos estáticos públicos
-├── server/
-│   └── index.js       # API REST (Express)
-├── src/               # Código-fonte Angular
-│   ├── app/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── services/
-│   └── ...
-├── angular.json
-├── package.json
-└── tsconfig.json
+├── database/                  # Scripts SQL (DDL, carga inicial e consultas)
+├── docs/                      # Documentação detalhada da API REST
+├── public/img/                # Retratos corporativos, fotos de ativos e ambientes
+├── server/                    # Back-end modular em Node.js + Express
+│   ├── app.js                 # Configuração de middlewares, rotas estáticas e erros
+│   ├── index.js               # Inicialização da API e banco de dados
+│   ├── config/                # Variáveis de ambiente (.env), constantes e Multer
+│   ├── controllers/           # Controladores HTTP por domínio
+│   ├── db/                    # Persistência JSON local + sincronização MySQL/Aiven
+│   ├── middlewares/           # Autenticação Bearer, RBAC e tratamento global de erros
+│   ├── routes/                # Rotas REST organizadas por recurso
+│   ├── services/              # Regras de negócio: SMTP/Nodemailer, SLA, notificações e chamados
+│   └── utils/                 # Criptografia bcrypt, formatação e cálculo de indicadores
+└── src/                       # Front-end SPA em Angular 21
+    └── app/
+        ├── core/              # Guards, interceptor HTTP, serviços reativos e utilitários
+        ├── sidebar/           # Navegação lateral, notificações e perfil logado
+        ├── helpdesk/          # Login, auto-cadastro e recuperação de senha com OTP
+        ├── dashboard/         # Painel operacional e indicadores de SLA
+        ├── chamados/          # Fila paginada com abas inteligentes e ação rápida
+        ├── novochamado/       # Registro de ocorrência com preview de SLA e anexos
+        ├── detalheschamados/  # Workspace de atendimento, notas internas e CSAT
+        ├── usuarioslista/     # Gestão de equipe e upload de fotos de usuários
+        ├── equipamentoslista/ # Controle patrimonial de hardware e estoque de TI
+        ├── categorialista/    # Catálogo de serviços e metas de SLA
+        ├── relatorios/        # Produtividade técnica e exportação CSV
+        └── configuracoes/     # Perfil, regras globais de SLA e configuração/teste SMTP
 ```
 
 ---
 
-## Pré-requisitos
+## Como executar localmente
 
-- [Node.js](https://nodejs.org/) 20.19 ou superior (exigência do Angular 21)
-- npm v10+
-
----
-
-## Como rodar o projeto
-
-### 1. Clone o repositório
-
-```bash
-git clone https://github.com/ViniciusVLM/PI-Projeto-Integrador-Senac.git
-cd PI-Projeto-Integrador-Senac
-```
-
-### 2. Instale as dependências
-
-Só na pasta raiz (a API usa as mesmas dependências):
+### 1. Instalar dependências
 
 ```bash
 npm install
 ```
 
-### 3. Inicie o servidor backend (API)
+### 2. Iniciar a API (porta 3000)
 
 ```bash
 npm run server
-# Servidor rodando em http://localhost:3000
 ```
 
-A API grava os dados em `server/db.json`. Para voltar aos dados iniciais da demonstração:
-
-```bash
-npm run db:reset
-```
-
-### 4. Inicie o frontend Angular
+### 3. Iniciar o front-end Angular (porta 4200)
 
 Em outro terminal:
 
 ```bash
 npm start
-# Aplicação disponível em http://localhost:4200
 ```
 
-### Usuários de teste
+Acesse `http://localhost:4200`. Para restaurar a base de demonstração a qualquer momento:
 
-| E-mail | Perfil | Senha |
-|--------|--------|-------|
-| joao.silvia@empresa.com | Cliente | 123456 |
-| fernanda.souza@empresa.com | Técnico | 123456 |
-| paulo.nunes@empresa.com | Técnico | 123456 |
-| carlos.lima@empresa.com | Administrador | 123456 |
-
-### Banco de dados SQL
-
-Os scripts da pasta `/database` descrevem o mesmo modelo de dados em MySQL/MariaDB (criação das tabelas, dados iniciais e consultas). Rode-os na ordem `01`, `02` e `03`.
+```bash
+npm run db:reset
+```
 
 ---
 
-## API
+## Configurar envio real de e-mail (SMTP gratuito)
 
-A documentação de todas as rotas, campos e permissões por perfil está em [`docs/api.md`](docs/api.md).
+Você pode ativar o envio real de e-mails de duas maneiras:
 
-## Testes
+### Opção 1 — Pelo próprio sistema (sem reiniciar o servidor)
+1. Faça login como Administrador (`carlos.lima@empresa.com` / `123456`).
+2. Acesse **Configurações > E-mail (SMTP)**.
+3. Selecione o preset **Gmail Gratuito (Senha de App)** ou **Brevo**, preencha seu e-mail e a **Senha de App de 16 caracteres** gerada na Conta Google (`myaccount.google.com/apppasswords`), clique em **Enviar e-mail de teste** e depois em **Salvar SMTP**.
 
-```bash
-# Testes automatizados da API (não alteram o server/db.json)
-npm run test:api
+### Opção 2 — Pelo arquivo `.env`
+Copie `.env.example` para `.env` na raiz do projeto e preencha:
 
-# Build de produção do front-end
-npm run build
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=seuemail@gmail.com
+SMTP_PASS=suasenhadeapp16digitos
+SMTP_FROM_NAME=SecureDesk Central de TI
 ```
 
-## Banco de dados no Aiven (opcional)
+---
 
-Copie o `.env.example` para `.env` e preencha com os dados do serviço MySQL. Sem o `.env`, a API usa o `server/db.json`. O `.env` não vai para o GitHub: nunca coloque a senha no código.
+## Contas de teste
 
-## Publicação no Render
+| Nome | E-mail | Perfil | Senha |
+|------|--------|--------|-------|
+| Carlos Lima | `carlos.lima@empresa.com` | Administrador | `123456` |
+| Fernanda Souza | `fernanda.souza@empresa.com` | Técnico de TI | `123456` |
+| Paulo Nunes | `paulo.nunes@empresa.com` | Técnico de TI | `123456` |
+| João Silva | `joao.silvia@empresa.com` | Solicitante | `123456` |
 
-O arquivo `render.yaml` publica a API e as telas num único endereço. Depois do `npm run build`, o próprio servidor Node entrega o Angular.
+---
 
-1. Entre em [render.com](https://render.com) com a conta do GitHub.
-2. Clique em **New > Blueprint** e escolha este repositório.
-3. Preencha `DB_HOST`, `DB_PORT`, `DB_USER` e `DB_PASSWORD` com os dados do Aiven (ou deixe em branco para usar o `server/db.json`).
-4. Clique em **Apply**. O endereço do site aparece no painel quando o build terminar.
+## Validação e Build
 
-No plano gratuito, o site "dorme" depois de 15 minutos sem acesso e leva cerca de 1 minuto para abrir de novo. Sem o Aiven, os dados voltam ao original a cada novo deploy. O código da recuperação de senha aparece na aba **Logs** do Render.
+```bash
+# Executa a suíte automatizada de testes da API (120 verificações em banco isolado)
+npm run test:api
 
+# Gera o bundle otimizado de produção do Angular
+npm run build
+```
 
 ---
 
 ## Licença
 
-Este projeto foi desenvolvido para fins educacionais como Projeto Integrador do **Senac — Análise e Desenvolvimento de Sistemas**.
+Projeto acadêmico desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas — Senac**.

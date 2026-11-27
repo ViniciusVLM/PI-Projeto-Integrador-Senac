@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Sidebar } from '../sidebar/sidebar';
+import { extrairIniciais } from '../core/utils/ui.utils';
 
 interface Opcao {
   id: number;
@@ -23,16 +24,20 @@ interface ItemCategoria {
 interface ItemTecnico {
   tecnicoId: number | null;
   tecnicoNome: string;
+  tecnicoAvatar?: string | null;
+  tecnicoDepartamento?: string | null;
   atendidos: number;
   resolvidos: number;
   taxaResolucao: number;
   tempoMedioResolucaoHoras: number | null;
+  notaMedia?: number | null;
 }
 
 interface RelatorioDados {
   totalChamados: number;
   chamadosResolvidos: number;
   taxaResolucao: number;
+  conformidadeSla?: number;
   tempoMedioResolucaoHoras: number | null;
   porMes: ItemMes[];
   porCategoria: ItemCategoria[];
@@ -40,8 +45,6 @@ interface RelatorioDados {
   geradoEm: string;
 }
 
-// Endereço relativo: em produção a API e a tela ficam no mesmo site;
-// no npm start, o proxy.conf.json encaminha /api para a porta 3000.
 const API_URL = '/api';
 
 @Component({
@@ -62,6 +65,8 @@ export class Relatorios implements OnInit {
   categoriaId = '';
   tecnicoId = '';
   status = '';
+
+  readonly iniciais = extrairIniciais;
 
   statusOpcoes = [
     { valor: 'ABERTO', nome: 'Aberto' },
@@ -116,7 +121,7 @@ export class Relatorios implements OnInit {
           this.carregando = false;
           if (err.status === 403) {
             this.semPermissao = true;
-            this.erro = 'Acesso restrito: apenas técnicos e administradores podem consultar relatórios.';
+            this.erro = 'Acesso restrito: apenas técnicos e administradores podem consultar relatórios gerenciais.';
           } else if (err.status === 0) {
             this.erro = 'Não foi possível conectar ao servidor. Execute: npm run server';
           } else {
@@ -154,11 +159,7 @@ export class Relatorios implements OnInit {
   alturaBarraMes(total: number): number {
     const lista = this.dados?.porMes ?? [];
     const maior = Math.max(1, ...lista.map((m) => m.total));
-    return (total / maior) * 76;
-  }
-
-  rotuloMesCurto(rotulo: string): string {
-    return rotulo.split('/')[0] || rotulo;
+    return Math.max(4, Math.round((total / maior) * 100));
   }
 
   larguraCategoria(total: number): number {

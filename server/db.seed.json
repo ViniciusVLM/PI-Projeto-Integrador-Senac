@@ -7,7 +7,10 @@
       "telefone": "(11) 91234-0001",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "cliente",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-1.jpg",
+      "departamento": "Financeiro",
+      "cargo": "Analista Financeiro"
     },
     {
       "id": 2,
@@ -16,7 +19,10 @@
       "telefone": "(11) 91234-0002",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "tecnico",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-2.jpg",
+      "departamento": "Service Desk N2",
+      "cargo": "Analista de Suporte Sênior"
     },
     {
       "id": 3,
@@ -25,7 +31,10 @@
       "telefone": "(11) 91234-0003",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "admin",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-3.jpg",
+      "departamento": "Governança de TI",
+      "cargo": "Coordenador de TI"
     },
     {
       "id": 4,
@@ -34,7 +43,10 @@
       "telefone": "(11) 91234-0004",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "tecnico",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-4.jpg",
+      "departamento": "Infraestrutura & Redes",
+      "cargo": "Especialista em Infraestrutura"
     },
     {
       "id": 5,
@@ -43,7 +55,10 @@
       "telefone": "(11) 91234-0005",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "cliente",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-5.jpg",
+      "departamento": "Marketing",
+      "cargo": "Designer de Produto"
     },
     {
       "id": 6,
@@ -52,7 +67,10 @@
       "telefone": "(11) 91234-0006",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "cliente",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-6.jpg",
+      "departamento": "Comercial",
+      "cargo": "Executivo de Contas"
     },
     {
       "id": 7,
@@ -61,7 +79,10 @@
       "telefone": "(11) 91234-0007",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "cliente",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-7.jpg",
+      "departamento": "Recursos Humanos",
+      "cargo": "Business Partner de RH"
     },
     {
       "id": 8,
@@ -70,7 +91,10 @@
       "telefone": "(11) 91234-0008",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "cliente",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-8.jpg",
+      "departamento": "Fiscal & Faturamento",
+      "cargo": "Analista Fiscal"
     },
     {
       "id": 9,
@@ -79,7 +103,10 @@
       "telefone": "(11) 91234-0009",
       "senha": "$2b$10$p6Kbwxe43fddZqUKzQEs5ufyOkiZStR/0tJpzv7Ys2YH/kn0BR8CS",
       "perfil": "cliente",
-      "status": "Ativo"
+      "status": "Ativo",
+      "avatarUrl": "/img/avatars/avatar-9.jpg",
+      "departamento": "Operações",
+      "cargo": "Supervisor de Operações"
     }
   ],
   "categorias": [
@@ -87,55 +114,73 @@
       "id": 1,
       "nome": "Hardware",
       "descricao": "Problemas relacionados a equipamentos físicos",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-cpu",
+      "slaHoras": 12
     },
     {
       "id": 2,
       "nome": "Software",
       "descricao": "Instalação e erros de programas",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-app-window",
+      "slaHoras": 16
     },
     {
       "id": 3,
       "nome": "Rede",
       "descricao": "Internet, VPN e conectividade",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-wifi",
+      "slaHoras": 8
     },
     {
       "id": 4,
       "nome": "E-mail",
       "descricao": "Contas, caixa de entrada e sincronização",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-mail",
+      "slaHoras": 12
     },
     {
       "id": 5,
       "nome": "Acesso",
       "descricao": "Acesso a sistemas e permissões",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-key",
+      "slaHoras": 6
     },
     {
       "id": 6,
       "nome": "Impressora",
       "descricao": "Impressão, toner e scanners",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-printer",
+      "slaHoras": 24
     },
     {
       "id": 7,
       "nome": "Sistema",
       "descricao": "Sistemas internos da empresa",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-server-2",
+      "slaHoras": 8
     },
     {
       "id": 8,
       "nome": "Segurança",
       "descricao": "Incidentes e boas práticas de segurança",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-shield-lock",
+      "slaHoras": 4
     },
     {
       "id": 9,
       "nome": "Outros",
       "descricao": "Demais solicitações",
-      "status": "Ativa"
+      "status": "Ativa",
+      "icone": "ti-layout-grid",
+      "slaHoras": 36
     }
   ],
   "equipamentos": [
@@ -147,7 +192,9 @@
       "modelo": "Nitro 5",
       "patrimonio": "PAT-00125",
       "usuarioId": 1,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Matriz — 2º Andar (Financeiro)",
+      "numeroSerie": "SN-ACR-99201"
     },
     {
       "id": 2,
@@ -157,7 +204,9 @@
       "modelo": "OptiPlex 3090",
       "patrimonio": "PAT-00112",
       "usuarioId": 1,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Matriz — 2º Andar (Financeiro)",
+      "numeroSerie": "SN-DLL-30908"
     },
     {
       "id": 3,
@@ -167,7 +216,9 @@
       "modelo": "24MK430H",
       "patrimonio": "PAT-00098",
       "usuarioId": 3,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Matriz — 4º Andar (TI)",
+      "numeroSerie": "SN-LGM-43012"
     },
     {
       "id": 4,
@@ -177,7 +228,9 @@
       "modelo": "Latitude 5440",
       "patrimonio": "PAT-00131",
       "usuarioId": 5,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Matriz — 3º Andar (Marketing)",
+      "numeroSerie": "SN-DLL-54409"
     },
     {
       "id": 5,
@@ -187,7 +240,9 @@
       "modelo": "ProDesk 400",
       "patrimonio": "PAT-00140",
       "usuarioId": 6,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Matriz — 1º Andar (Comercial)",
+      "numeroSerie": "SN-HPP-40077"
     },
     {
       "id": 6,
@@ -197,7 +252,9 @@
       "modelo": "S24C310",
       "patrimonio": "PAT-00141",
       "usuarioId": 6,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Matriz — 1º Andar (Comercial)",
+      "numeroSerie": "SN-SAM-24310"
     },
     {
       "id": 7,
@@ -207,7 +264,9 @@
       "modelo": "EcoTank L3250",
       "patrimonio": "PAT-00150",
       "usuarioId": 7,
-      "status": "Em manutenção"
+      "status": "Em manutenção",
+      "localizacao": "Matriz — 3º Andar (RH)",
+      "numeroSerie": "SN-EPS-32504"
     },
     {
       "id": 8,
@@ -217,7 +276,9 @@
       "modelo": "ThinkPad E14",
       "patrimonio": "PAT-00152",
       "usuarioId": 8,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Matriz — 2º Andar (Fiscal)",
+      "numeroSerie": "SN-LNV-E1488"
     },
     {
       "id": 9,
@@ -227,7 +288,9 @@
       "modelo": "Galaxy A54",
       "patrimonio": "PAT-00160",
       "usuarioId": 9,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Operações Externas",
+      "numeroSerie": "SN-SGA-54019"
     },
     {
       "id": 10,
@@ -237,7 +300,9 @@
       "modelo": "Archer C6",
       "patrimonio": "PAT-00170",
       "usuarioId": null,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Sala de Reunião Principal",
+      "numeroSerie": "SN-TPL-C6011"
     },
     {
       "id": 11,
@@ -247,7 +312,9 @@
       "modelo": "SG 2404",
       "patrimonio": "PAT-00171",
       "usuarioId": null,
-      "status": "Ativo"
+      "status": "Ativo",
+      "localizacao": "Rack Principal — CPD",
+      "numeroSerie": "SN-INT-24041"
     },
     {
       "id": 12,
@@ -257,7 +324,9 @@
       "modelo": "Vivobook 15",
       "patrimonio": "PAT-00118",
       "usuarioId": 9,
-      "status": "Inativo"
+      "status": "Inativo",
+      "localizacao": "Almoxarifado de TI (Baixado)",
+      "numeroSerie": "SN-ASU-15003"
     }
   ],
   "chamados": [
@@ -274,7 +343,12 @@
       "dataAbertura": "2026-05-13T15:25:00.000Z",
       "dataAtualizacao": "2026-05-14T17:59:51.000Z",
       "dataEncerramento": "2026-05-14T17:59:51.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": {
+        "nota": 5,
+        "comentario": "Troca rápida do cabo DisplayPort, resolveu na hora.",
+        "avaliadoEm": "2026-05-14T18:10:00.000Z"
+      }
     },
     {
       "id": 2,
@@ -289,7 +363,8 @@
       "dataAbertura": "2026-05-21T14:07:00.000Z",
       "dataAtualizacao": "2026-05-23T15:00:21.000Z",
       "dataEncerramento": "2026-05-23T15:00:21.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 3,
@@ -304,7 +379,12 @@
       "dataAbertura": "2026-06-09T11:40:00.000Z",
       "dataAtualizacao": "2026-06-10T12:30:46.000Z",
       "dataEncerramento": "2026-06-10T12:30:46.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": {
+        "nota": 5,
+        "comentario": "Permissões SMB ajustadas com muita agilidade.",
+        "avaliadoEm": "2026-06-10T13:00:00.000Z"
+      }
     },
     {
       "id": 4,
@@ -319,7 +399,8 @@
       "dataAbertura": "2026-06-20T13:32:00.000Z",
       "dataAtualizacao": "2026-06-21T14:09:13.000Z",
       "dataEncerramento": "2026-06-21T14:09:13.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 5,
@@ -334,7 +415,12 @@
       "dataAbertura": "2026-06-26T15:12:00.000Z",
       "dataAtualizacao": "2026-06-28T00:42:28.000Z",
       "dataEncerramento": "2026-06-28T00:42:28.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": {
+        "nota": 5,
+        "comentario": "Pacote instalado remotamente sem interromper o trabalho.",
+        "avaliadoEm": "2026-06-28T09:00:00.000Z"
+      }
     },
     {
       "id": 6,
@@ -349,7 +435,8 @@
       "dataAbertura": "2026-07-04T08:45:00.000Z",
       "dataAtualizacao": "2026-07-04T17:38:46.000Z",
       "dataEncerramento": "2026-07-04T17:38:46.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 7,
@@ -364,7 +451,8 @@
       "dataAbertura": "2026-07-13T12:12:00.000Z",
       "dataAtualizacao": "2026-07-14T13:26:38.000Z",
       "dataEncerramento": "2026-07-14T13:26:38.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 8,
@@ -379,7 +467,12 @@
       "dataAbertura": "2026-07-24T13:32:00.000Z",
       "dataAtualizacao": "2026-07-25T17:30:05.000Z",
       "dataEncerramento": "2026-07-25T17:30:05.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": {
+        "nota": 4,
+        "comentario": "Equipamento substituído dentro do prazo.",
+        "avaliadoEm": "2026-07-25T18:00:00.000Z"
+      }
     },
     {
       "id": 9,
@@ -394,7 +487,8 @@
       "dataAbertura": "2026-08-02T10:12:00.000Z",
       "dataAtualizacao": "2026-08-04T00:11:48.000Z",
       "dataEncerramento": "2026-08-04T00:11:48.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 10,
@@ -409,7 +503,8 @@
       "dataAbertura": "2026-08-15T16:40:00.000Z",
       "dataAtualizacao": "2026-08-17T22:06:38.000Z",
       "dataEncerramento": "2026-08-17T22:06:38.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 11,
@@ -424,7 +519,12 @@
       "dataAbertura": "2026-08-26T17:00:00.000Z",
       "dataAtualizacao": "2026-08-27T07:00:05.000Z",
       "dataEncerramento": "2026-08-27T07:00:05.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": {
+        "nota": 5,
+        "comentario": "Ótimo suporte do Paulo na reparação do Office 64-bit.",
+        "avaliadoEm": "2026-08-27T09:30:00.000Z"
+      }
     },
     {
       "id": 12,
@@ -439,7 +539,12 @@
       "dataAbertura": "2026-09-09T17:07:00.000Z",
       "dataAtualizacao": "2026-09-11T11:14:58.000Z",
       "dataEncerramento": "2026-09-11T11:14:58.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": {
+        "nota": 5,
+        "comentario": "Ponto de rede recrimpado e testado.",
+        "avaliadoEm": "2026-09-11T12:00:00.000Z"
+      }
     },
     {
       "id": 13,
@@ -454,7 +559,8 @@
       "dataAbertura": "2026-09-22T14:51:00.000Z",
       "dataAtualizacao": "2026-09-24T05:23:45.000Z",
       "dataEncerramento": "2026-09-24T05:23:45.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 14,
@@ -469,7 +575,8 @@
       "dataAbertura": "2026-09-22T10:51:00.000Z",
       "dataAtualizacao": "2026-09-22T13:54:40.000Z",
       "dataEncerramento": "2026-09-22T13:54:40.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 15,
@@ -484,7 +591,8 @@
       "dataAbertura": "2026-10-01T13:07:00.000Z",
       "dataAtualizacao": "2026-10-03T14:27:21.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 16,
@@ -499,7 +607,8 @@
       "dataAbertura": "2026-10-03T15:40:00.000Z",
       "dataAtualizacao": "2026-10-04T15:07:13.000Z",
       "dataEncerramento": "2026-10-04T15:07:13.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 17,
@@ -514,7 +623,8 @@
       "dataAbertura": "2026-10-10T17:25:00.000Z",
       "dataAtualizacao": "2026-10-12T18:20:54.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 18,
@@ -529,7 +639,8 @@
       "dataAbertura": "2026-10-16T15:51:00.000Z",
       "dataAtualizacao": "2026-10-17T00:00:32.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 19,
@@ -544,7 +655,12 @@
       "dataAbertura": "2026-10-18T16:12:00.000Z",
       "dataAtualizacao": "2026-10-19T12:22:50.000Z",
       "dataEncerramento": "2026-10-19T12:22:50.000Z",
-      "anexos": []
+      "anexos": [],
+      "avaliacao": {
+        "nota": 4,
+        "comentario": "Windows restaurado sem perda de arquivos.",
+        "avaliadoEm": "2026-10-19T14:00:00.000Z"
+      }
     },
     {
       "id": 20,
@@ -559,7 +675,8 @@
       "dataAbertura": "2026-10-20T16:18:00.000Z",
       "dataAtualizacao": "2026-10-21T17:03:15.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 21,
@@ -574,7 +691,8 @@
       "dataAbertura": "2026-10-26T08:18:00.000Z",
       "dataAtualizacao": "2026-10-27T01:45:58.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 22,
@@ -589,7 +707,8 @@
       "dataAbertura": "2026-10-28T14:07:00.000Z",
       "dataAtualizacao": "2026-10-28T17:56:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 23,
@@ -604,7 +723,8 @@
       "dataAbertura": "2026-10-30T14:32:00.000Z",
       "dataAtualizacao": "2026-10-30T17:39:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 24,
@@ -619,7 +739,8 @@
       "dataAbertura": "2026-10-30T16:07:00.000Z",
       "dataAtualizacao": "2026-10-30T23:30:53.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 25,
@@ -634,7 +755,8 @@
       "dataAbertura": "2026-10-31T12:18:00.000Z",
       "dataAtualizacao": "2026-10-31T16:06:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 26,
@@ -649,7 +771,8 @@
       "dataAbertura": "2026-11-02T09:51:00.000Z",
       "dataAtualizacao": "2026-11-02T17:37:13.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 27,
@@ -664,7 +787,8 @@
       "dataAbertura": "2026-11-03T12:07:00.000Z",
       "dataAtualizacao": "2026-11-03T14:43:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 28,
@@ -679,7 +803,8 @@
       "dataAbertura": "2026-11-04T12:12:00.000Z",
       "dataAtualizacao": "2026-11-04T12:51:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 29,
@@ -694,7 +819,8 @@
       "dataAbertura": "2026-11-04T16:25:00.000Z",
       "dataAtualizacao": "2026-11-05T01:49:24.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 30,
@@ -709,7 +835,8 @@
       "dataAbertura": "2026-11-04T15:00:00.000Z",
       "dataAtualizacao": "2026-11-04T16:56:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 31,
@@ -724,7 +851,8 @@
       "dataAbertura": "2026-11-05T12:18:00.000Z",
       "dataAtualizacao": "2026-11-05T14:01:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 32,
@@ -739,7 +867,8 @@
       "dataAbertura": "2026-11-05T10:12:00.000Z",
       "dataAtualizacao": "2026-11-05T16:52:21.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 33,
@@ -754,7 +883,8 @@
       "dataAbertura": "2026-11-06T11:07:00.000Z",
       "dataAtualizacao": "2026-11-06T11:07:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 34,
@@ -769,7 +899,8 @@
       "dataAbertura": "2026-11-06T09:45:00.000Z",
       "dataAtualizacao": "2026-11-06T09:59:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 35,
@@ -784,7 +915,8 @@
       "dataAbertura": "2026-11-06T09:07:00.000Z",
       "dataAtualizacao": "2026-11-06T10:55:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 36,
@@ -799,7 +931,8 @@
       "dataAbertura": "2026-11-06T08:07:00.000Z",
       "dataAtualizacao": "2026-11-06T08:07:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 37,
@@ -814,7 +947,8 @@
       "dataAbertura": "2026-11-07T14:00:00.000Z",
       "dataAtualizacao": "2026-11-07T14:05:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 38,
@@ -829,7 +963,8 @@
       "dataAbertura": "2026-11-07T10:12:00.000Z",
       "dataAtualizacao": "2026-11-07T10:12:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 39,
@@ -844,7 +979,8 @@
       "dataAbertura": "2026-11-07T08:07:00.000Z",
       "dataAtualizacao": "2026-11-07T09:25:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     },
     {
       "id": 40,
@@ -859,7 +995,8 @@
       "dataAbertura": "2026-11-08T09:18:00.000Z",
       "dataAtualizacao": "2026-11-08T09:18:00.000Z",
       "dataEncerramento": null,
-      "anexos": []
+      "anexos": [],
+      "avaliacao": null
     }
   ],
   "historico": [
@@ -2392,5 +2529,47 @@
     }
   ],
   "tokens": [],
-  "redefinicoes": []
+  "redefinicoes": [],
+  "notificacoes": [
+    {
+      "id": 1,
+      "usuarioId": 1,
+      "tipo": "status",
+      "titulo": "Chamado #24 aguarda sua confirmação",
+      "mensagem": "Fernanda Souza solicitou os dados do novo colaborador para preparar o notebook.",
+      "chamadoId": 24,
+      "lida": false,
+      "criadaEm": "2026-11-25T14:20:00.000Z"
+    },
+    {
+      "id": 2,
+      "usuarioId": 1,
+      "tipo": "atribuicao",
+      "titulo": "Chamado #30 em atendimento",
+      "mensagem": "Paulo Nunes iniciou o diagnóstico de hardware do seu equipamento.",
+      "chamadoId": 30,
+      "lida": false,
+      "criadaEm": "2026-11-26T10:15:00.000Z"
+    },
+    {
+      "id": 3,
+      "usuarioId": 2,
+      "tipo": "urgente",
+      "titulo": "Fila com chamados sem técnico atribuído",
+      "mensagem": "Existem chamados abertos aguardando triagem na fila da Central de TI.",
+      "chamadoId": 36,
+      "lida": false,
+      "criadaEm": "2026-11-26T15:40:00.000Z"
+    },
+    {
+      "id": 4,
+      "usuarioId": 3,
+      "tipo": "urgente",
+      "titulo": "Monitoramento de SLA ativo",
+      "mensagem": "Verifique os indicadores operacionais e a configuração de e-mail SMTP em Configurações.",
+      "chamadoId": 36,
+      "lida": false,
+      "criadaEm": "2026-11-27T09:00:00.000Z"
+    }
+  ]
 }

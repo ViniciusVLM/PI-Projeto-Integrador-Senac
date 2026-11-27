@@ -1,228 +1,527 @@
-<div class="container-dash">
-    <app-sidebar />
+<div class="sd-shell">
+  <app-sidebar />
 
-    <main class="lado-direito-dash">
-        <div class="barra-topo">
-            <a routerLink="/chamados" class="link-voltar">
-                <i class="ti ti-arrow-left"></i>
-                Voltar para a lista
-            </a>
+  <main class="sd-main">
+    <div class="barra-topo">
+      <a routerLink="/chamados" class="link-voltar">
+        <i class="ti ti-arrow-left"></i>
+        <span>Fila de chamados</span>
+      </a>
 
-            @if (chamado) {
-                <div class="acoes-dropdown" #menuAcoesRef>
-                    <button
-                        type="button"
-                        class="btn btn-filtro"
-                        [disabled]="!temAcoesDisponiveis || executandoAcao"
-                        (click)="alternarMenuAcoes()"
-                    >
-                        Ações
-                        <i class="ti ti-chevron-down"></i>
-                    </button>
+      @if (chamado) {
+        <div class="topo-botoes">
+          @if (podeAssumir) {
+            <button type="button" class="sd-btn sd-btn-primary" [disabled]="executandoAcao" (click)="assumirChamado()">
+              <i class="ti ti-user-check"></i>
+              <span>Assumir atendimento</span>
+            </button>
+          }
 
-                    @if (menuAcoesAberto) {
-                        <div class="menu-acoes">
-                            @if (podeAssumir) {
-                                <button type="button" class="item-acao" (click)="assumirChamado()">
-                                    <i class="ti ti-user-check"></i>
-                                    Assumir chamado
-                                </button>
-                            }
+          <div class="acoes-dropdown" #menuAcoesRef>
+            <button
+              type="button"
+              class="sd-btn sd-btn-secondary"
+              [disabled]="!temAcoesDisponiveis || executandoAcao"
+              [attr.aria-expanded]="menuAcoesAberto"
+              (click)="alternarMenuAcoes()"
+            >
+              <span>Ações do chamado</span>
+              <i class="ti ti-chevron-down"></i>
+            </button>
 
-                            @for (st of transicoesDisponiveis; track st) {
-                                <button
-                                    type="button"
-                                    class="item-acao"
-                                    [class.item-perigo]="st === 'CANCELADO'"
-                                    (click)="acionarTransicao(st)"
-                                >
-                                    <i class="ti ti-arrow-right"></i>
-                                    {{ rotuloTransicao(st) }}
-                                </button>
-                            }
+            @if (menuAcoesAberto) {
+              <div class="menu-acoes" role="menu">
+                @for (st of transicoesDisponiveis; track st) {
+                  <button
+                    type="button"
+                    class="item-acao"
+                    [class.item-perigo]="st === 'CANCELADO'"
+                    (click)="acionarTransicao(st)"
+                  >
+                    <i class="ti" [class]="st === 'RESOLVIDO' || st === 'ENCERRADO' ? 'ti-circle-check' : st === 'CANCELADO' ? 'ti-circle-x' : 'ti-arrow-right'"></i>
+                    <span>{{ rotuloTransicao(st) }}</span>
+                  </button>
+                }
 
-                            @if (podeReabrir) {
-                                <button type="button" class="item-acao" (click)="abrirModalReabrir()">
-                                    <i class="ti ti-refresh"></i>
-                                    Reabrir chamado
-                                </button>
-                            }
-                        </div>
-                    }
-                </div>
+                @if (podeReabrir) {
+                  <button type="button" class="item-acao" (click)="abrirModalReabrir()">
+                    <i class="ti ti-refresh"></i>
+                    <span>Reabrir chamado</span>
+                  </button>
+                }
+
+                @if (ehAdmin) {
+                  <div class="menu-divisor"></div>
+                  <button type="button" class="item-acao item-perigo" (click)="excluirChamado()">
+                    <i class="ti ti-trash"></i>
+                    <span>Excluir registro</span>
+                  </button>
+                }
+              </div>
             }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (carregando) {
+      <div class="sd-card msg-box">Carregando detalhes do chamado...</div>
+    }
+    @if (erro) {
+      <div class="sd-alert sd-alert-error" role="alert"><i class="ti ti-alert-circle"></i><span>{{ erro }}</span></div>
+    }
+    @if (mensagemErroAcao) {
+      <div class="sd-alert sd-alert-error" role="alert"><i class="ti ti-alert-circle"></i><span>{{ mensagemErroAcao }}</span></div>
+    }
+    @if (mensagemSucesso) {
+      <div class="sd-alert sd-alert-success" role="status"><i class="ti ti-circle-check"></i><span>{{ mensagemSucesso }}</span></div>
+    }
+
+    @if (chamado) {
+      <!-- Cabeçalho do Ticket -->
+      <section class="sd-card cabecalho-ticket">
+        <div class="cabecalho-meta">
+          <span class="ticket-id sd-mono">#{{ chamado.id }}</span>
+          <span class="sd-badge {{ statusClasse(chamado.status) }}">
+            <span class="sd-badge-dot"></span>
+            {{ formatarStatus(chamado.status) }}
+          </span>
+          <span class="sd-badge {{ prioridadeClasse(chamado.prioridade) }}">
+            {{ chamado.prioridade }}
+          </span>
+          <span class="cat-chip">
+            <i class="ti {{ chamado.categoriaIcone || 'ti-tag' }}"></i>
+            {{ chamado.categoriaNome }}
+          </span>
+          @if (chamado.sla) {
+            <span class="sd-sla {{ slaClasse(chamado.sla.situacao) }}">
+              <i class="ti ti-clock"></i>
+              {{ slaTexto(chamado.sla) }} (meta: {{ chamado.sla.prazoHoras }}h)
+            </span>
+          }
         </div>
 
-        @if (carregando) { <p class="msg-estado">Carregando...</p> }
-        @if (erro) { <p class="msg-estado msg-erro">{{ erro }}</p> }
-        @if (mensagemErroAcao) { <p class="msg-estado msg-erro msg-feedback">{{ mensagemErroAcao }}</p> }
-        @if (mensagemSucesso) { <p class="msg-estado msg-sucesso msg-feedback">{{ mensagemSucesso }}</p> }
+        <h1 class="ticket-titulo">{{ chamado.titulo }}</h1>
+      </section>
 
-        @if (chamado) {
-            <!-- Lista de atividades, usada na aba "Histórico" e no card da direita -->
-            <ng-template #historico>
-                <ul class="linha-tempo">
-                    @for (e of eventos; track $index) {
-                        <li [class.atual]="e.atual">
-                            <p><strong>{{ e.autor }}</strong> {{ e.acao }}</p>
-                            @if (e.observacao) {
-                                <p class="evento-obs">{{ e.observacao }}</p>
-                            }
-                            @if (e.data) {
-                                <span>{{ e.data | date:"dd/MM 'às' HH:mm" }}</span>
-                            }
-                        </li>
-                    } @empty {
-                        <li class="vazio">Nenhuma atividade registrada.</li>
-                    }
-                </ul>
-            </ng-template>
+      <!-- Banner CSAT de Avaliação quando Resolvido/Encerrado -->
+      @if (podeAvaliar) {
+        <section class="sd-card csat-card">
+          <div class="csat-texto">
+            <strong><i class="ti ti-star"></i> Avalie a solução deste atendimento</strong>
+            <p>Sua nota ajuda a monitorar a qualidade da equipe técnica do SecureDesk.</p>
+          </div>
+          <div class="csat-controles">
+            <div class="estrelas-selecao" role="group" aria-label="Nota de 1 a 5 estrelas">
+              @for (n of estrelas; track n) {
+                <button
+                  type="button"
+                  class="estrela-btn"
+                  [class.ativa]="n <= notaSelecionada"
+                  (click)="notaSelecionada = n"
+                  [attr.aria-label]="n + ' estrelas'"
+                >
+                  <i class="ti ti-star-filled"></i>
+                </button>
+              }
+            </div>
+            <input
+              type="text"
+              class="csat-input"
+              [(ngModel)]="comentarioAvaliacao"
+              placeholder="Comentário opcional sobre o suporte..."
+            />
+            <button type="button" class="sd-btn sd-btn-primary sd-btn-sm" [disabled]="enviandoAvaliacao" (click)="salvarAvaliacao()">
+              Enviar avaliação
+            </button>
+          </div>
+        </section>
+      } @else if (chamado.avaliacao) {
+        <section class="sd-card csat-registrada">
+          <div class="estrelas-fixas">
+            @for (n of estrelas; track n) {
+              <i class="ti ti-star-filled" [class.acesa]="n <= chamado.avaliacao.nota"></i>
+            }
+          </div>
+          <span>
+            Atendimento avaliado com <strong>{{ chamado.avaliacao.nota }}/5</strong>
+            @if (chamado.avaliacao.comentario) {
+              — "{{ chamado.avaliacao.comentario }}"
+            }
+          </span>
+        </section>
+      }
 
-            <div class="titulo-detalhe">
-                <h1>#{{ chamado.id }} – {{ chamado.titulo }}</h1>
-                <span class="badge prioridade {{ prioridadeClasse(chamado.prioridade) }}">{{ chamado.prioridade }}</span>
-                <span class="badge {{ statusClasse(chamado.status) }}">{{ formatarStatus(chamado.status) }}</span>
-                <span class="categoria">{{ chamado.categoriaNome }}</span>
+      <div class="detalhe-grid">
+        <!-- Coluna principal: Descrição, Conversa/Notas Internas e Anexos -->
+        <div class="col-principal">
+          <section class="sd-card card-conteudo">
+            <div class="abas-topo">
+              <button type="button" class="aba" [class.ativa]="aba === 'conversa'" (click)="aba = 'conversa'">
+                <i class="ti ti-messages"></i>
+                Descrição &amp; Interações ({{ chamado.comentarios?.length ?? 0 }})
+              </button>
+              <button type="button" class="aba" [class.ativa]="aba === 'anexos'" (click)="aba = 'anexos'">
+                <i class="ti ti-paperclip"></i>
+                Anexos ({{ chamado.anexos?.length ?? 0 }})
+              </button>
+              <button type="button" class="aba" [class.ativa]="aba === 'historico'" (click)="aba = 'historico'">
+                <i class="ti ti-history"></i>
+                Auditoria ({{ chamado.historico?.length ?? 0 }})
+              </button>
             </div>
 
-            <div class="grade-detalhe">
-                <div class="coluna-principal">
-
-                    <div class="card">
-                        <h2>Informações do chamado</h2>
-                        <dl class="lista-info">
-                            <dt>Solicitante:</dt>
-                            <dd>{{ (chamado.solicitanteNome || '—') + (chamado.solicitanteSetor ? ' (' + chamado.solicitanteSetor + ')' : '') }}</dd>
-                            <dt>Data de abertura:</dt>
-                            <dd>{{ chamado.dataAbertura | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
-                            <dt>Equipamento:</dt>
-                            <dd>{{ (chamado.equipamentoNome || '—') + (chamado.equipamentoPatrimonio ? ' ' + chamado.equipamentoPatrimonio : '') }}</dd>
-                            <dt>Última atualização:</dt>
-                            <dd>{{ (chamado.dataAtualizacao || chamado.dataAbertura) | date:"dd/MM/yyyy 'às' HH:mm" }}</dd>
-                            <dt>Técnico responsável:</dt>
-                            <dd>{{ chamado.tecnicoNome || 'Aguardando atribuição' }}</dd>
-                        </dl>
+            <div class="aba-corpo">
+              @if (aba === 'conversa') {
+                <article class="relato-original">
+                  <div class="relato-autor">
+                    <span class="sd-avatar">
+                      @if (chamado.solicitanteAvatar) {
+                        <img [src]="chamado.solicitanteAvatar" [alt]="chamado.solicitanteNome || ''" />
+                      } @else {
+                        {{ iniciais(chamado.solicitanteNome) }}
+                      }
+                    </span>
+                    <div>
+                      <strong>{{ chamado.solicitanteNome }}</strong>
+                      <span>Abriu em {{ chamado.dataAbertura | date:"dd/MM/yyyy 'às' HH:mm" }}</span>
                     </div>
+                  </div>
+                  <p class="texto-relato">{{ chamado.descricao }}</p>
+                </article>
 
-                    <div class="card card-descricao">
-                        <div class="abas">
-                            <button type="button" class="aba" [class.ativa]="aba === 'descricao'" (click)="aba = 'descricao'">Descrição</button>
-                            <button type="button" class="aba" [class.ativa]="aba === 'historico'" (click)="aba = 'historico'">Histórico</button>
-                            <button type="button" class="aba" [class.ativa]="aba === 'anexos'" (click)="aba = 'anexos'">Anexos ({{ chamado.anexos?.length ?? 0 }})</button>
-                        </div>
-
-                        <div class="conteudo-aba">
-                            @switch (aba) {
-                                @case ('descricao') {
-                                    <div class="texto-descricao">
-                                        <p>{{ chamado.descricao }}</p>
-                                    </div>
-
-                                    @if ((chamado.comentarios?.length ?? 0) > 0) {
-                                        <div class="conversa-comentarios">
-                                            <h3>Comentários ({{ chamado.comentarios?.length }})</h3>
-                                            @for (cm of chamado.comentarios ?? []; track cm.id) {
-                                                <div class="item-comentario">
-                                                    <div class="comentario-topo">
-                                                        <strong>{{ cm.usuarioNome }}</strong>
-                                                        <span>{{ cm.dataCriacao | date:"dd/MM/yyyy 'às' HH:mm" }}</span>
-                                                    </div>
-                                                    <p>{{ cm.comentario }}</p>
-                                                </div>
-                                            }
-                                        </div>
-                                    }
-                                }
-                                @case ('historico') {
-                                    <ng-container [ngTemplateOutlet]="historico" />
-                                }
-                                @case ('anexos') {
-                                    <ul class="lista-anexos">
-                                        @for (a of chamado.anexos ?? []; track a.id) {
-                                            <li>
-                                                <button type="button" class="link-anexo" (click)="baixarAnexo(a)">
-                                                    <i class="ti ti-paperclip"></i>
-                                                    <span>{{ a.nomeOriginal }}</span>
-                                                    <small class="tamanho-anexo">({{ formatarTamanho(a.tamanho) }})</small>
-                                                    <i class="ti ti-download"></i>
-                                                </button>
-                                            </li>
-                                        } @empty {
-                                            <li class="vazio">Nenhum anexo.</li>
-                                        }
-                                    </ul>
-                                }
+                <div class="lista-comentarios">
+                  @for (cm of chamado.comentarios ?? []; track cm.id) {
+                    <article class="comentario-card" [class.comentario-interno]="cm.interno">
+                      <header class="comentario-header">
+                        <div class="sd-user-cell">
+                          <span class="sd-avatar sd-avatar-sm">
+                            @if (cm.usuarioAvatar) {
+                              <img [src]="cm.usuarioAvatar" [alt]="cm.usuarioNome" loading="lazy" />
+                            } @else {
+                              {{ iniciais(cm.usuarioNome) }}
                             }
+                          </span>
+                          <strong>{{ cm.usuarioNome }}</strong>
+                          <span class="papel-tag">{{ rotuloPerfil(cm.usuarioPerfil) }}</span>
+                          @if (cm.interno) {
+                            <span class="tag-interna"><i class="ti ti-lock"></i> Nota interna de TI</span>
+                          }
                         </div>
+                        <time>{{ cm.dataCriacao | date:"dd/MM/yyyy 'às' HH:mm" }}</time>
+                      </header>
+                      <p>{{ cm.comentario }}</p>
+                    </article>
+                  }
+                </div>
+              }
 
-                        @if (chamado.status !== 'CANCELADO') {
-                            <div class="resposta">
-                                @if (erroComentario) {
-                                    <p class="msg-estado msg-erro msg-comentario-erro">{{ erroComentario }}</p>
-                                }
-                                <textarea
-                                    rows="3"
-                                    placeholder="Digite uma resposta ou atualização pública sobre o caso... (Ctrl+Enter para enviar)"
-                                    [(ngModel)]="novoComentario"
-                                    (keydown.control.enter)="enviarComentario()"
-                                ></textarea>
-                                <div class="resposta-acoes">
-                                    <button
-                                        type="button"
-                                        class="btn btn-novo"
-                                        [disabled]="!novoComentario.trim() || enviandoComentario"
-                                        (click)="enviarComentario()"
-                                    >
-                                        {{ enviandoComentario ? 'Enviando...' : 'Enviar' }}
-                                    </button>
-                                </div>
-                            </div>
+              @if (aba === 'anexos') {
+                <div class="anexos-topo">
+                  <span>Arquivos vinculados a este chamado</span>
+                  @if (!finalizado) {
+                    <label class="sd-btn sd-btn-secondary sd-btn-sm">
+                      <i class="ti ti-upload"></i>
+                      <span>{{ enviandoAnexo ? 'Enviando...' : 'Adicionar arquivo' }}</span>
+                      <input type="file" hidden multiple (change)="enviarNovoAnexo($event)" [disabled]="enviandoAnexo" />
+                    </label>
+                  }
+                </div>
+
+                <ul class="grade-anexos">
+                  @for (a of chamado.anexos ?? []; track a.id) {
+                    <li class="item-anexo">
+                      <div class="anexo-icone">
+                        <i class="ti" [class]="a.ehImagem ? 'ti-photo' : 'ti-file-text'"></i>
+                      </div>
+                      <div class="anexo-info">
+                        <strong>{{ a.nomeOriginal }}</strong>
+                        <span>{{ formatarTamanho(a.tamanho) }}</span>
+                      </div>
+                      <div class="anexo-acoes">
+                        @if (a.ehImagem) {
+                          <button type="button" class="sd-icon-btn" title="Visualizar imagem" (click)="visualizarImagem(a)">
+                            <i class="ti ti-eye"></i>
+                          </button>
                         }
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>Histórico de atividades</h2>
-                    <ng-container [ngTemplateOutlet]="historico" />
-                </div>
-            </div>
-        }
-
-        @if (modalTipo) {
-            <div class="modal-backdrop" (click)="fecharModalAcao()">
-                <div class="modal-card" (click)="$event.stopPropagation()">
-                    @if (modalTipo === 'aguardando') {
-                        <h3>Aguardar resposta do usuário</h3>
-                        <p class="modal-sub">Explique o que o solicitante precisa informar ou testar:</p>
-                    } @else if (modalTipo === 'reabrir') {
-                        <h3>Reabrir chamado</h3>
-                        <p class="modal-sub">Informe o motivo para reabrir este chamado:</p>
-                    } @else if (modalTipo === 'cancelar') {
-                        <h3>Cancelar chamado</h3>
-                        <p class="modal-sub">Tem certeza de que deseja cancelar este chamado? Você pode informar uma observação opcional abaixo:</p>
-                    }
-
-                    @if (modalErro) {
-                        <p class="msg-estado msg-erro msg-feedback">{{ modalErro }}</p>
-                    }
-
-                    <textarea
-                        rows="3"
-                        class="modal-textarea"
-                        [(ngModel)]="modalTexto"
-                        [placeholder]="modalTipo === 'cancelar' ? 'Observação (opcional)...' : 'Digite aqui...'"
-                    ></textarea>
-
-                    <div class="modal-acoes">
-                        <button type="button" class="btn btn-filtro" [disabled]="executandoAcao" (click)="fecharModalAcao()">
-                            Voltar
+                        <button type="button" class="sd-icon-btn" title="Baixar arquivo" (click)="baixarAnexo(a)">
+                          <i class="ti ti-download"></i>
                         </button>
-                        <button type="button" class="btn btn-novo" [disabled]="executandoAcao" (click)="confirmarModalAcao()">
-                            {{ executandoAcao ? 'Processando...' : 'Confirmar' }}
-                        </button>
-                    </div>
-                </div>
+                      </div>
+                    </li>
+                  } @empty {
+                    <li class="vazio-anexo">Nenhum arquivo anexado até o momento.</li>
+                  }
+                </ul>
+              }
+
+              @if (aba === 'historico') {
+                <ul class="timeline">
+                  @for (e of eventos; track $index) {
+                    <li [class.atual]="e.atual">
+                      <div class="tl-cabecalho">
+                        <strong>{{ e.autor }}</strong>
+                        <span>{{ e.acao }}</span>
+                        @if (e.data) {
+                          <time>{{ e.data | date:"dd/MM/yyyy HH:mm" }}</time>
+                        }
+                      </div>
+                      @if (e.observacao) {
+                        <p class="tl-obs">{{ e.observacao }}</p>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
             </div>
+
+            @if (chamado.status !== 'CANCELADO') {
+              <div class="caixa-resposta" [class.modo-interno]="notaInterna">
+                @if (erroComentario) {
+                  <div class="sd-alert sd-alert-error">{{ erroComentario }}</div>
+                }
+
+                @if (ehEquipeTi) {
+                  <div class="barra-tipo-msg">
+                    <button type="button" [class.ativo]="!notaInterna" (click)="notaInterna = false">
+                      <i class="ti ti-world"></i> Resposta ao solicitante
+                    </button>
+                    <button type="button" class="btn-nota" [class.ativo]="notaInterna" (click)="notaInterna = true">
+                      <i class="ti ti-lock"></i> Nota técnica interna
+                    </button>
+                  </div>
+                }
+
+                <textarea
+                  rows="3"
+                  [placeholder]="notaInterna ? 'Registre observações técnicas visíveis apenas para a equipe de TI...' : 'Escreva uma mensagem ou atualização sobre o chamado... (Ctrl+Enter para enviar)'"
+                  [(ngModel)]="novoComentario"
+                  (keydown.control.enter)="enviarComentario()"
+                ></textarea>
+
+                <div class="resposta-rodape">
+                  @if (!finalizado) {
+                    <label class="link-anexar-rapido">
+                      <i class="ti ti-paperclip"></i> Anexar evidência
+                      <input type="file" hidden multiple (change)="enviarNovoAnexo($event)" />
+                    </label>
+                  } @else {
+                    <span></span>
+                  }
+
+                  <button
+                    type="button"
+                    class="sd-btn sd-btn-primary"
+                    [disabled]="!novoComentario.trim() || enviandoComentario"
+                    (click)="enviarComentario()"
+                  >
+                    <i class="ti ti-send"></i>
+                    <span>{{ enviandoComentario ? 'Publicando...' : notaInterna ? 'Salvar nota interna' : 'Enviar mensagem' }}</span>
+                  </button>
+                </div>
+              </div>
+            }
+          </section>
+        </div>
+
+        <!-- Coluna lateral direita: Pessoas, Classificação rápida e Patrimônio -->
+        <aside class="col-lateral">
+          <section class="sd-card lateral-card">
+            <h2>Pessoas envolvidas</h2>
+
+            <div class="bloco-pessoa">
+              <span class="rotulo-mini">Solicitante</span>
+              <div class="sd-user-cell">
+                <span class="sd-avatar">
+                  @if (chamado.solicitanteAvatar) {
+                    <img [src]="chamado.solicitanteAvatar" [alt]="chamado.solicitanteNome || ''" />
+                  } @else {
+                    {{ iniciais(chamado.solicitanteNome) }}
+                  }
+                </span>
+                <div class="sd-user-meta">
+                  <span class="sd-user-name">{{ chamado.solicitanteNome }}</span>
+                  <span class="sd-user-sub">{{ chamado.solicitanteDepartamento || chamado.solicitanteEmail || 'Colaborador' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bloco-pessoa">
+              <span class="rotulo-mini">Técnico responsável</span>
+              @if (chamado.tecnicoNome) {
+                <div class="sd-user-cell">
+                  <span class="sd-avatar">
+                    @if (chamado.tecnicoAvatar) {
+                      <img [src]="chamado.tecnicoAvatar" [alt]="chamado.tecnicoNome" />
+                    } @else {
+                      {{ iniciais(chamado.tecnicoNome) }}
+                    }
+                  </span>
+                  <div class="sd-user-meta">
+                    <span class="sd-user-name">{{ chamado.tecnicoNome }}</span>
+                    <span class="sd-user-sub">{{ chamado.tecnicoDepartamento || 'Equipe Técnica' }}</span>
+                  </div>
+                </div>
+              } @else {
+                <p class="sem-responsavel">Aguardando atribuição na fila</p>
+              }
+
+              @if (ehAdmin && !finalizado) {
+                <div class="sd-field mt-8">
+                  <label for="atrib-tec" class="sr-label">Designar especialista</label>
+                  <select
+                    id="atrib-tec"
+                    [ngModel]="chamado.tecnicoId || ''"
+                    (ngModelChange)="atualizarCampoRapido('tecnicoId', $event)"
+                  >
+                    <option value="">Sem técnico atribuído</option>
+                    @for (t of tecnicos; track t.id) {
+                      <option [value]="t.id">{{ t.nome }}</option>
+                    }
+                  </select>
+                </div>
+              }
+            </div>
+          </section>
+
+          @if (ehEquipeTi && !finalizado) {
+            <section class="sd-card lateral-card">
+              <h2>Classificação operacional</h2>
+              <div class="sd-field">
+                <label for="det-prio">Prioridade</label>
+                <select
+                  id="det-prio"
+                  [ngModel]="chamado.prioridade"
+                  (ngModelChange)="atualizarCampoRapido('prioridade', $event)"
+                >
+                  <option value="Baixa">Baixa</option>
+                  <option value="Média">Média</option>
+                  <option value="Alta">Alta</option>
+                  <option value="Crítica">Crítica</option>
+                </select>
+              </div>
+
+              <div class="sd-field">
+                <label for="det-cat">Categoria</label>
+                <select
+                  id="det-cat"
+                  [ngModel]="chamado.categoriaId"
+                  (ngModelChange)="atualizarCampoRapido('categoriaId', $event)"
+                >
+                  @for (cat of categorias; track cat.id) {
+                    <option [value]="cat.id">{{ cat.nome }}</option>
+                  }
+                </select>
+              </div>
+            </section>
+          }
+
+          @if (chamado.equipamentoNome) {
+            <section class="sd-card lateral-card ativo-card">
+              <h2>Equipamento vinculado</h2>
+              <div class="ativo-thumb">
+                <img [src]="imagemEquipamento" [alt]="chamado.equipamentoNome" loading="lazy" />
+                <div>
+                  <strong>{{ chamado.equipamentoNome }}</strong>
+                  <span class="sd-mono">{{ chamado.equipamentoPatrimonio }}</span>
+                </div>
+              </div>
+            </section>
+          }
+
+          <section class="sd-card lateral-card">
+            <h2>Registro de datas</h2>
+            <dl class="datas-dl">
+              <div>
+                <dt>Abertura</dt>
+                <dd class="sd-tabular">{{ chamado.dataAbertura | date:"dd/MM/yyyy HH:mm" }}</dd>
+              </div>
+              <div>
+                <dt>Última atividade</dt>
+                <dd class="sd-tabular">{{ (chamado.dataAtualizacao || chamado.dataAbertura) | date:"dd/MM/yyyy HH:mm" }}</dd>
+              </div>
+              @if (chamado.sla) {
+                <div>
+                  <dt>Limite SLA</dt>
+                  <dd class="sd-tabular">{{ chamado.sla.dataLimite | date:"dd/MM/yyyy HH:mm" }}</dd>
+                </div>
+              }
+            </dl>
+          </section>
+        </aside>
+      </div>
+    }
+
+    <!-- Modal nativo <dialog> para ações que pedem justificativa -->
+    <dialog
+      #dialogAcaoRef
+      class="sd-dialog"
+      closedby="any"
+      aria-labelledby="dlg-acao-titulo"
+      (close)="aoFecharDialogNativo()"
+    >
+      <div class="sd-dialog-header">
+        <div>
+          <h1 id="dlg-acao-titulo">
+            @if (modalTipo === 'aguardando') { Solicitar retorno do usuário }
+            @else if (modalTipo === 'reabrir') { Reabrir chamado }
+            @else { Cancelar chamado }
+          </h1>
+          <p>
+            @if (modalTipo === 'aguardando') { Descreva o teste ou informação necessária para prosseguir. }
+            @else if (modalTipo === 'reabrir') { Explique por que o problema persiste para retomar o atendimento. }
+            @else { O chamado será encerrado sem atendimento técnico. }
+          </p>
+        </div>
+        <button type="button" class="sd-dialog-close" (click)="fecharModalAcao()" aria-label="Fechar janela">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="sd-dialog-body">
+        @if (modalErro) {
+          <div class="sd-alert sd-alert-error" role="alert">{{ modalErro }}</div>
         }
-    </main>
+        <div class="sd-field">
+          <label for="dlg-obs">Observação {{ modalTipo === 'cancelar' ? '(opcional)' : '*' }}</label>
+          <textarea
+            id="dlg-obs"
+            rows="3"
+            [(ngModel)]="modalTexto"
+            [placeholder]="modalTipo === 'cancelar' ? 'Motivo do cancelamento...' : 'Digite os detalhes...'"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="sd-dialog-footer">
+        <button type="button" class="sd-btn sd-btn-secondary" [disabled]="executandoAcao" (click)="fecharModalAcao()">
+          Voltar
+        </button>
+        <button
+          type="button"
+          class="sd-btn"
+          [class]="modalTipo === 'cancelar' ? 'sd-btn-danger' : 'sd-btn-primary'"
+          [disabled]="executandoAcao"
+          (click)="confirmarModalAcao()"
+        >
+          {{ executandoAcao ? 'Processando...' : 'Confirmar' }}
+        </button>
+      </div>
+    </dialog>
+
+    <!-- Lightbox nativo <dialog> para pré-visualização de imagens anexadas -->
+    <dialog #dialogPreviewRef class="sd-dialog sd-dialog-lg" closedby="any" aria-labelledby="dlg-img-titulo">
+      <div class="sd-dialog-header">
+        <h1 id="dlg-img-titulo">{{ previewImagemNome }}</h1>
+        <button type="button" class="sd-dialog-close" (click)="fecharPreview()" aria-label="Fechar visualização">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="sd-dialog-body preview-corpo">
+        @if (previewImagemUrl) {
+          <img [src]="previewImagemUrl" [alt]="previewImagemNome" class="preview-img" />
+        }
+      </div>
+    </dialog>
+  </main>
 </div>

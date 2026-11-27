@@ -1,85 +1,183 @@
-<div class="container-dash">
-    <app-sidebar />
+<div class="sd-shell">
+  <app-sidebar />
 
-    <main class="lado-direito-dash">
-        <a routerLink="/chamados" class="voltar">
-            <i class="ti ti-arrow-left"></i>
-            Voltar para a lista
-        </a>
+  <main class="sd-main">
+    <div>
+      <a routerLink="/chamados" class="link-voltar">
+        <i class="ti ti-arrow-left"></i>
+        <span>Voltar para a fila de chamados</span>
+      </a>
+    </div>
 
-        <div class="card-form">
-            <h1>Abrir novo chamado</h1>
-            <p class="subtitulo">Preencha as informações detalhadas para registrar o ticket na central de TI.</p>
-
-            @if (erro) { <div class="msg-erro">{{ erro }}</div> }
-
-            <form [formGroup]="form" (ngSubmit)="enviar()">
-                <div class="campo">
-                    <label for="titulo">Título do chamado *</label>
-                    <input type="text" id="titulo" formControlName="titulo" placeholder="Ex: Problemas de conexão com o banco de dados">
-                    @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
-                        <small class="erro-campo">Informe um título (mín. 5 caracteres).</small>
-                    }
-                </div>
-
-                <div class="campo">
-                    <label for="descricao">Descrição detalhada *</label>
-                    <textarea id="descricao" rows="6" formControlName="descricao" placeholder="Por favor, descreva o erro com o máximo de detalhes possível, incluindo passos para reproduzir..."></textarea>
-                    @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
-                        <small class="erro-campo">Informe uma descrição (mín. 10 caracteres).</small>
-                    }
-                </div>
-
-                <div class="linha-campos">
-                    <div class="campo">
-                        <label for="categoria">Categoria *</label>
-                        <select id="categoria" formControlName="categoriaId" required>
-                            <option value="">Selecione...</option>
-                            @for (c of categorias; track c.id) {
-                                <option [value]="c.id">{{ c.nome }}</option>
-                            }
-                        </select>
-                        @if (form.controls.categoriaId.touched && form.controls.categoriaId.invalid) {
-                            <small class="erro-campo">Selecione uma categoria.</small>
-                        }
-                    </div>
-
-                    <div class="campo">
-                        <label for="prioridade">Prioridade *</label>
-                        <select id="prioridade" formControlName="prioridade">
-                            @for (p of prioridades; track p) {
-                                <option [value]="p">{{ p }}</option>
-                            }
-                        </select>
-                    </div>
-
-                    <div class="campo">
-                        <label for="equipamento">Equipamento</label>
-                        <select id="equipamento" formControlName="equipamentoId">
-                            <option value="">Selecionar equipamento...</option>
-                            @for (e of equipamentos; track e.id) {
-                                <option [value]="e.id">{{ e.nome }}</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-                <div class="campo">
-                    <label for="anexo">Anexos</label>
-                    <div class="upload">
-                        <input type="file" id="anexo" hidden multiple (change)="selecionarArquivos($event)">
-                        <label for="anexo" class="btn-arquivo">Escolher arquivo</label>
-                        <span id="nome-arquivo">{{ textoAnexos }}</span>
-                    </div>
-                </div>
-
-                <div class="acoes">
-                    <button type="button" class="btn btn-cancelar" routerLink="/chamados">Cancelar</button>
-                    <button type="submit" class="btn btn-enviar" [disabled]="enviando">
-                        {{ enviando ? 'Enviando...' : 'Enviar chamado' }}
-                    </button>
-                </div>
-            </form>
+    <div class="novo-grid">
+      <section class="sd-card form-card">
+        <div class="form-header">
+          <h1 class="sd-page-title">Registrar chamado técnico</h1>
+          <p class="sd-page-subtitle">
+            Descreva o incidente ou solicitação com clareza para agilizar a triagem pela equipe de TI.
+          </p>
         </div>
-    </main>
+
+        @if (erro) {
+          <div class="sd-alert sd-alert-error" role="alert">
+            <i class="ti ti-alert-circle"></i>
+            <span>{{ erro }}</span>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="enviar()" class="form-corpo">
+          @if (podeEscolherSolicitante && usuarios.length > 1) {
+            <div class="sd-field">
+              <label for="solicitanteId">Abrir em nome de (opcional)</label>
+              <select id="solicitanteId" formControlName="solicitanteId">
+                <option value="">Eu mesmo (minha conta)</option>
+                @for (u of usuarios; track u.id) {
+                  <option [value]="u.id">{{ u.nome }}{{ u.departamento ? ' — ' + u.departamento : '' }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <div class="sd-field">
+            <label for="titulo">Assunto / Título resumido *</label>
+            <input
+              type="text"
+              id="titulo"
+              formControlName="titulo"
+              placeholder="Ex.: Falha de autenticação na VPN corporativa ao conectar externamente"
+            />
+            @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
+              <small class="erro-campo">Informe um título claro com ao menos 5 caracteres.</small>
+            }
+          </div>
+
+          <div class="sd-grid-3">
+            <div class="sd-field">
+              <label for="categoria">Categoria *</label>
+              <select id="categoria" formControlName="categoriaId" required>
+                <option value="">Selecione...</option>
+                @for (c of categorias; track c.id) {
+                  <option [value]="c.id">{{ c.nome }}</option>
+                }
+              </select>
+              @if (form.controls.categoriaId.touched && form.controls.categoriaId.invalid) {
+                <small class="erro-campo">Escolha uma categoria.</small>
+              }
+            </div>
+
+            <div class="sd-field">
+              <label for="prioridade">Impacto / Prioridade *</label>
+              <select id="prioridade" formControlName="prioridade">
+                @for (p of prioridades; track p) {
+                  <option [value]="p">{{ p }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="sd-field">
+              <label for="equipamento">Ativo vinculado (opcional)</label>
+              <select id="equipamento" formControlName="equipamentoId">
+                <option value="">Nenhum equipamento específico</option>
+                @for (e of equipamentos; track e.id) {
+                  <option [value]="e.id">{{ e.nome }} ({{ e.patrimonio }})</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="sd-field">
+            <label for="descricao">Descrição detalhada da ocorrência *</label>
+            <textarea
+              id="descricao"
+              rows="6"
+              formControlName="descricao"
+              placeholder="Informe mensagens de erro exibidas, horário em que o problema começou e se afeta apenas sua estação ou todo o setor..."
+            ></textarea>
+            @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
+              <small class="erro-campo">Descreva o problema com pelo menos 10 caracteres.</small>
+            }
+          </div>
+
+          <div class="sd-field">
+            <label for="anexo">Evidências e anexos (até 5 arquivos • máx. 10MB cada)</label>
+            <div class="upload-box">
+              <input type="file" id="anexo" hidden multiple (change)="selecionarArquivos($event)" />
+              <label for="anexo" class="sd-btn sd-btn-secondary">
+                <i class="ti ti-paperclip"></i>
+                <span>Selecionar arquivos</span>
+              </label>
+              <span class="upload-hint">Capturas de tela (.png, .jpg), logs (.txt, .log), PDF ou planilhas.</span>
+            </div>
+
+            @if (anexos.length > 0) {
+              <ul class="lista-arquivos">
+                @for (arq of anexos; track $index) {
+                  <li>
+                    <i class="ti ti-file-description"></i>
+                    <span class="arq-nome">{{ arq.name }}</span>
+                    <small class="sd-tabular">{{ formatarTamanho(arq.size) }}</small>
+                    <button type="button" class="arq-remover" (click)="removerArquivo($index)" aria-label="Remover anexo">
+                      <i class="ti ti-x"></i>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          <div class="form-rodape">
+            <a routerLink="/chamados" class="sd-btn sd-btn-secondary">Cancelar</a>
+            <button type="submit" class="sd-btn sd-btn-primary" [disabled]="enviando">
+              <i class="ti ti-send"></i>
+              <span>{{ enviando ? 'Registrando chamado...' : 'Registrar chamado' }}</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Coluna lateral informativa com imagem corporativa e SLA estimado -->
+      <aside class="guia-lateral">
+        <div class="sd-card sla-preview-card">
+          <div class="sla-preview-top">
+            <i class="ti ti-clock-shield"></i>
+            <div>
+              <span>Acordo de Nível de Serviço (SLA)</span>
+              <strong>Até {{ prazoEstimadoHoras }} horas úteis</strong>
+            </div>
+          </div>
+          <p>
+            Prazo calculado automaticamente conforme a criticidade <strong>{{ form.controls.prioridade.value }}</strong>.
+          </p>
+        </div>
+
+        <div class="sd-card guia-card">
+          <img
+            src="img/it-team-support.jpg"
+            width="360"
+            height="160"
+            loading="lazy"
+            alt="Atendimento especializado de TI"
+            class="guia-img"
+          />
+          <div class="guia-conteudo">
+            <h2>Boas práticas para resolução ágil</h2>
+            <ul>
+              <li>
+                <i class="ti ti-check"></i>
+                <span>Anexe captura da tela inteira caso haja código de erro visível.</span>
+              </li>
+              <li>
+                <i class="ti ti-check"></i>
+                <span>Vincule o patrimônio do equipamento (etiqueta <code>PAT-XXXXX</code>) em falhas físicas.</span>
+              </li>
+              <li>
+                <i class="ti ti-check"></i>
+                <span>Use prioridade <strong>Crítica</strong> apenas quando uma operação inteira estiver parada.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
 </div>

@@ -1,135 +1,283 @@
-<div class="container-dash">
+<div class="sd-shell">
   <app-sidebar />
 
-  <main class="lado-direito-dash">
-    <header class="topo">
-      <div class="titulo-pagina">
-        <h1>Usuários</h1>
-        <p>Gerencie os usuários do sistema</p>
+  <main class="sd-main">
+    <header class="sd-page-header">
+      <div>
+        <span class="sd-eyebrow">
+          <i class="ti ti-users"></i>
+          Diretório Corporativo
+        </span>
+        <h1 class="sd-page-title">Usuários &amp; Equipe</h1>
+        <p class="sd-page-subtitle">
+          Gerencie colaboradores, analistas de suporte, perfis de permissão e fotos de identificação.
+        </p>
       </div>
 
-      <div class="topo-acoes">
-        <label class="busca">
-          <i class="bi bi-search"></i>
-          <input type="text" placeholder="Buscar usuário..." (input)="onBusca($event)" />
-        </label>
-        <button type="button" class="btn btn-enviar btn-novo" (click)="abrirModal()">
-          <i class="bi bi-plus-lg"></i> Novo usuário
-        </button>
+      <div class="sd-header-actions">
+        <search>
+          <label class="sd-search">
+            <i class="ti ti-search"></i>
+            <input
+              type="search"
+              placeholder="Buscar nome, e-mail ou setor..."
+              (input)="onBusca($event)"
+              autocorrect="off"
+              spellcheck="false"
+            />
+          </label>
+        </search>
+
+        @if (ehAdmin) {
+          <button type="button" class="sd-btn sd-btn-primary" (click)="abrirModalNovo()">
+            <i class="ti ti-user-plus"></i>
+            <span>Novo usuário</span>
+          </button>
+        }
       </div>
     </header>
 
-    <section class="card-tabela">
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>E-mail</th>
-            <th>Perfil</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (u of filtrados(); track u.id) {
-            <tr>
-              <td class="col-nome">{{ u.nome }}</td>
-              <td class="col-secundaria">{{ u.email }}</td>
-              <td class="col-destaque">{{ u.perfil }}</td>
-              <td>
-                <span class="badge" [class.badge-inativo]="!u.ativo">
-                  {{ u.ativo ? 'Ativo' : 'Inativo' }}
-                </span>
-              </td>
-            </tr>
-          } @empty {
-            <tr><td colspan="4" class="sem-resultado">Nenhum usuário encontrado.</td></tr>
-          }
-        </tbody>
-      </table>
+    @if (feedbackSucesso) {
+      <div class="sd-alert sd-alert-success" role="status">
+        <i class="ti ti-circle-check"></i>
+        <span>{{ feedbackSucesso }}</span>
+      </div>
+    }
 
-      <p class="rodape-tabela">Total: <strong>{{ filtrados().length }}</strong> usuários</p>
+    @if (usuarios().length > 1) {
+      <div class="sd-pill-tabs" role="tablist" aria-label="Filtrar por função">
+        <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'todos'" (click)="abaFiltro.set('todos')">
+          Todos <span class="sd-pill-count">{{ contarAba('todos') }}</span>
+        </button>
+        <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'tecnico'" (click)="abaFiltro.set('tecnico')">
+          Técnicos de TI <span class="sd-pill-count">{{ contarAba('tecnico') }}</span>
+        </button>
+        <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'admin'" (click)="abaFiltro.set('admin')">
+          Administradores <span class="sd-pill-count">{{ contarAba('admin') }}</span>
+        </button>
+        <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'cliente'" (click)="abaFiltro.set('cliente')">
+          Solicitantes <span class="sd-pill-count">{{ contarAba('cliente') }}</span>
+        </button>
+        @if (contarAba('inativos') > 0) {
+          <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'inativos'" (click)="abaFiltro.set('inativos')">
+            Inativos <span class="sd-pill-count">{{ contarAba('inativos') }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <section class="sd-card card-tabela">
+      <div tabindex="0" role="region" aria-label="Tabela de usuários" class="sd-table-scroll">
+        <table class="sd-table">
+          <thead>
+            <tr>
+              <th>Colaborador</th>
+              <th>Setor / Cargo</th>
+              <th>Contato</th>
+              <th>Perfil de Acesso</th>
+              <th>Vínculos</th>
+              <th>Status</th>
+              @if (ehAdmin) {
+                <th class="col-acoes-th">Ações</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of filtrados(); track u.id) {
+              <tr [class.linha-inativa]="!u.ativo">
+                <td>
+                  <div class="sd-user-cell">
+                    <span class="sd-avatar avatar-usuario">
+                      @if (u.avatarUrl) {
+                        <img [src]="u.avatarUrl" [alt]="u.nome" loading="lazy" />
+                      } @else {
+                        {{ iniciais(u.nome) }}
+                      }
+                    </span>
+                    <div class="sd-user-meta">
+                      <span class="sd-user-name">{{ u.nome }}</span>
+                      <span class="sd-user-sub sd-mono">ID #{{ u.id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <strong class="texto-bloco">{{ u.departamento || 'Geral' }}</strong>
+                  <span class="sub-bloco">{{ u.cargo || u.perfilRotulo }}</span>
+                </td>
+                <td>
+                  <span class="texto-bloco">{{ u.email }}</span>
+                  <span class="sub-bloco">{{ u.telefone || 'Sem telefone' }}</span>
+                </td>
+                <td>
+                  <span class="perfil-pill {{ classePerfil(u.perfilCodigo) }}">
+                    <i class="ti {{ iconePerfil(u.perfilCodigo) }}"></i>
+                    {{ u.perfilRotulo }}
+                  </span>
+                </td>
+                <td class="sd-tabular">
+                  <span class="vinculo-chip" title="Chamados abertos por este usuário">
+                    <i class="ti ti-ticket"></i> {{ u.totalChamados }}
+                  </span>
+                  <span class="vinculo-chip" title="Equipamentos vinculados">
+                    <i class="ti ti-device-laptop"></i> {{ u.totalEquipamentos }}
+                  </span>
+                </td>
+                <td>
+                  <span class="sd-badge" [class]="u.ativo ? 'sd-status-aberto' : 'sd-status-encerrado'">
+                    <span class="sd-badge-dot"></span>
+                    {{ u.ativo ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+                @if (ehAdmin) {
+                  <td class="col-acoes">
+                    <button type="button" class="sd-icon-btn" title="Editar dados e foto" (click)="abrirModalEditar(u)">
+                      <i class="ti ti-edit"></i>
+                    </button>
+                    @if (u.id !== meuId) {
+                      <button
+                        type="button"
+                        class="sd-icon-btn"
+                        [title]="u.ativo ? 'Inativar acesso' : 'Reativar acesso'"
+                        (click)="alternarStatusRapido(u)"
+                      >
+                        <i class="ti" [class]="u.ativo ? 'ti-user-off' : 'ti-user-check'"></i>
+                      </button>
+                    }
+                  </td>
+                }
+              </tr>
+            } @empty {
+              <tr>
+                <td [attr.colspan]="ehAdmin ? 7 : 6" class="sem-resultado">
+                  Nenhum usuário encontrado para a busca atual.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="rodape-tabela sd-tabular">
+        Total listado: <strong>{{ filtrados().length }}</strong> {{ filtrados().length === 1 ? 'usuário' : 'usuários' }}
+      </footer>
     </section>
 
-    @if (modalAberto) {
-      <div class="modal-backdrop" (click)="fecharModal()">
-        <div class="modal-card" (click)="$event.stopPropagation()">
-          <div class="modal-topo">
-            <h2>Novo usuário</h2>
-            <button type="button" class="modal-fechar" (click)="fecharModal()">&times;</button>
-          </div>
+    <!-- Modal nativo <dialog> para Criar ou Editar Usuário com Upload de Foto -->
+    <dialog #dialogUsuarioRef class="sd-dialog" closedby="any" aria-labelledby="dlg-usr-titulo">
+      <div class="sd-dialog-header">
+        <div>
+          <h1 id="dlg-usr-titulo">{{ editandoId ? 'Editar usuário' : 'Cadastrar novo usuário' }}</h1>
+          <p>Defina dados institucionais, foto de identificação e nível de permissão.</p>
+        </div>
+        <button type="button" class="sd-dialog-close" (click)="fecharModal()" aria-label="Fechar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
 
+      <form (ngSubmit)="salvarUsuario()">
+        <div class="sd-dialog-body">
           @if (erroModal) {
-            <div class="modal-erro">{{ erroModal }}</div>
+            <div class="sd-alert sd-alert-error" role="alert">{{ erroModal }}</div>
           }
 
-          <form (ngSubmit)="salvarUsuario()" class="modal-form">
-            <div class="campo-modal">
-              <label for="usr-nome">Nome completo *</label>
-              <input
-                id="usr-nome"
-                type="text"
-                [(ngModel)]="novoNome"
-                name="novoNome"
-                placeholder="Ex.: Lucas Prado"
-                required
-              />
+          <div class="foto-upload-row">
+            <span class="sd-avatar sd-avatar-lg">
+              @if (previewFotoUrl) {
+                <img [src]="previewFotoUrl" alt="Pré-visualização da foto" />
+              } @else {
+                {{ iniciais(formNome || 'US') }}
+              }
+            </span>
+            <div>
+              <label class="sd-btn sd-btn-secondary sd-btn-sm">
+                <i class="ti ti-camera"></i>
+                <span>Escolher foto da pessoa</span>
+                <input type="file" accept="image/*" hidden (change)="aoSelecionarFoto($event)" />
+              </label>
+              <p class="sd-hint mt-4">JPG, PNG ou WebP até 3MB.</p>
             </div>
+          </div>
 
-            <div class="campo-modal">
+          <div class="sd-field">
+            <label for="usr-nome">Nome completo *</label>
+            <input id="usr-nome" type="text" [(ngModel)]="formNome" name="formNome" placeholder="Ex.: Lucas Prado" required />
+          </div>
+
+          <div class="sd-grid-2">
+            <div class="sd-field">
               <label for="usr-email">E-mail institucional *</label>
               <input
                 id="usr-email"
                 type="email"
-                [(ngModel)]="novoEmail"
-                name="novoEmail"
+                [(ngModel)]="formEmail"
+                name="formEmail"
                 placeholder="lucas.prado@empresa.com"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
                 required
               />
             </div>
 
-            <div class="linha-modal">
-              <div class="campo-modal">
-                <label for="usr-telefone">Telefone</label>
-                <input
-                  id="usr-telefone"
-                  type="text"
-                  [(ngModel)]="novoTelefone"
-                  name="novoTelefone"
-                  placeholder="(11) 90000-0000"
-                />
-              </div>
+            <div class="sd-field">
+              <label for="usr-tel">Telefone / Ramal</label>
+              <input id="usr-tel" type="tel" [(ngModel)]="formTelefone" name="formTelefone" placeholder="(11) 90000-0000" />
+            </div>
+          </div>
 
-              <div class="campo-modal">
-                <label for="usr-perfil">Perfil *</label>
-                <select id="usr-perfil" [(ngModel)]="novoPerfil" name="novoPerfil">
-                  <option value="cliente">Solicitante (Cliente)</option>
-                  <option value="tecnico">Técnico</option>
-                  <option value="admin">Administrador</option>
+          <div class="sd-grid-2">
+            <div class="sd-field">
+              <label for="usr-depto">Departamento</label>
+              <input id="usr-depto" type="text" [(ngModel)]="formDepartamento" name="formDepartamento" placeholder="Ex.: Financeiro, Suporte N2" />
+            </div>
+
+            <div class="sd-field">
+              <label for="usr-cargo">Cargo</label>
+              <input id="usr-cargo" type="text" [(ngModel)]="formCargo" name="formCargo" placeholder="Ex.: Analista Pleno" />
+            </div>
+          </div>
+
+          <div class="sd-grid-2">
+            <div class="sd-field">
+              <label for="usr-perfil">Perfil de permissão *</label>
+              <select id="usr-perfil" [(ngModel)]="formPerfil" name="formPerfil" [disabled]="editandoId === meuId">
+                <option value="cliente">Solicitante (Cliente)</option>
+                <option value="tecnico">Técnico de TI</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+
+            @if (editandoId) {
+              <div class="sd-field">
+                <label for="usr-status">Status da conta</label>
+                <select id="usr-status" [(ngModel)]="formStatus" name="formStatus" [disabled]="editandoId === meuId">
+                  <option value="Ativo">Ativo</option>
+                  <option value="Inativo">Inativo</option>
                 </select>
               </div>
-            </div>
+            } @else {
+              <div class="sd-field">
+                <label for="usr-senha">Senha inicial (mín. 6) *</label>
+                <input id="usr-senha" type="password" [(ngModel)]="formSenha" name="formSenha" placeholder="Mínimo 6 caracteres" required />
+              </div>
+            }
+          </div>
 
-            <div class="campo-modal">
-              <label for="usr-senha">Senha inicial (mín. 6 caracteres) *</label>
-              <input
-                id="usr-senha"
-                type="password"
-                [(ngModel)]="novaSenha"
-                name="novaSenha"
-                placeholder="••••••••"
-                required
-              />
+          @if (editandoId) {
+            <div class="sd-field">
+              <label for="usr-senha-edit">Redefinir senha (deixe em branco para manter a atual)</label>
+              <input id="usr-senha-edit" type="password" [(ngModel)]="formSenha" name="formSenhaEdit" placeholder="Nova senha opcional" />
             </div>
-
-            <div class="modal-acoes">
-              <button type="button" class="btn btn-cancelar" (click)="fecharModal()">Cancelar</button>
-              <button type="submit" class="btn btn-enviar" [disabled]="salvando">
-                {{ salvando ? 'Salvando...' : 'Cadastrar usuário' }}
-              </button>
-            </div>
-          </form>
+          }
         </div>
-      </div>
-    }
+
+        <div class="sd-dialog-footer">
+          <button type="button" class="sd-btn sd-btn-secondary" (click)="fecharModal()">Cancelar</button>
+          <button type="submit" class="sd-btn sd-btn-primary" [disabled]="salvando">
+            {{ salvando ? 'Salvando...' : editandoId ? 'Salvar alterações' : 'Cadastrar usuário' }}
+          </button>
+        </div>
+      </form>
+    </dialog>
   </main>
 </div>

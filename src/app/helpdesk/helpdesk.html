@@ -1,99 +1,155 @@
-<main class="container">
-    
-    
-    <section class="lado-esquerdo">
-        <div class="logo">
-            <i class="bx bxs-shield-alt-2"></i>
-            <div>
-                <h4>Secure<span>Desk</span></h4>
-                <p>Sistemas de Chamado de TI</p>
-            </div>
-        </div>
+<main class="sd-auth-page">
+  <aside class="sd-auth-aside">
+    <div class="sd-auth-brand">
+      <span class="sd-auth-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 3v5c0 5-3.2 8.7-7 10-3.8-1.3-7-5-7-10V6l7-3z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </span>
+      <div>
+        <strong>SecureDesk</strong>
+        <span>Central Corporativa de Serviços de TI</span>
+      </div>
+    </div>
 
-        <div class="imagem-box">
-            <img src="img/imagem-projeto.png" width="200" height="150" alt="sala com servidores">
-            <span class="tag-imagem">Segurança da Informação</span>
+    <div class="sd-auth-Showcase">
+      <div class="sd-auth-photo-frame">
+        <img
+          src="img/office-workspace.jpg"
+          width="540"
+          height="230"
+          fetchpriority="high"
+          alt="Ambiente corporativo da operação de suporte técnico"
+        />
+        <div class="sd-auth-photo-caption">
+          <div class="sd-auth-team-stack">
+            <img src="img/avatars/avatar-2.jpg" width="24" height="24" alt="" />
+            <img src="img/avatars/avatar-4.jpg" width="24" height="24" alt="" />
+            <img src="img/avatars/avatar-3.jpg" width="24" height="24" alt="" />
+          </div>
+          <span>Equipe técnica em operação • Controle de SLA ativo</span>
         </div>
+      </div>
 
-        <h1>Gerencie seus chamados com eficiência e controle total</h1>
-        <p class="texto-apoio">
-            Uma plataforma robusta para técnicos e administradores resolverem problemas de TI com velocidade corporativa.
+      <div>
+        <h2>Operação de suporte estruturada, rastreável e transparente</h2>
+        <p class="sd-auth-lead">
+          Registre incidentes, acompanhe acordos de nível de serviço (SLA), gerencie inventário de patrimônio e centralize a comunicação entre colaboradores e especialistas de TI.
         </p>
+      </div>
 
-        <footer>
-            &copy; 2026 SecureDesk. Todos os direitos reservados.
-            Protegido por criptografia TLS.
-        </footer>
-    </section>
-    
-    
-    <section class="lado-direito">
-        <form class="card-login" (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
-            <h1>Acesse sua conta</h1>
-            <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
-        
-            <div *ngIf="erroMensagem" class="alerta-erro" role="alert">
-                <i class="bx bxs-error-circle"></i>
-                {{ erroMensagem }}
-            </div>
+      <div class="sd-auth-highlights">
+        <div class="sd-auth-highlight">
+          <strong>Gestão por SLA</strong>
+          <span>Prazos automáticos por criticidade e categoria</span>
+        </div>
+        <div class="sd-auth-highlight">
+          <strong>Inventário Integrado</strong>
+          <span>Histórico vinculado ao patrimônio do ativo</span>
+        </div>
+      </div>
+    </div>
 
-            <div class="input-box">
-                <h5>E-mail institucional</h5>
-                <div class="campo">
-                    <i class="bx bxs-envelope"></i>
-                    <input
-                        id="email"
-                        name="email"
-                        [(ngModel)]="email"
-                        placeholder="exemplo@empresa.com"
-                        type="email"
-                        autocomplete="email"
-                        required
-                    >
-                </div>
-            </div>
-                
-            <div class="input-box">
-                <h5>Senha de Acesso</h5>
-                <div class="campo">
-                    <i class="bx bxs-lock-alt"></i>
-                    <input
-                        id="senha"
-                        name="senha"
-                        [(ngModel)]="senha"
-                        placeholder="••••••••••••"
-                        [type]="mostrarSenha ? 'text' : 'password'"
-                        autocomplete="current-password"
-                        required
-                    >
-                    <button
-                        type="button"
-                        class="olho"
-                        (click)="alternarSenha()"
-                        [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
-                    >
-                        <i [class]="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
-                    </button>
-                </div>
-            </div>
+    <footer class="sd-auth-footer">
+      <span>&copy; 2026 SecureDesk</span>
+      <span>Conexão autenticada via Bearer Token</span>
+    </footer>
+  </aside>
 
-            <div class="relembre-esqueci">
-                <label>
-                    <input type="checkbox" name="lembrar" [(ngModel)]="lembrar">
-                    Lembrar-me
-                </label>
-                <a routerLink="/esquecisenha">Esqueci minha senha</a>
-            </div>
-            
-            <button type="submit" [disabled]="carregando">
-                <span *ngIf="!carregando">Login</span>
-                <span *ngIf="carregando">Entrando...</span>
+  <section class="sd-auth-content">
+    <form class="sd-auth-card" (ngSubmit)="onLogin()" novalidate>
+      <div>
+        <h1>Acessar central de serviços</h1>
+        <p class="sd-auth-sub">Entre com seu e-mail corporativo para acompanhar ou atender chamados.</p>
+      </div>
+
+      @if (erroMensagem) {
+        <div class="sd-alert sd-alert-error" role="alert">
+          <i class="ti ti-alert-circle"></i>
+          <span>{{ erroMensagem }}</span>
+        </div>
+      }
+
+      <div class="sd-field">
+        <label for="login-email">E-mail institucional</label>
+        <div class="sd-input-icon-wrap">
+          <i class="ti ti-mail"></i>
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            placeholder="nome.sobrenome@empresa.com"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="sd-field">
+        <div class="linha-label">
+          <label for="login-senha">Senha de acesso</label>
+          <a routerLink="/esquecisenha" class="link-esqueci">Esqueci minha senha</a>
+        </div>
+        <div class="sd-input-icon-wrap has-toggle">
+          <i class="ti ti-lock"></i>
+          <input
+            id="login-senha"
+            name="senha"
+            [type]="mostrarSenha ? 'text' : 'password'"
+            [(ngModel)]="senha"
+            placeholder="Digite sua senha"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            class="sd-pw-toggle"
+            (click)="alternarSenha()"
+            [attr.aria-pressed]="mostrarSenha"
+            [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+          >
+            <i [class]="mostrarSenha ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
+          </button>
+        </div>
+      </div>
+
+      <label class="lembrar-linha">
+        <input type="checkbox" name="lembrar" [(ngModel)]="lembrar" />
+        <span>Manter sessão conectada neste dispositivo</span>
+      </label>
+
+      <button type="submit" class="sd-btn sd-btn-primary btn-full" [disabled]="carregando">
+        @if (!carregando) {
+          <span>Entrar no SecureDesk</span>
+          <i class="ti ti-arrow-right"></i>
+        } @else {
+          <span>Autenticando...</span>
+        }
+      </button>
+
+      <div class="demo-acesso">
+        <span class="demo-titulo">Acesso rápido para avaliação (senha: 123456)</span>
+        <div class="demo-botoes">
+          @for (c of contasDemo; track c.email) {
+            <button type="button" class="demo-chip" (click)="preencherDemo(c)">
+              <img [src]="c.avatar" width="24" height="24" [alt]="c.nome" />
+              <div>
+                <strong>{{ c.papel }}</strong>
+                <span>{{ c.nome }}</span>
+              </div>
             </button>
+          }
+        </div>
+      </div>
 
-            <div class="registro-link">
-                <p>Ainda não tem conta? <a routerLink="/cadastro">Cadastre-se</a> </p>
-            </div>
-        </form>
-    </section>
-
+      <div class="sd-auth-switch">
+        Novo colaborador? <a routerLink="/cadastro">Solicitar cadastro de conta</a>
+      </div>
+    </form>
+  </section>
 </main>

@@ -1,97 +1,185 @@
-<div class="container-dash">
+<div class="sd-shell">
   <app-sidebar />
 
-  <main class="lado-direito-dash">
-    <header class="topo">
-      <div class="titulo-pagina">
-        <h1>Categorias</h1>
-        <p>Gerencie os tópicos e categorias de classificação de chamados técnicos.</p>
+  <main class="sd-main">
+    <header class="sd-page-header">
+      <div>
+        <span class="sd-eyebrow">
+          <i class="ti ti-category-2"></i>
+          Catálogo de Serviços
+        </span>
+        <h1 class="sd-page-title">Categorias &amp; Metas de SLA</h1>
+        <p class="sd-page-subtitle">
+          Classificação temática de incidentes, ícones operacionais e prazos de referência.
+        </p>
       </div>
 
-      <div class="topo-acoes">
-        <button type="button" class="btn btn-enviar btn-novo" (click)="abrirModal()">
-          <i class="ti ti-plus"></i> Nova categoria
-        </button>
+      <div class="sd-header-actions">
+        <search>
+          <label class="sd-search">
+            <i class="ti ti-search"></i>
+            <input type="search" placeholder="Filtrar categorias..." (input)="onBusca($event)" />
+          </label>
+        </search>
+
+        @if (ehAdmin) {
+          <button type="button" class="sd-btn sd-btn-primary" (click)="abrirModalNova()">
+            <i class="ti ti-plus"></i>
+            <span>Nova categoria</span>
+          </button>
+        }
       </div>
     </header>
 
-    <section class="card-tabela">
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Descrição</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (c of categorias(); track c.id) {
-            <tr>
-              <td class="col-nome">{{ c.nome }}</td>
-              <td class="col-secundaria">{{ c.descricao }}</td>
-              <td>
-                <span class="badge" [class.badge-inativo]="!c.ativo">
-                  {{ c.ativo ? 'Ativo' : 'Inativo' }}
-                </span>
-              </td>
-            </tr>
-          } @empty {
-            <tr><td colspan="3" class="sem-resultado">Nenhuma categoria cadastrada.</td></tr>
-          }
-        </tbody>
-      </table>
-
-      <p class="rodape-tabela">
-        Mostrando <strong>1-{{ categorias().length }}</strong> de
-        <strong>{{ categorias().length }}</strong> categorias cadastradas
-      </p>
-    </section>
-
-    @if (modalAberto) {
-      <div class="modal-backdrop" (click)="fecharModal()">
-        <div class="modal-card" (click)="$event.stopPropagation()">
-          <div class="modal-topo">
-            <h2>Nova categoria</h2>
-            <button type="button" class="modal-fechar" (click)="fecharModal()">&times;</button>
-          </div>
-
-          @if (erroModal) {
-            <div class="modal-erro">{{ erroModal }}</div>
-          }
-
-          <form (ngSubmit)="salvarCategoria()" class="modal-form">
-            <div class="campo-modal">
-              <label for="cat-nome">Nome da categoria *</label>
-              <input
-                id="cat-nome"
-                type="text"
-                [(ngModel)]="novoNome"
-                name="novoNome"
-                placeholder="Ex.: Telefonia"
-                required
-              />
-            </div>
-
-            <div class="campo-modal">
-              <label for="cat-desc">Descrição</label>
-              <input
-                id="cat-desc"
-                type="text"
-                [(ngModel)]="novaDescricao"
-                name="novaDescricao"
-                placeholder="Ex.: Ramais, aparelhos telefônicos e celulares corporativos"
-              />
-            </div>
-
-            <div class="modal-acoes">
-              <button type="button" class="btn btn-cancelar" (click)="fecharModal()">Cancelar</button>
-              <button type="submit" class="btn btn-enviar" [disabled]="salvando">
-                {{ salvando ? 'Salvando...' : 'Cadastrar categoria' }}
-              </button>
-            </div>
-          </form>
-        </div>
+    @if (feedbackSucesso) {
+      <div class="sd-alert sd-alert-success" role="status">
+        <i class="ti ti-circle-check"></i>
+        <span>{{ feedbackSucesso }}</span>
       </div>
     }
+
+    <section class="sd-card card-tabela">
+      <div tabindex="0" role="region" aria-label="Tabela de categorias" class="sd-table-scroll">
+        <table class="sd-table">
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Escopo de Atendimento</th>
+              <th>SLA Referência</th>
+              <th>Volume de Chamados</th>
+              <th>Status</th>
+              @if (ehAdmin) {
+                <th class="col-acoes-th">Ações</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of filtradas(); track c.id) {
+              <tr>
+                <td>
+                  <div class="cat-cell">
+                    <span class="cat-icone">
+                      <i class="ti {{ c.icone || 'ti-tag' }}"></i>
+                    </span>
+                    <strong class="cat-nome">{{ c.nome }}</strong>
+                  </div>
+                </td>
+                <td class="col-desc">{{ c.descricao || '—' }}</td>
+                <td>
+                  <span class="sla-ref sd-tabular">
+                    <i class="ti ti-clock"></i> Até {{ c.slaHoras || 24 }}h
+                  </span>
+                </td>
+                <td class="sd-tabular">
+                  <strong>{{ c.totalChamados ?? 0 }}</strong> total
+                  @if ((c.chamadosAtivos ?? 0) > 0) {
+                    <span class="ativos-sub">({{ c.chamadosAtivos }} em aberto)</span>
+                  }
+                </td>
+                <td>
+                  <span class="sd-badge" [class]="c.status === 'Ativa' ? 'sd-status-aberto' : 'sd-status-encerrado'">
+                    <span class="sd-badge-dot"></span>
+                    {{ c.status === 'Ativa' ? 'Ativa' : 'Inativa' }}
+                  </span>
+                </td>
+                @if (ehAdmin) {
+                  <td class="col-acoes">
+                    <button type="button" class="sd-icon-btn" title="Editar categoria" (click)="abrirModalEditar(c)">
+                      <i class="ti ti-edit"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="sd-icon-btn"
+                      [title]="c.status === 'Ativa' ? 'Inativar categoria' : 'Ativar categoria'"
+                      (click)="alternarStatus(c)"
+                    >
+                      <i class="ti" [class]="c.status === 'Ativa' ? 'ti-ban' : 'ti-check'"></i>
+                    </button>
+                  </td>
+                }
+              </tr>
+            } @empty {
+              <tr>
+                <td [attr.colspan]="ehAdmin ? 6 : 5" class="sem-resultado">Nenhuma categoria encontrada.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="rodape-tabela sd-tabular">
+        Total: <strong>{{ filtradas().length }}</strong> categorias configuradas
+      </footer>
+    </section>
+
+    <!-- Modal nativo <dialog> -->
+    <dialog #dialogCatRef class="sd-dialog" closedby="any" aria-labelledby="dlg-cat-titulo">
+      <div class="sd-dialog-header">
+        <div>
+          <h1 id="dlg-cat-titulo">{{ editandoId ? 'Editar categoria' : 'Nova categoria de serviço' }}</h1>
+          <p>Defina nome, ícone identificador e meta padrão de atendimento.</p>
+        </div>
+        <button type="button" class="sd-dialog-close" (click)="fecharModal()" aria-label="Fechar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="salvarCategoria()">
+        <div class="sd-dialog-body">
+          @if (erroModal) {
+            <div class="sd-alert sd-alert-error" role="alert">{{ erroModal }}</div>
+          }
+
+          <div class="sd-field">
+            <label for="cat-nome">Nome da categoria *</label>
+            <input id="cat-nome" type="text" [(ngModel)]="formNome" name="formNome" placeholder="Ex.: Telefonia VoIP" required />
+          </div>
+
+          <div class="sd-field">
+            <label for="cat-desc">Descrição do escopo</label>
+            <input
+              id="cat-desc"
+              type="text"
+              [(ngModel)]="formDescricao"
+              name="formDescricao"
+              placeholder="Ex.: Aparelhos IP, ramais internos e headsets corporativos"
+            />
+          </div>
+
+          <div class="sd-grid-2">
+            <div class="sd-field">
+              <label for="cat-icone">Ícone representativo</label>
+              <select id="cat-icone" [(ngModel)]="formIcone" name="formIcone">
+                @for (ic of iconesDisponiveis; track ic.valor) {
+                  <option [value]="ic.valor">{{ ic.nome }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="sd-field">
+              <label for="cat-sla">SLA de referência (horas)</label>
+              <input id="cat-sla" type="number" min="1" max="168" [(ngModel)]="formSlaHoras" name="formSlaHoras" />
+            </div>
+          </div>
+
+          @if (editandoId) {
+            <div class="sd-field">
+              <label for="cat-status">Status</label>
+              <select id="cat-status" [(ngModel)]="formStatus" name="formStatus">
+                <option value="Ativa">Ativa</option>
+                <option value="Inativa">Inativa</option>
+              </select>
+            </div>
+          }
+        </div>
+
+        <div class="sd-dialog-footer">
+          <button type="button" class="sd-btn sd-btn-secondary" (click)="fecharModal()">Cancelar</button>
+          <button type="submit" class="sd-btn sd-btn-primary" [disabled]="salvando">
+            {{ salvando ? 'Salvando...' : editandoId ? 'Salvar alterações' : 'Criar categoria' }}
+          </button>
+        </div>
+      </form>
+    </dialog>
   </main>
 </div>

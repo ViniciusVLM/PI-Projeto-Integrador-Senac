@@ -1,121 +1,185 @@
-<main class="container">
-    
-    
-    <section class="lado-esquerdo">
-        <div class="logo">
-            <i class="bx bxs-shield-alt-2"></i>
-            <div>
-                <h4>Secure<span>Desk</span></h4>
-                <p>Sistemas de Chamado de TI</p>
-            </div>
-        </div>
+<main class="sd-auth-page">
+  <aside class="sd-auth-aside">
+    <a routerLink="/" class="sd-auth-brand">
+      <span class="sd-auth-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 3v5c0 5-3.2 8.7-7 10-3.8-1.3-7-5-7-10V6l7-3z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </span>
+      <div>
+        <strong>SecureDesk</strong>
+        <span>Central Corporativa de Serviços de TI</span>
+      </div>
+    </a>
 
-        <div class="imagem-box">
-            <img src="img/imagem-projeto.png" width="200" height="150" alt="sala com servidores">
-            <span class="tag-imagem">Segurança da Informação</span>
+    <div class="sd-auth-Showcase">
+      <div class="sd-auth-photo-frame">
+        <img
+          src="img/it-team-support.jpg"
+          width="540"
+          height="230"
+          fetchpriority="high"
+          alt="Equipe de suporte colaborando em atendimento corporativo"
+        />
+        <div class="sd-auth-photo-caption">
+          <span>Portal do Colaborador • Abertura rápida de solicitações</span>
         </div>
+      </div>
 
-        <h1>Gerencie seus chamados com eficiência e controle total</h1>
-        <p class="texto-apoio">
-            Uma plataforma robusta para técnicos e administradores resolverem problemas de TI com velocidade corporativa.
+      <div>
+        <h2>Atendimento direto com a equipe interna de tecnologia</h2>
+        <p class="sd-auth-lead">
+          Com sua conta corporativa você abre chamados com anexos, acompanha cada etapa da resolução e recebe alertas sobre seus equipamentos.
         </p>
+      </div>
+    </div>
 
-        <footer>
-            &copy; 2026 SecureDesk. Todos os direitos reservados.
-            Protegido por criptografia TLS.
-        </footer>
-    </section>
-    
-    
-    <section class="lado-direito">
-        <form class="card-login" (ngSubmit)="onCadastrar()" #cadastroForm="ngForm" novalidate>
-            <h1>Crie sua conta</h1>
-            <p class="subtitulo">Insira suas credenciais para gerenciar a central de serviços</p>
-        
-            <div *ngIf="erroMensagem" class="alerta-erro" role="alert">
-                <i class="bx bxs-error-circle"></i>
-                {{ erroMensagem }}
-            </div>
+    <footer class="sd-auth-footer">
+      <span>&copy; 2026 SecureDesk</span>
+      <span>Acesso padrão: Perfil Solicitante</span>
+    </footer>
+  </aside>
 
-            <div *ngIf="sucessoMensagem" class="alerta-sucesso" role="alert">
-                <i class="bx bxs-check-circle"></i>
-                {{ sucessoMensagem }}
-            </div>
+  <section class="sd-auth-content">
+    <form class="sd-auth-card card-cadastro" (ngSubmit)="onCadastrar()" novalidate>
+      <div>
+        <h1>Criar conta corporativa</h1>
+        <p class="sd-auth-sub">Preencha seus dados institucionais para habilitar o acesso à central.</p>
+      </div>
 
-            <div class="input-box">
-                <h5>E-mail institucional</h5>
-                <div class="campo">
-                    <i class="bx bxs-envelope" ></i>
-                    <input
-                        id="email"
-                        name="email"
-                        [(ngModel)]="email"
-                        placeholder="exemplo@empresa.com"
-                        type="email"
-                        autocomplete="email"
-                        required
-                    >
-                </div>
-            </div>
-                
-            <div class="input-box">
-                <h5>Crie uma senha</h5>
-                <div class="campo">
-                    <i class="bx bxs-lock-alt"></i>
-                    <input
-                        id="senha"
-                        name="senha"
-                        [(ngModel)]="senha"
-                        placeholder="••••••••••••"
-                        [type]="mostrarSenha ? 'text' : 'password'"
-                        autocomplete="new-password"
-                        required
-                    >
-                    <button
-                        type="button"
-                        class="olho"
-                        (click)="alternarSenha()"
-                        [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
-                    >
-                        <i [class]="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
-                    </button>
-                </div>
-            </div>
+      @if (erroMensagem) {
+        <div class="sd-alert sd-alert-error" role="alert">
+          <i class="ti ti-alert-circle"></i>
+          <span>{{ erroMensagem }}</span>
+        </div>
+      }
 
-            <div class="input-box">
-                <h5>Confirme sua senha</h5>
-                <div class="campo">
-                    <i class="bx bxs-lock-alt"></i>
-                    <input
-                        id="confirmarSenha"
-                        name="confirmarSenha"
-                        [(ngModel)]="confirmarSenha"
-                        placeholder="••••••••••••"
-                        [type]="mostrarConfirmarSenha ? 'text' : 'password'"
-                        autocomplete="new-password"
-                        required
-                    >
-                    <button
-                        type="button"
-                        class="olho"
-                        (click)="alternarConfirmarSenha()"
-                        [attr.aria-label]="mostrarConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'"
-                    >
-                        <i [class]="mostrarConfirmarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <button type="submit" [disabled]="carregando">
-                <span *ngIf="!carregando">Criar conta</span>
-                <span *ngIf="carregando">Cadastrando...</span>
+      @if (sucessoMensagem) {
+        <div class="sd-alert sd-alert-success" role="status">
+          <i class="ti ti-circle-check"></i>
+          <span>{{ sucessoMensagem }}</span>
+        </div>
+      }
+
+      <div class="sd-field">
+        <label for="cad-nome">Nome completo *</label>
+        <div class="sd-input-icon-wrap">
+          <i class="ti ti-user"></i>
+          <input
+            id="cad-nome"
+            name="nome"
+            type="text"
+            [(ngModel)]="nome"
+            placeholder="Ex.: Mariana Alves"
+            autocomplete="name"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="sd-field">
+        <label for="cad-email">E-mail institucional *</label>
+        <div class="sd-input-icon-wrap">
+          <i class="ti ti-mail"></i>
+          <input
+            id="cad-email"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            placeholder="mariana.alves@empresa.com"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="sd-grid-2">
+        <div class="sd-field">
+          <label for="cad-depto">Departamento</label>
+          <select id="cad-depto" name="departamento" [(ngModel)]="departamento">
+            <option value="">Selecionar setor...</option>
+            @for (d of departamentosSugeridos; track d) {
+              <option [value]="d">{{ d }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="sd-field">
+          <label for="cad-tel">Ramal / Telefone</label>
+          <input
+            id="cad-tel"
+            name="telefone"
+            type="tel"
+            [(ngModel)]="telefone"
+            placeholder="(11) 90000-0000"
+            autocomplete="tel"
+          />
+        </div>
+      </div>
+
+      <div class="sd-grid-2">
+        <div class="sd-field">
+          <label for="cad-senha">Senha (mín. 6) *</label>
+          <div class="sd-input-icon-wrap has-toggle">
+            <i class="ti ti-lock"></i>
+            <input
+              id="cad-senha"
+              name="senha"
+              [type]="mostrarSenha ? 'text' : 'password'"
+              [(ngModel)]="senha"
+              placeholder="Mín. 6 caracteres"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="sd-pw-toggle"
+              (click)="alternarSenha()"
+              [attr.aria-pressed]="mostrarSenha"
+              [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+            >
+              <i [class]="mostrarSenha ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
             </button>
+          </div>
+        </div>
 
-            <div class="login-link">
-                <p>Já tem uma conta? </p>
-                <p><a routerLink="/">Conecte-se</a> </p>
-            </div>
-        </form>
-    </section>
+        <div class="sd-field">
+          <label for="cad-confirmar">Confirmar senha *</label>
+          <div class="sd-input-icon-wrap has-toggle">
+            <i class="ti ti-lock-check"></i>
+            <input
+              id="cad-confirmar"
+              name="confirmarSenha"
+              [type]="mostrarConfirmarSenha ? 'text' : 'password'"
+              [(ngModel)]="confirmarSenha"
+              placeholder="Repita a senha"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="sd-pw-toggle"
+              (click)="alternarConfirmarSenha()"
+              [attr.aria-pressed]="mostrarConfirmarSenha"
+              [attr.aria-label]="mostrarConfirmarSenha ? 'Ocultar confirmação' : 'Mostrar confirmação'"
+            >
+              <i [class]="mostrarConfirmarSenha ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
 
+      <button type="submit" class="sd-btn sd-btn-primary btn-full" [disabled]="carregando">
+        {{ carregando ? 'Criando conta...' : 'Concluir cadastro' }}
+      </button>
+
+      <div class="sd-auth-switch">
+        Já possui credenciais? <a routerLink="/">Voltar para o login</a>
+      </div>
+    </form>
+  </section>
 </main>

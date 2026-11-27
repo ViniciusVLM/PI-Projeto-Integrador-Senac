@@ -1,140 +1,198 @@
-<main class="container">
-    
-    
-    <section class="lado-esquerdo">
-        <div class="logo">
-            <i class="bx bxs-shield-alt-2"></i>
-            <div>
-                <h4>Secure<span>Desk</span></h4>
-                <p>Sistemas de Chamado de TI</p>
-            </div>
-        </div>
+<main class="sd-auth-page">
+  <aside class="sd-auth-aside">
+    <a routerLink="/" class="sd-auth-brand">
+      <span class="sd-auth-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 3v5c0 5-3.2 8.7-7 10-3.8-1.3-7-5-7-10V6l7-3z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </span>
+      <div>
+        <strong>SecureDesk</strong>
+        <span>Central Corporativa de Serviços de TI</span>
+      </div>
+    </a>
 
-        <div class="imagem-box">
-            <img src="img/imagem-projeto.png" width="200" height="150" alt="sala com servidores">
-            <span class="tag-imagem">Segurança da Informação</span>
+    <div class="sd-auth-Showcase">
+      <div class="sd-auth-photo-frame">
+        <img
+          src="img/security-desk.jpg"
+          width="540"
+          height="230"
+          fetchpriority="high"
+          alt="Estação de trabalho corporativa com autenticação segura"
+        />
+        <div class="sd-auth-photo-caption">
+          <span>Recuperação verificada por código único (OTP)</span>
         </div>
+      </div>
 
-        <h1>Gerencie seus chamados com eficiência e controle total</h1>
-        <p class="texto-apoio">
-            Uma plataforma robusta para técnicos e administradores resolverem problemas de TI com velocidade corporativa.
+      <div>
+        <h2>Recuperação segura de credenciais corporativas</h2>
+        <p class="sd-auth-lead">
+          O código temporário de 6 dígitos é enviado diretamente ao seu e-mail cadastrado via SMTP autenticado e invalida sessões anteriores após a troca.
         </p>
+      </div>
+    </div>
 
-        <footer>
-            &copy; 2026 SecureDesk. Todos os direitos reservados.
-            Protegido por criptografia TLS.
-        </footer>
-    </section>
-    
-    
-    <section class="lado-direito">
-        <form class="card-login" (ngSubmit)="onRedefinirSenha()" #esqueciForm="ngForm" novalidate>
-            <h1>Redefina sua senha</h1>
-        
-            <div *ngIf="erroMensagem" class="alerta-erro" role="alert">
-                <i class="bx bxs-error-circle"></i>
-                {{ erroMensagem }}
-            </div>
+    <footer class="sd-auth-footer">
+      <span>&copy; 2026 SecureDesk</span>
+      <span>Expiração automática em 15 minutos</span>
+    </footer>
+  </aside>
 
-            <div *ngIf="sucessoMensagem" class="alerta-sucesso" role="alert">
-                <i class="bx bxs-check-circle"></i>
-                {{ sucessoMensagem }}
-            </div>
+  <section class="sd-auth-content">
+    <form class="sd-auth-card" (ngSubmit)="onRedefinirSenha()" novalidate>
+      <div class="etapas-barra" aria-label="Progresso da recuperação">
+        <span class="etapa" [class.ativa]="!codigoEnviado" [class.concluida]="codigoEnviado">
+          1. Solicitar código
+        </span>
+        <i class="ti ti-chevron-right"></i>
+        <span class="etapa" [class.ativa]="codigoEnviado">
+          2. Validar e redefinir
+        </span>
+      </div>
 
-            <div class="input-box">
-                <h5> Insira seu e-mail institucional</h5>
-                <div class="campo">
-                    <i class="bx bxs-envelope" ></i>
-                    <input
-                        id="email"
-                        name="email"
-                        [(ngModel)]="email"
-                        placeholder="exemplo@empresa.com"
-                        type="email"
-                        autocomplete="email"
-                        [readonly]="codigoEnviado"
-                        required
-                    >
-                </div>
-            </div>
-                
-            <ng-container *ngIf="codigoEnviado">
-            <div class="input-box">
-                <h5>Código de verificação</h5>
-                <div class="campo">
-                    <i class="bx bxs-key"></i>
-                    <input
-                        id="codigo"
-                        name="codigo"
-                        [(ngModel)]="codigo"
-                        placeholder="000000"
-                        type="text"
-                        inputmode="numeric"
-                        maxlength="6"
-                        autocomplete="one-time-code"
-                        required
-                    >
-                </div>
-            </div>
+      <div>
+        <h1>Recuperar senha de acesso</h1>
+        <p class="sd-auth-sub">
+          {{ codigoEnviado ? 'Informe o código recebido no seu e-mail e defina a nova senha.' : 'Informe seu e-mail institucional para receber o código de verificação.' }}
+        </p>
+      </div>
 
-            <div class="input-box">
-                <h5>Crie sua senha nova</h5>
-                <div class="campo">
-                    <i class="bx bxs-lock-alt"></i>
-                    <input
-                        id="novaSenha"
-                        name="novaSenha"
-                        [(ngModel)]="novaSenha"
-                        placeholder="••••••••••••"
-                        [type]="mostrarNovaSenha ? 'text' : 'password'"
-                        autocomplete="new-password"
-                        required
-                    >
-                    <button
-                        type="button"
-                        class="olho"
-                        (click)="alternarNovaSenha()"
-                        [attr.aria-label]="mostrarNovaSenha ? 'Ocultar senha' : 'Mostrar senha'"
-                    >
-                        <i [class]="mostrarNovaSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
-                    </button>
-                </div>
-            </div>
+      @if (erroMensagem) {
+        <div class="sd-alert sd-alert-error" role="alert">
+          <i class="ti ti-alert-circle"></i>
+          <span>{{ erroMensagem }}</span>
+        </div>
+      }
 
-            <div class="input-box">
-                <h5>Confirme sua senha nova</h5>
-                <div class="campo">
-                    <i class="bx bxs-lock-alt"></i>
-                    <input
-                        id="confirmarSenha"
-                        name="confirmarSenha"
-                        [(ngModel)]="confirmarSenha"
-                        placeholder="••••••••••••"
-                        [type]="mostrarConfirmarSenha ? 'text' : 'password'"
-                        autocomplete="new-password"
-                        required
-                    >
-                    <button
-                        type="button"
-                        class="olho"
-                        (click)="alternarConfirmarSenha()"
-                        [attr.aria-label]="mostrarConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'"
-                    >
-                        <i [class]="mostrarConfirmarSenha ? 'bx bx-show' : 'bx bx-hide'"></i>
-                    </button>
-                </div>
-            </div>
+      @if (sucessoMensagem) {
+        <div class="sd-alert sd-alert-info" role="status">
+          <i class="ti ti-mail-check"></i>
+          <span>{{ sucessoMensagem }}</span>
+        </div>
+      }
 
-            </ng-container>
+      <div class="sd-field">
+        <div class="linha-topo-campo">
+          <label for="rec-email">E-mail institucional</label>
+          @if (codigoEnviado) {
+            <button type="button" class="btn-link-inline" (click)="voltarEtapaEmail()">Alterar e-mail</button>
+          }
+        </div>
+        <div class="sd-input-icon-wrap">
+          <i class="ti ti-mail"></i>
+          <input
+            id="rec-email"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            placeholder="nome.sobrenome@empresa.com"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            [readonly]="codigoEnviado"
+            required
+          />
+        </div>
+      </div>
 
-            <button type="submit" [disabled]="carregando">
-                <span *ngIf="!carregando">{{ codigoEnviado ? 'Redefinir Senha' : 'Enviar código' }}</span>
-                <span *ngIf="carregando">Aguarde...</span>
+      @if (codigoEnviado) {
+        <div class="sd-field">
+          <label for="rec-codigo">Código de verificação (6 dígitos)</label>
+          <div class="sd-input-icon-wrap">
+            <i class="ti ti-key"></i>
+            <input
+              id="rec-codigo"
+              name="codigo"
+              type="text"
+              class="input-codigo"
+              [(ngModel)]="codigo"
+              placeholder="000000"
+              inputmode="numeric"
+              maxlength="6"
+              autocomplete="one-time-code"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="sd-field">
+          <label for="rec-nova-senha">Nova senha (mín. 6 caracteres)</label>
+          <div class="sd-input-icon-wrap has-toggle">
+            <i class="ti ti-lock"></i>
+            <input
+              id="rec-nova-senha"
+              name="novaSenha"
+              [type]="mostrarNovaSenha ? 'text' : 'password'"
+              [(ngModel)]="novaSenha"
+              placeholder="Digite a nova senha"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="sd-pw-toggle"
+              (click)="alternarNovaSenha()"
+              [attr.aria-pressed]="mostrarNovaSenha"
+              [attr.aria-label]="mostrarNovaSenha ? 'Ocultar senha' : 'Mostrar senha'"
+            >
+              <i [class]="mostrarNovaSenha ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
             </button>
-            <div class="voltar-login">
-                <p><a routerLink="/">Voltar ao login</a></p>
-            </div>
-        </form>
-    </section>
+          </div>
+        </div>
 
+        <div class="sd-field">
+          <label for="rec-confirmar">Confirmar nova senha</label>
+          <div class="sd-input-icon-wrap has-toggle">
+            <i class="ti ti-lock-check"></i>
+            <input
+              id="rec-confirmar"
+              name="confirmarSenha"
+              [type]="mostrarConfirmarSenha ? 'text' : 'password'"
+              [(ngModel)]="confirmarSenha"
+              placeholder="Repita a nova senha"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="sd-pw-toggle"
+              (click)="alternarConfirmarSenha()"
+              [attr.aria-pressed]="mostrarConfirmarSenha"
+              [attr.aria-label]="mostrarConfirmarSenha ? 'Ocultar confirmação' : 'Mostrar confirmação'"
+            >
+              <i [class]="mostrarConfirmarSenha ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="acoes-recuperacao">
+        <button type="submit" class="sd-btn sd-btn-primary btn-full" [disabled]="carregando">
+          @if (!carregando) {
+            <span>{{ codigoEnviado ? 'Confirmar nova senha' : 'Enviar código por e-mail' }}</span>
+          } @else {
+            <span>Processando...</span>
+          }
+        </button>
+
+        @if (codigoEnviado) {
+          <button type="button" class="sd-btn sd-btn-secondary btn-full" [disabled]="carregando" (click)="pedirCodigo()">
+            <i class="ti ti-refresh"></i>
+            <span>Reenviar código</span>
+          </button>
+        }
+      </div>
+
+      <div class="sd-auth-switch">
+        Lembrou sua senha? <a routerLink="/">Voltar ao login</a>
+      </div>
+    </form>
+  </section>
 </main>

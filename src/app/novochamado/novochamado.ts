@@ -1,13 +1,34 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../core/services/auth.service';
 import { Sidebar } from '../sidebar/sidebar';
 
-interface Opcao { id: number; nome: string; }
+interface CategoriaOpcao {
+  id: number;
+  nome: string;
+  descricao?: string;
+  icone?: string;
+  slaHoras?: number;
+  status?: string;
+}
 
-// Endereço relativo: em produção a API e a tela ficam no mesmo site;
-// no npm start, o proxy.conf.json encaminha /api para a porta 3000.
+interface EquipamentoOpcao {
+  id: number;
+  nome: string;
+  patrimonio: string;
+  tipo: string;
+  status: string;
+}
+
+interface UsuarioOpcao {
+  id: number;
+  nome: string;
+  departamento?: string | null;
+  status?: string;
+}
+
 const API_URL = '/api';
 const LIMITE = 10 * 1024 * 1024;
 
@@ -20,14 +41,24 @@ const LIMITE = 10 * 1024 * 1024;
 export class Novochamado implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
 
-  categorias: Opcao[] = [];
-  equipamentos: Opcao[] = [];
+  categorias: CategoriaOpcao[] = [];
+  equipamentos: EquipamentoOpcao[] = [];
+  usuarios: UsuarioOpcao[] = [];
   prioridades = ['Baixa', 'Média', 'Alta', 'Crítica'];
   anexos: File[] = [];
   enviando = false;
   erro = '';
+
+  readonly slaPorPrioridade: Record<string, number> = {
+    'Crítica': 4,
+    'Alta': 8,
+    'Média': 24,
+    'Baixa': 48,
+  };
 
   form = this.fb.nonNullable.group({
     titulo: ['', [Validators.required, Validators.minLength(5)]],
@@ -35,31 +66,65 @@ export class Novochamado implements OnInit {
     categoriaId: ['', Validators.required],
     prioridade: ['Média', Validators.required],
     equipamentoId: [''],
+    solicitanteId: [''],
   });
 
-  ngOnInit(): void {
-    this.http.get<Opcao[]>(`${API_URL}/categorias`).subscribe({ next: (d) => (this.categorias = d), error: () => {} });
-    this.http.get<Opcao[]>(`${API_URL}/equipamentos`).subscribe({ next: (d) => (this.equipamentos = d), error: () => {} });
+  get podeEscolherSolicitante(): boolean {
+    return this.authService.temPerfil('tecnico', 'admin');
   }
 
-  get textoAnexos(): string {
-    return this.anexos.length
-      ? this.anexos.map((a) => a.name).join(', ')
-      : 'Nenhum arquivo selecionado (Limite: 10MB por arquivo)';
+  ngOnInit(): void {
+    const eqQuery = this.route.snapshot.queryParamMap.get('equipamentoId');
+    if (eqQuery) {
+      this.form.patchValue({ equipamentoId: eqQuery });
+    }
+
+    this.http.get<CategoriaOpcao[]>(`${API_URL}/categorias?status=Ativa`).subscribe({
+      next: (d) => (this.categorias = d),
+      error: () => {},
+    });
+
+    this.http.get<EquipamentoOpcao[]>(`${API_URL}/equipamentos`).subscribe({
+      next: (d) => (this.equipamentos = d.filter((e) => e.status !== 'Inativo')),
+      error: () => {},
+    });
+
+    if (this.podeEscolherSolicitante) {
+      this.http.get<UsuarioOpcao[]>(`${API_URL}/usuarios?status=Ativo`).subscribe({
+        next: (lista) => (this.usuarios = lista),
+        error: () => {},
+      });
+    }
+  }
+
+  get prazoEstimadoHoras(): number {
+    const prio = this.form.controls.prioridade.value;
+    return this.slaPorPrioridade[prio] || 24;
   }
 
   selecionarArquivos(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const arquivos = input.files ? Array.from(input.files) : [];
+    const novos = input.files ? Array.from(input.files) : [];
 
-    if (arquivos.some((a) => a.size > LIMITE)) {
-      this.erro = 'Cada arquivo deve ter no máximo 10MB.';
+    if (novos.some((a) => a.size > LIMITE)) {
+      this.erro = 'Cada arquivo anexado deve ter no máximo 10MB.';
       input.value = '';
-      this.anexos = [];
       return;
     }
+
+    const combinados = [...this.anexos, ...novos].slice(0, 5);
     this.erro = '';
-    this.anexos = arquivos;
+    this.anexos = combinados;
+    input.value = '';
+  }
+
+  removerArquivo(index: number): void {
+    this.anexos = this.anexos.filter((_, i) => i !== index);
+  }
+
+  formatarTamanho(bytes: number): string {
+    if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   enviar(): void {
@@ -77,12 +142,15 @@ export class Novochamado implements OnInit {
     dados.append('categoriaId', v.categoriaId);
     dados.append('prioridade', v.prioridade);
     if (v.equipamentoId) dados.append('equipamentoId', v.equipamentoId);
+    if (v.solicitanteId && this.podeEscolherSolicitante) {
+      dados.append('solicitanteId', v.solicitanteId);
+    }
     this.anexos.forEach((f) => dados.append('anexos', f));
 
-    this.http.post(`${API_URL}/chamados`, dados).subscribe({
-      next: () => this.router.navigate(['/chamados']),
-      error: () => {
-        this.erro = 'Não foi possível abrir o chamado. Tente novamente.';
+    this.http.post<{ id: number }>(`${API_URL}/chamados`, dados).subscribe({
+      next: (criado) => this.router.navigate(['/detalhes-chamados', criado.id]),
+      error: (err) => {
+        this.erro = err.error?.erro || 'Não foi possível abrir o chamado. Tente novamente.';
         this.enviando = false;
       },
     });

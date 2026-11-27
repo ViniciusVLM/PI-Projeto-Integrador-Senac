@@ -25,3 +25,14 @@ services:
         value: SecureDesk
       - key: DB_SSL
         value: "true"
+      # Envio real de e-mail via SMTP gratuito (Gmail Senha de App ou Brevo)
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM_NAME
+        value: SecureDesk Central de TI

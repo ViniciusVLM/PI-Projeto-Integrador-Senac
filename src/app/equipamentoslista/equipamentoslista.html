@@ -1,138 +1,285 @@
-<div class="container-dash">
+<div class="sd-shell">
   <app-sidebar />
 
-  <main class="lado-direito-dash">
-    <header class="topo">
-      <div class="titulo-pagina">
-        <h1>Equipamentos</h1>
-        <p>Controle os equipamentos cadastrados</p>
+  <main class="sd-main">
+    <header class="sd-page-header">
+      <div>
+        <span class="sd-eyebrow">
+          <i class="ti ti-devices"></i>
+          Inventário de Hardware &amp; Redes
+        </span>
+        <h1 class="sd-page-title">Equipamentos</h1>
+        <p class="sd-page-subtitle">
+          Controle patrimonial de estações, notebooks, servidores de rede e responsáveis vinculados.
+        </p>
       </div>
 
-      <div class="topo-acoes">
-        <label class="busca">
-          <i class="bi bi-search"></i>
-          <input type="text" placeholder="Buscar equipamento..." (input)="onBusca($event)" />
-        </label>
-        <button type="button" class="btn btn-enviar btn-novo" (click)="abrirModal()">
-          <i class="bi bi-plus-lg"></i> Novo equipamento
-        </button>
+      <div class="sd-header-actions">
+        <search>
+          <label class="sd-search">
+            <i class="ti ti-search"></i>
+            <input
+              type="search"
+              placeholder="Buscar patrimônio, modelo ou usuário..."
+              (input)="onBusca($event)"
+              autocorrect="off"
+              spellcheck="false"
+            />
+          </label>
+        </search>
+
+        @if (ehAdmin) {
+          <button type="button" class="sd-btn sd-btn-primary" (click)="abrirModalNovo()">
+            <i class="ti ti-plus"></i>
+            <span>Cadastrar ativo</span>
+          </button>
+        }
       </div>
     </header>
 
-    <section class="card-tabela">
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>Equipamento</th>
-            <th>Tipo</th>
-            <th>Patrimônio</th>
-            <th>Usuário</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (e of filtrados(); track e.id) {
-            <tr>
-              <td class="col-nome">{{ e.nome }}</td>
-              <td class="col-destaque">{{ e.tipo }}</td>
-              <td class="col-secundaria">{{ e.patrimonio }}</td>
-              <td class="col-secundaria">{{ e.usuario }}</td>
-              <td>
-                <span class="badge" [class.badge-inativo]="!e.ativo">
-                  {{ e.status }}
-                </span>
-              </td>
-            </tr>
-          } @empty {
-            <tr><td colspan="5" class="sem-resultado">Nenhum equipamento encontrado.</td></tr>
-          }
-        </tbody>
-      </table>
+    @if (feedbackSucesso) {
+      <div class="sd-alert sd-alert-success" role="status">
+        <i class="ti ti-circle-check"></i>
+        <span>{{ feedbackSucesso }}</span>
+      </div>
+    }
 
-      <p class="rodape-tabela">Total: <strong>{{ filtrados().length }}</strong> equipamentos</p>
+    <!-- Resumo rápido do parque -->
+    <section class="resumo-ativos">
+      <div class="sd-card mini-kpi">
+        <span>Total catalogado</span>
+        <strong class="sd-tabular">{{ equipamentos().length }}</strong>
+      </div>
+      <div class="sd-card mini-kpi">
+        <span>Em operação</span>
+        <strong class="sd-tabular cor-verde">{{ totalPorStatus('Ativo') }}</strong>
+      </div>
+      <div class="sd-card mini-kpi">
+        <span>Disponíveis em estoque</span>
+        <strong class="sd-tabular cor-azul">{{ totalEmEstoque }}</strong>
+      </div>
+      <div class="sd-card mini-kpi">
+        <span>Em manutenção</span>
+        <strong class="sd-tabular cor-ambar">{{ totalPorStatus('Em manutenção') }}</strong>
+      </div>
     </section>
 
-    @if (modalAberto) {
-      <div class="modal-backdrop" (click)="fecharModal()">
-        <div class="modal-card" (click)="$event.stopPropagation()">
-          <div class="modal-topo">
-            <h2>Novo equipamento</h2>
-            <button type="button" class="modal-fechar" (click)="fecharModal()">&times;</button>
-          </div>
+    <div class="sd-pill-tabs" role="tablist" aria-label="Filtrar categorias de hardware">
+      <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'todos'" (click)="abaFiltro.set('todos')">
+        Todos os ativos
+      </button>
+      <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'computadores'" (click)="abaFiltro.set('computadores')">
+        Estações &amp; Mobilidade
+      </button>
+      <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'rede_impressao'" (click)="abaFiltro.set('rede_impressao')">
+        Impressão &amp; Infraestrutura
+      </button>
+      <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'estoque'" (click)="abaFiltro.set('estoque')">
+        Sem responsável
+      </button>
+      <button type="button" class="sd-pill-tab" [class.active]="abaFiltro() === 'manutencao'" (click)="abaFiltro.set('manutencao')">
+        Em manutenção
+      </button>
+    </div>
 
+    <section class="sd-card card-tabela">
+      <div tabindex="0" role="region" aria-label="Inventário de equipamentos" class="sd-table-scroll">
+        <table class="sd-table">
+          <thead>
+            <tr>
+              <th>Ativo</th>
+              <th>Patrimônio / Série</th>
+              <th>Localização</th>
+              <th>Responsável</th>
+              <th>Status</th>
+              <th class="col-acoes-th">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of filtrados(); track e.id) {
+              <tr>
+                <td>
+                  <div class="equip-cell">
+                    <img
+                      [src]="e.imagemUrl || '/img/equipamentos/desktop.jpg'"
+                      [alt]="e.nome"
+                      width="48"
+                      height="36"
+                      loading="lazy"
+                      class="equip-foto"
+                    />
+                    <div>
+                      <strong class="equip-nome">{{ e.nome }}</strong>
+                      <span class="equip-tipo">
+                        <i class="ti {{ iconeTipo(e.tipo) }}"></i> {{ e.tipo }}
+                        @if ((e.chamadosAbertos ?? 0) > 0) {
+                          <span class="alerta-chamado">• {{ e.chamadosAbertos }} chamado(s) ativo(s)</span>
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="sd-mono pat-tag">{{ e.patrimonio }}</span>
+                  @if (e.numeroSerie) {
+                    <span class="serie-sub sd-mono">{{ e.numeroSerie }}</span>
+                  }
+                </td>
+                <td class="col-loc">{{ e.localizacao || 'Matriz' }}</td>
+                <td>
+                  @if (e.usuarioNome) {
+                    <div class="sd-user-cell">
+                      <span class="sd-avatar sd-avatar-xs">
+                        @if (e.usuarioAvatar) {
+                          <img [src]="e.usuarioAvatar" [alt]="e.usuarioNome" loading="lazy" />
+                        } @else {
+                          {{ iniciais(e.usuarioNome) }}
+                        }
+                      </span>
+                      <div class="sd-user-meta">
+                        <span class="sd-user-name">{{ e.usuarioNome }}</span>
+                        @if (e.usuarioDepartamento) {
+                          <span class="sd-user-sub">{{ e.usuarioDepartamento }}</span>
+                        }
+                      </div>
+                    </div>
+                  } @else {
+                    <span class="estoque-label">Disponível (Estoque TI)</span>
+                  }
+                </td>
+                <td>
+                  <span class="sd-badge {{ classeStatus(e.status) }}">
+                    <span class="sd-badge-dot"></span>
+                    {{ e.status }}
+                  </span>
+                </td>
+                <td class="col-acoes">
+                  <a
+                    [routerLink]="['/novochamado']"
+                    [queryParams]="{ equipamentoId: e.id }"
+                    class="sd-icon-btn"
+                    title="Abrir chamado para este equipamento"
+                  >
+                    <i class="ti ti-ticket"></i>
+                  </a>
+                  @if (ehAdmin) {
+                    <button type="button" class="sd-icon-btn" title="Editar equipamento" (click)="abrirModalEditar(e)">
+                      <i class="ti ti-edit"></i>
+                    </button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="sem-resultado">Nenhum equipamento encontrado para este filtro.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="rodape-tabela sd-tabular">
+        Exibindo <strong>{{ filtrados().length }}</strong> de <strong>{{ equipamentos().length }}</strong> equipamentos
+      </footer>
+    </section>
+
+    <!-- Modal nativo <dialog> de Cadastro / Edição de Equipamento -->
+    <dialog #dialogEquipRef class="sd-dialog" closedby="any" aria-labelledby="dlg-eq-titulo">
+      <div class="sd-dialog-header">
+        <div>
+          <h1 id="dlg-eq-titulo">{{ editandoId ? 'Editar equipamento' : 'Cadastrar equipamento' }}</h1>
+          <p>Registre dados patrimoniais, localização física e usuário responsável.</p>
+        </div>
+        <button type="button" class="sd-dialog-close" (click)="fecharModal()" aria-label="Fechar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="salvarEquipamento()">
+        <div class="sd-dialog-body">
           @if (erroModal) {
-            <div class="modal-erro">{{ erroModal }}</div>
+            <div class="sd-alert sd-alert-error" role="alert">{{ erroModal }}</div>
           }
 
-          <form (ngSubmit)="salvarEquipamento()" class="modal-form">
-            <div class="linha-modal">
-              <div class="campo-modal">
-                <label for="eq-tipo">Tipo *</label>
-                <select id="eq-tipo" [(ngModel)]="novoTipo" name="novoTipo">
-                  @for (t of tiposValidos; track t) {
-                    <option [value]="t">{{ t }}</option>
-                  }
-                </select>
-              </div>
-
-              <div class="campo-modal">
-                <label for="eq-patrimonio">Nº Patrimônio *</label>
-                <input
-                  id="eq-patrimonio"
-                  type="text"
-                  [(ngModel)]="novoPatrimonio"
-                  name="novoPatrimonio"
-                  placeholder="Ex.: PAT-00200"
-                  required
-                />
-              </div>
+          <div class="sd-grid-2">
+            <div class="sd-field">
+              <label for="eq-tipo">Categoria do ativo *</label>
+              <select id="eq-tipo" [(ngModel)]="formTipo" name="formTipo">
+                @for (t of tiposValidos; track t) {
+                  <option [value]="t">{{ t }}</option>
+                }
+              </select>
             </div>
 
-            <div class="linha-modal">
-              <div class="campo-modal">
-                <label for="eq-marca">Marca *</label>
-                <input
-                  id="eq-marca"
-                  type="text"
-                  [(ngModel)]="novaMarca"
-                  name="novaMarca"
-                  placeholder="Ex.: Dell"
-                  required
-                />
-              </div>
+            <div class="sd-field">
+              <label for="eq-patrimonio">Etiqueta de Patrimônio *</label>
+              <input
+                id="eq-patrimonio"
+                type="text"
+                class="sd-mono"
+                [(ngModel)]="formPatrimonio"
+                name="formPatrimonio"
+                placeholder="Ex.: PAT-00210"
+                autocorrect="off"
+                spellcheck="false"
+                required
+              />
+            </div>
+          </div>
 
-              <div class="campo-modal">
-                <label for="eq-modelo">Modelo *</label>
-                <input
-                  id="eq-modelo"
-                  type="text"
-                  [(ngModel)]="novoModelo"
-                  name="novoModelo"
-                  placeholder="Ex.: Latitude 5440"
-                  required
-                />
-              </div>
+          <div class="sd-grid-2">
+            <div class="sd-field">
+              <label for="eq-marca">Fabricante / Marca *</label>
+              <input id="eq-marca" type="text" [(ngModel)]="formMarca" name="formMarca" placeholder="Ex.: Dell, Lenovo, HP" required />
             </div>
 
-            <div class="campo-modal">
-              <label for="eq-usuario">Usuário responsável (opcional)</label>
-              <select id="eq-usuario" [(ngModel)]="novoUsuarioId" name="novoUsuarioId">
-                <option value="">Sem responsável atribuído</option>
+            <div class="sd-field">
+              <label for="eq-modelo">Modelo *</label>
+              <input id="eq-modelo" type="text" [(ngModel)]="formModelo" name="formModelo" placeholder="Ex.: Latitude 5440" required />
+            </div>
+          </div>
+
+          <div class="sd-grid-2">
+            <div class="sd-field">
+              <label for="eq-loc">Localização física</label>
+              <input id="eq-loc" type="text" [(ngModel)]="formLocalizacao" name="formLocalizacao" placeholder="Ex.: Matriz — 2º Andar" />
+            </div>
+
+            <div class="sd-field">
+              <label for="eq-sn">Número de série (S/N)</label>
+              <input id="eq-sn" type="text" class="sd-mono" [(ngModel)]="formNumeroSerie" name="formNumeroSerie" placeholder="Ex.: SN-882910" />
+            </div>
+          </div>
+
+          <div class="sd-grid-2">
+            <div class="sd-field">
+              <label for="eq-usuario">Colaborador responsável</label>
+              <select id="eq-usuario" [(ngModel)]="formUsuarioId" name="formUsuarioId">
+                <option value="">Disponível no estoque de TI</option>
                 @for (u of usuariosOpcoes; track u.id) {
                   <option [value]="u.id">{{ u.nome }}</option>
                 }
               </select>
             </div>
 
-            <div class="modal-acoes">
-              <button type="button" class="btn btn-cancelar" (click)="fecharModal()">Cancelar</button>
-              <button type="submit" class="btn btn-enviar" [disabled]="salvando">
-                {{ salvando ? 'Salvando...' : 'Cadastrar equipamento' }}
-              </button>
+            <div class="sd-field">
+              <label for="eq-status">Situação operacional</label>
+              <select id="eq-status" [(ngModel)]="formStatus" name="formStatus">
+                @for (st of statusValidos; track st) {
+                  <option [value]="st">{{ st }}</option>
+                }
+              </select>
             </div>
-          </form>
+          </div>
         </div>
-      </div>
-    }
+
+        <div class="sd-dialog-footer">
+          <button type="button" class="sd-btn sd-btn-secondary" (click)="fecharModal()">Cancelar</button>
+          <button type="submit" class="sd-btn sd-btn-primary" [disabled]="salvando">
+            {{ salvando ? 'Salvando...' : editandoId ? 'Salvar alterações' : 'Incorporar ativo' }}
+          </button>
+        </div>
+      </form>
+    </dialog>
   </main>
 </div>

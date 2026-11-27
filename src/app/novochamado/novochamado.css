@@ -1,230 +1,214 @@
-/* Layout geral: sidebar + conteúdo lado a lado */
-.container-dash {
-    display: flex;
-    width: 100%;
-    min-height: 100vh;
+.link-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--sd-text-secondary);
+  text-decoration: none;
 }
 
-/* ---------- CONTEÚDO ---------- */
-.lado-direito-dash {
-    flex: 1;
-    background: #eaf1f8;
-    padding: 24px 28px;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
+.link-voltar:hover {
+  color: var(--sd-primary);
 }
 
-.voltar {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #0f4aa8;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    margin-bottom: 24px;
-    align-self: flex-start;
+.novo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 20px;
+  align-items: start;
 }
 
-.voltar:hover {
-    text-decoration: underline;
+.form-card {
+  padding: 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Card grande: centralizado e ocupando toda a altura disponível */
-.card-form {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 40px;
-    width: 100%;
-    max-width: 1450px;
-    margin: 0 auto;
-    flex: 1;
-}
-
-.card-form h1 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.subtitulo {
-    font-size: 13px;
-    color: #64748b;
-    margin: 4px 0 24px;
-}
-
-/* Bloco de cada campo: label em cima, input embaixo */
-.campo {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 20px;
-    flex: 1;
-    min-width: 0;
-}
-
-.campo label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #0f172a;
-}
-
-.campo input[type="text"],
-.campo textarea,
-.campo select {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 13px;
-    color: #0f172a;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.campo input::placeholder,
-.campo textarea::placeholder {
-    color: #94a3b8;
-}
-
-.campo textarea {
-    resize: vertical;
-    min-height: 110px;
-}
-
-/* Estado de foco: borda azul para indicar o campo ativo */
-.campo input:focus,
-.campo textarea:focus,
-.campo select:focus {
-    border-color: #2f6bff;
-    box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
-}
-
-/* Select com seta personalizada (remove o estilo padrão do navegador) */
-.campo select {
-    appearance: none;
-    cursor: pointer;
-    padding-right: 34px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-}
-
-/* Placeholder cinza enquanto nenhuma opção obrigatória foi escolhida */
-.campo select:invalid {
-    color: #94a3b8;
-}
-
-/* Linha com os três selects */
-.linha-campos {
-    display: flex;
-    gap: 16px;
-}
-
-/* ---------- MENSAGENS DE ERRO ---------- */
-.msg-erro {
-    background: #fee2e2;
-    color: #991b1b;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 13px;
+.form-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .erro-campo {
-    color: #b91c1c;
-    font-size: 12px;
+  font-size: 0.75rem;
+  color: var(--sd-danger);
 }
 
-/* ---------- UPLOAD ---------- */
-.upload {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px;
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
+.upload-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-surface-subtle);
+  border: 1px dashed var(--sd-border-strong);
 }
 
-.btn-arquivo {
-    flex-shrink: 0;
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #0f172a;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    cursor: pointer;
+.upload-hint {
+  font-size: 0.78125rem;
+  color: var(--sd-text-muted);
 }
 
-.btn-arquivo:hover {
-    background: #f1f5f9;
+.lista-arquivos {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
 }
 
-#nome-arquivo {
-    font-size: 12px;
-    color: #64748b;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.lista-arquivos li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--sd-surface-subtle);
+  border: 1px solid var(--sd-border);
+  font-size: 0.8125rem;
 }
 
-/* ---------- AÇÕES ---------- */
-.acoes {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 8px;
-    padding-top: 24px;
-    border-top: 1px solid #e2e8f0;
+.arq-nome {
+  flex: 1;
+  font-weight: 500;
+  color: var(--sd-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.btn {
-    padding: 10px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s ease;
+.lista-arquivos small {
+  color: var(--sd-text-muted);
+  font-size: 0.75rem;
 }
 
-.btn-cancelar {
-    color: #475569;
-    background: #fff;
-    border: 1px solid #e2e8f0;
+.arq-remover {
+  background: none;
+  border: none;
+  color: var(--sd-text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  padding: 2px;
 }
 
-.btn-cancelar:hover {
-    background: #f1f5f9;
+.arq-remover:hover {
+  color: var(--sd-danger);
 }
 
-.btn-enviar {
-    color: #fff;
-    background: #0f4aa8;
-    border: none;
+.form-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--sd-border);
 }
 
-.btn-enviar:hover {
-    background: #0c3d8c;
+/* Coluna lateral */
+.guia-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.btn-enviar:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.sla-preview-card {
+  padding: 18px 20px;
+  background: var(--sd-primary-soft);
+  border-color: var(--sd-primary-border);
 }
 
-/* ---------- RESPONSIVO ---------- */
-@media (max-width: 900px) {
-    .container-dash {
-        flex-direction: column;
-    }
+.sla-preview-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
 
-    .linha-campos {
-        flex-direction: column;
-        gap: 0;
-    }
+.sla-preview-top i {
+  font-size: 1.5rem;
+  color: var(--sd-primary);
+}
+
+.sla-preview-top span {
+  display: block;
+  font-size: 0.71875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sd-text-secondary);
+}
+
+.sla-preview-top strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--sd-text);
+}
+
+.sla-preview-card p {
+  font-size: 0.8125rem;
+  color: var(--sd-text-secondary);
+  line-height: 1.5;
+}
+
+.guia-card {
+  overflow: hidden;
+}
+
+.guia-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.guia-conteudo {
+  padding: 18px 20px;
+}
+
+.guia-conteudo h2 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--sd-text);
+  margin-bottom: 12px;
+}
+
+.guia-conteudo ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guia-conteudo li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--sd-text-secondary);
+  line-height: 1.45;
+}
+
+.guia-conteudo li i {
+  color: var(--sd-success);
+  font-size: 0.95rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.guia-conteudo code {
+  font-family: var(--sd-font-mono);
+  font-size: 0.75rem;
+  background: var(--sd-surface-muted);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+@media (max-width: 1080px) {
+  .novo-grid {
+    grid-template-columns: 1fr;
+  }
 }

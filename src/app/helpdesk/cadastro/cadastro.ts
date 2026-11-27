@@ -1,17 +1,19 @@
 import { Component } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-cadastro',
-  imports: [RouterLink, FormsModule, NgIf],
+  imports: [RouterLink, FormsModule],
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css',
 })
 export class Cadastro {
+  nome = '';
   email = '';
+  departamento = '';
+  telefone = '';
   senha = '';
   confirmarSenha = '';
   mostrarSenha = false;
@@ -20,9 +22,20 @@ export class Cadastro {
   erroMensagem = '';
   sucessoMensagem = '';
 
+  readonly departamentosSugeridos = [
+    'Administrativo',
+    'Comercial',
+    'Financeiro',
+    'Fiscal & Faturamento',
+    'Marketing',
+    'Operações',
+    'Recursos Humanos',
+    'Tecnologia da Informação',
+  ];
+
   constructor(
     private authService: AuthService,
-    private router: Router,
+    private router: Router
   ) {}
 
   alternarSenha(): void {
@@ -37,7 +50,12 @@ export class Cadastro {
     this.erroMensagem = '';
     this.sucessoMensagem = '';
 
-    if (!this.email || !this.senha || !this.confirmarSenha) {
+    if (!this.nome.trim() || this.nome.trim().length < 3) {
+      this.erroMensagem = 'Informe seu nome completo.';
+      return;
+    }
+
+    if (!this.email.trim() || !this.senha || !this.confirmarSenha) {
       this.erroMensagem = 'Preencha todos os campos obrigatórios.';
       return;
     }
@@ -54,28 +72,33 @@ export class Cadastro {
 
     this.carregando = true;
 
-    this.authService.cadastrar({
-      email: this.email,
-      senha: this.senha,
-      confirmarSenha: this.confirmarSenha,
-    }).subscribe({
-      next: (resp) => {
-        this.carregando = false;
-        this.sucessoMensagem = resp.mensagem || 'Conta criada com sucesso! Redirecionando...';
-        setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 1500);
-      },
-      error: (err) => {
-        this.carregando = false;
-        if (err.status === 409) {
-          this.erroMensagem = 'Já existe uma conta cadastrada com este e-mail.';
-        } else if (err.status === 0) {
-          this.erroMensagem = 'Servidor indisponível. Verifique se o backend está rodando.';
-        } else {
-          this.erroMensagem = err.error?.erro ?? 'Erro ao criar conta. Tente novamente.';
-        }
-      },
-    });
+    this.authService
+      .cadastrar({
+        nome: this.nome.trim(),
+        email: this.email.trim(),
+        departamento: this.departamento || 'Geral',
+        telefone: this.telefone.trim() || undefined,
+        senha: this.senha,
+        confirmarSenha: this.confirmarSenha,
+      })
+      .subscribe({
+        next: (resp) => {
+          this.carregando = false;
+          this.sucessoMensagem = resp.mensagem || 'Conta criada com sucesso! Redirecionando para o login...';
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 1400);
+        },
+        error: (err) => {
+          this.carregando = false;
+          if (err.status === 409) {
+            this.erroMensagem = 'Já existe uma conta cadastrada com este e-mail.';
+          } else if (err.status === 0) {
+            this.erroMensagem = 'Servidor indisponível. Verifique se o backend está em execução.';
+          } else {
+            this.erroMensagem = err.error?.erro ?? 'Erro ao criar conta. Tente novamente.';
+          }
+        },
+      });
   }
 }

@@ -2,17 +2,44 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../core/services/auth.service';
 import { Sidebar } from '../sidebar/sidebar';
+import {
+  classeBadgePrioridade,
+  classeBadgeStatus,
+  classeSla,
+  extrairIniciais,
+  formatarStatusChamado,
+  tempoRelativoCurto,
+  textoResumoSla,
+} from '../core/utils/ui.utils';
+
+interface SlaInfo {
+  prazoHoras: number;
+  dataLimite: string;
+  situacao: string;
+  rotulo: string;
+  horasRestantes: number | null;
+}
 
 interface Chamado {
   id: number;
   titulo: string;
+  solicitanteId?: number;
   solicitanteNome?: string;
+  solicitanteAvatar?: string | null;
+  solicitanteDepartamento?: string | null;
   prioridade: string;
   status: string;
   categoriaId?: number;
   categoriaNome?: string;
-  tecnicoNome?: string;
+  categoriaIcone?: string;
+  equipamentoPatrimonio?: string | null;
+  tecnicoId?: number | null;
+  tecnicoNome?: string | null;
+  tecnicoAvatar?: string | null;
+  totalAnexos?: number;
+  sla?: SlaInfo | null;
   dataAbertura: string;
   dataAtualizacao?: string;
 }
@@ -22,8 +49,8 @@ interface CategoriaOpcao {
   nome: string;
 }
 
-// Endereço relativo: em produção a API e a tela ficam no mesmo site;
-// no npm start, o proxy.conf.json encaminha /api para a porta 3000.
+type AbaFila = 'todos' | 'minha_fila' | 'sem_tecnico' | 'abertos' | 'aguardando' | 'sla_critico' | 'concluidos';
+
 const API_URL = '/api';
 
 @Component({
@@ -34,19 +61,30 @@ const API_URL = '/api';
 })
 export class Chamados implements OnInit {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
 
   chamados: Chamado[] = [];
   categorias: CategoriaOpcao[] = [];
   busca = '';
+  abaFila: AbaFila = 'todos';
   pagina = 1;
   porPagina = 10;
   carregando = true;
+  assumindoId: number | null = null;
   erro = '';
 
   mostrarFiltros = false;
   filtroStatus = '';
   filtroPrioridade = '';
   filtroCategoriaId = '';
+
+  readonly iniciais = extrairIniciais;
+  readonly formatarStatus = formatarStatusChamado;
+  readonly statusClasse = classeBadgeStatus;
+  readonly prioridadeClasse = classeBadgePrioridade;
+  readonly slaClasse = classeSla;
+  readonly slaTexto = textoResumoSla;
+  readonly tempoRelativo = tempoRelativoCurto;
 
   statusOpcoes = [
     'ABERTO',
@@ -61,11 +99,29 @@ export class Chamados implements OnInit {
   prioridadeOpcoes = ['Baixa', 'Média', 'Alta', 'Crítica'];
 
   ngOnInit(): void {
+    try {
+      const pref = JSON.parse(localStorage.getItem('securedesk_preferencias') || '{}');
+      const salvo = Number(pref.itensPorPagina);
+      if ([5, 10, 20].includes(salvo)) this.porPagina = salvo;
+    } catch {}
+
     this.http.get<CategoriaOpcao[]>(`${API_URL}/categorias`).subscribe({
       next: (dados) => (this.categorias = dados),
       error: () => {},
     });
     this.carregarChamados();
+  }
+
+  get ehEquipeTi(): boolean {
+    return this.authService.temPerfil('tecnico', 'admin');
+  }
+
+  get ehTecnico(): boolean {
+    return this.authService.getPerfil() === 'tecnico';
+  }
+
+  get meuId(): number | null {
+    return this.authService.getUsuario()?.id ?? null;
   }
 
   carregarChamados(): void {
@@ -84,8 +140,55 @@ export class Chamados implements OnInit {
         this.carregando = false;
       },
       error: () => {
-        this.erro = 'Não foi possível carregar os chamados.';
+        this.erro = 'Não foi possível carregar a lista de chamados.';
         this.carregando = false;
+      },
+    });
+  }
+
+  selecionarAbaFila(aba: AbaFila): void {
+    this.abaFila = aba;
+    this.pagina = 1;
+  }
+
+  contarAba(aba: AbaFila): number {
+    return this.chamados.filter((c) => this.passaNaAba(c, aba)).length;
+  }
+
+  private passaNaAba(c: Chamado, aba: AbaFila): boolean {
+    const finalizado = ['ENCERRADO', 'CANCELADO', 'RESOLVIDO'].includes(c.status);
+    switch (aba) {
+      case 'minha_fila':
+        return c.tecnicoId === this.meuId && !['ENCERRADO', 'CANCELADO'].includes(c.status);
+      case 'sem_tecnico':
+        return !c.tecnicoId && !finalizado;
+      case 'abertos':
+        return c.status === 'ABERTO';
+      case 'aguardando':
+        return c.status === 'AGUARDANDO USUÁRIO';
+      case 'sla_critico':
+        return c.sla?.situacao === 'vencido' || c.sla?.situacao === 'atencao';
+      case 'concluidos':
+        return ['RESOLVIDO', 'ENCERRADO'].includes(c.status);
+      default:
+        return true;
+    }
+  }
+
+  assumirRapido(chamado: Chamado, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    if (!this.ehTecnico || this.assumindoId) return;
+
+    this.assumindoId = chamado.id;
+    this.http.patch<Chamado>(`${API_URL}/chamados/${chamado.id}/assumir`, {}).subscribe({
+      next: (atualizado) => {
+        this.assumindoId = null;
+        this.chamados = this.chamados.map((c) => (c.id === atualizado.id ? atualizado : c));
+      },
+      error: () => {
+        this.assumindoId = null;
+        this.carregarChamados();
       },
     });
   }
@@ -102,6 +205,8 @@ export class Chamados implements OnInit {
     this.filtroStatus = '';
     this.filtroPrioridade = '';
     this.filtroCategoriaId = '';
+    this.abaFila = 'todos';
+    this.busca = '';
     this.carregarChamados();
   }
 
@@ -109,23 +214,26 @@ export class Chamados implements OnInit {
     return !!(this.filtroStatus || this.filtroPrioridade || this.filtroCategoriaId);
   }
 
-  // Lista filtrada pela busca (título, solicitante ou ID)
   get filtrados(): Chamado[] {
     const termo = this.busca.trim().toLowerCase();
-    if (!termo) return this.chamados;
-    return this.chamados.filter(
-      (c) =>
-        c.titulo?.toLowerCase().includes(termo) ||
-        c.solicitanteNome?.toLowerCase().includes(termo) ||
-        String(c.id).includes(termo)
-    );
+    return this.chamados
+      .filter((c) => this.passaNaAba(c, this.abaFila))
+      .filter((c) => {
+        if (!termo) return true;
+        return (
+          c.titulo?.toLowerCase().includes(termo) ||
+          c.solicitanteNome?.toLowerCase().includes(termo) ||
+          c.categoriaNome?.toLowerCase().includes(termo) ||
+          c.equipamentoPatrimonio?.toLowerCase().includes(termo) ||
+          String(c.id).includes(termo.replace('#', ''))
+        );
+      });
   }
 
   get totalPaginas(): number {
     return Math.max(1, Math.ceil(this.filtrados.length / this.porPagina));
   }
 
-  // Botões da paginação com reticências: 1 2 3 ... 15
   get paginas(): (number | string)[] {
     const total = this.totalPaginas;
     const p = this.pagina;
@@ -152,48 +260,7 @@ export class Chamados implements OnInit {
     if (typeof p === 'number' && p >= 1 && p <= this.totalPaginas) this.pagina = p;
   }
 
-  // Ao buscar, volta para a primeira página
   buscar(): void {
     this.pagina = 1;
-  }
-
-  private normalizar(v: string): string {
-    return (v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  }
-
-  // "EM ANÁLISE" -> "Em análise"
-  formatarStatus(v: string): string {
-    const t = (v || '').toLowerCase();
-    return t.charAt(0).toUpperCase() + t.slice(1);
-  }
-
-  prioridadeClasse(v: string): string {
-    const n = this.normalizar(v);
-    if (n.includes('crit')) return 'critica';
-    if (n.includes('alta')) return 'alta';
-    if (n.includes('media')) return 'media';
-    if (n.includes('baixa')) return 'baixa';
-    return '';
-  }
-
-  statusClasse(v: string): string {
-    const n = this.normalizar(v);
-    if (n.includes('andamento') || n.includes('atendimento')) return 'status-andamento';
-    if (n.includes('aguardando')) return 'status-aguardando';
-    if (n.includes('analise')) return 'status-analise';
-    if (n.includes('resolvid')) return 'status-resolvido';
-    if (n.includes('abert')) return 'status-aberto';
-    return 'status-encerrado';
-  }
-
-  tempoRelativo(data?: string): string {
-    if (!data) return '—';
-    const min = Math.floor((Date.now() - new Date(data).getTime()) / 60000);
-    if (min < 1) return 'Agora';
-    if (min < 60) return `Há ${min} min`;
-    const h = Math.floor(min / 60);
-    if (h < 24) return `Há ${h} ${h === 1 ? 'hora' : 'horas'}`;
-    const d = Math.floor(h / 24);
-    return `Há ${d} ${d === 1 ? 'dia' : 'dias'}`;
   }
 }
